@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "editorDeGrafos", "editorDeGrafos\editorDeGrafos.csproj", "{0D786C03-9D5D-4093-B821-F0DDB790BB43}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D786C03-9D5D-4093-B821-F0DDB790BB43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D786C03-9D5D-4093-B821-F0DDB790BB43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D786C03-9D5D-4093-B821-F0DDB790BB43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D786C03-9D5D-4093-B821-F0DDB790BB43}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4DBD6F5A-B3FE-4986-9911-0C432D394F8C}
+	EndGlobalSection
+EndGlobal
