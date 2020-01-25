@@ -94,13 +94,15 @@ namespace editorDeGrafos
                                 //here i have to ask the weight of the link.
                                 //int weight = AskForAWeight();
                                 int weight = 0;
-                                aListGraph.addUndirectedEdge(selectedNode, oneNode, weight);
+                                edgeList.Add(new Edge(selected, oneNode));
+                                aListGraph.addUndirectedEdge(selected, oneNode, weight);
                             }
                             if (selected.Status == 3)//directed link
                             {
                                 //here i have to ask the weight of the link.
                                 //int weight = AskForAWeight();
                                 int weight = 0;
+                                edgeList.Add(new Edge(selected, oneNode, true));
                                 aListGraph.addDirectedEdge(selected, oneNode, weight);
                             }
                         }
@@ -111,6 +113,7 @@ namespace editorDeGrafos
                             oneNode.COLOR = Color.Green;//change to green color to indicate the status(can move).
                             anyNodeSelected = true;
                             selected = oneNode;
+                            selected.SelectedBool = true;
                         }
                     }
                 }
@@ -431,15 +434,28 @@ namespace editorDeGrafos
             public void addNode(Node nodo)
             {
                NodeRef nodoRef = new NodeRef(-1,nodo);         //the new Node that is going to be added have no conectio, so it have a -1 value.
-               List<NodeRef> newNodeList = new List<NodeRef>();//the new list for the new node conections.             
-               int indexOfNode = 0;                            //for controling the new list adding Node indexes.
+               List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.             
+                                                                  //for controling the new list adding Node indexes.
 
-               foreach (List<NodeRef> row in graph)
-               {
-                    //newNodeList.Add(new NodeRef(-1,row[indexOfNode].NODO));//making the new list at the end of the "array".
-                    row.Add(nodoRef);//adding to each row the new Node.
-               }
-                graph.Add(newNodeList);//adding the list made.
+                if (graph.Count() <= 0)//ther's no elements
+                {
+                    newNodeRefList.Add(nodoRef);
+                    graph.Add(newNodeRefList);
+                }
+                else//At least one element.
+                {
+                    int indexOfNode = 0;
+                    foreach (List<NodeRef> row in graph)
+                    {
+                        if (row.Count > indexOfNode)
+                        {
+                            newNodeRefList.Add(new NodeRef(-1, row[indexOfNode].NODO));//making the new list at the end of the "array".
+                            row.Add(nodoRef);//adding to each row the new Node.
+                            indexOfNode++;
+                        }                        
+                    }
+                    graph.Add(newNodeRefList);//adding the list made.
+                }            
             }
 
             public void removeANode(Node nodo)//the same process ass addNode() but vice versa.
