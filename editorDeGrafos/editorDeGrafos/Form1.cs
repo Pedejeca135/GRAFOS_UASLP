@@ -173,6 +173,11 @@ namespace editorDeGrafos
                 get { return this.justSelected; }
                 set { this.justSelected = value; }
             }
+
+            public int Index
+            {
+                get { return this.index; }
+            }
             /*******************************************************
              *                Geters and seters(End)               *
              *******************************************************/
@@ -244,6 +249,16 @@ namespace editorDeGrafos
                     this.nodo = nodo;
                     this.weight = weight;
                 }
+            public Node NODO
+            {
+                get { return this.nodo; }
+            }
+            
+            public int W
+            {
+                get { return this.weight; }
+                set { this.weight = value; }
+            }
         }
 
         public class AdjacencyList
@@ -255,24 +270,37 @@ namespace editorDeGrafos
                 graph = new List<List<NodeRef>>();
             }
 
-            public void addNode(int weight, Node nodo)
+            public void addNode(Node nodo)
             {
+               NodeRef nodoRef = new NodeRef(-1,nodo);         //the new Node that is going to be added have no conectio, so it have a -1 value.
+               List<NodeRef> newNodeList = new List<NodeRef>();//the new list for the new node conections.             
+               int indexOfNode = 0;                            //for controling the new list adding Node indexes.
+
                foreach (List<NodeRef> row in graph)
                {
-                    row.Add(new NodeRef(weight,nodo));
+                    newNodeList.Add(new NodeRef(-1,row[indexOfNode++].NODO));//making the new list at the end of the "array".
+                    row.Add(nodoRef);                                        //adding to each row the new Node.
                }
             }
 
-            public void addUndirectedEdge(Node client, Node Host, int weight)
+            public void addUndirectedEdge(Node client, Node host, int weight)
             {
-
+                /*
+                foreach (List<NodeRef> row in graph)
+                {
+                    if (row[0].NODO == host){}
+                    if (row[0].NODO == client){}                  
+                }
+                */
+                graph[client.Index][host.Index].W = weight;
+                graph[host.Index][client.Index].W = weight;
             }
 
-            public void addDirectedEdge(Node client, Node Host, int weight)
+            public void addDirectedEdge(Node client, Node host, int weight)
             {
-
+                graph[client.Index][host.Index].W = weight;
             }
-        }
+        }//AdjacencyList
 
 
     }//Form.
