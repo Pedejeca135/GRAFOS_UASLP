@@ -16,6 +16,8 @@ namespace editorDeGrafos
         List<Edge> edgeList;
         Node selectedNode;
         public int generalRadius;
+        Boolean anyNodeSelected;
+        int indexCount;
 
         public Form1()
         {
@@ -24,6 +26,8 @@ namespace editorDeGrafos
             nodeList = new List<Node>();
             edgeList = new List<Edge>();
             selectedNode = new Node();
+            anyNodeSelected = false;
+            indexCount = 0;
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
@@ -38,12 +42,13 @@ namespace editorDeGrafos
                         && e.Y < oneNode.Position.Y + oneNode.Radius
                         && e.Y > oneNode.Position.Y - oneNode.Radius)
                     {
-                        if(oneNode.SelectedBool)
+                        if(oneNode.SelectedBool == true)//if the node selected was selected already in any state.
                         {
                             if(oneNode.Status == 3)// in the third state
                             {
                                oneNode.Status = 0;//change to the original state.
                                oneNode.COLOR = Color.Black;//change to black color(original state).
+                               anyNodeSelected = oneNode.SelectedBool = false;
 
                             }
                             else
@@ -60,25 +65,40 @@ namespace editorDeGrafos
                                         oneNode.Status = 2;//change to the second selected State.
                                         oneNode.COLOR = Color.Blue;//change to blue color to indicate the status(can do undirected Edges).
                                     }
-                                    else // is not selected, (Status == 0).
-                                    {
-                                        oneNode.Status = 1;//change to the first selected state.
-                                        oneNode.COLOR = Color.Green;//change to green color to indicate the status(can move).
-                                    }
+                                    
                                 }
                             }
                            
                         }
-                        else // is tryng to do a link between nodes
+                        else // is tryng to do a link between nodes or select for first time
                         {
+                            if (anyNodeSelected == true)//want to do a link between nodes.
+                            {
+                                if(selectedNode.Status == 2)//undirected link
+                                {
+                                    
+                                }
+                                if(selectedNode.Status == 3)//directed link
+                                {
 
-                        }
-                      
+                                }
+                            }
+                            else // select for the first time.                            
+                            {
+                                // is not selected, (Status == 0).
+                                oneNode.Status = 1;//change to the first selected state.
+                                oneNode.COLOR = Color.Green;//change to green color to indicate the status(can move).
+                                anyNodeSelected = true;
+                                selectedNode = oneNode;
+                            }
+                        }                      
                     }
                 }
             }
-            else
+            else // want to make a new node 
             {
+                Coordenate newNodePosition = new Coordenate(e.X, e.Y);
+                nodeList.Add(new Node(newNodePosition, generalRadius, indexCount++));
 
             }
         }
@@ -214,9 +234,44 @@ namespace editorDeGrafos
 
         }
 
-        public class adjacencyList
+        public class NodeRef
         {
+            int weight;
+            Node nodo;
 
+            public NodeRef(int weight, Node nodo)
+                {
+                    this.nodo = nodo;
+                    this.weight = weight;
+                }
+        }
+
+        public class AdjacencyList
+        {
+            List<List<NodeRef>> graph;
+
+            public AdjacencyList()
+            {
+                graph = new List<List<NodeRef>>();
+            }
+
+            public void addNode(int weight, Node nodo)
+            {
+               foreach (List<NodeRef> row in graph)
+               {
+                    row.Add(new NodeRef(weight,nodo));
+               }
+            }
+
+            public void addUndirectedEdge(Node client, Node Host, int weight)
+            {
+
+            }
+
+            public void addDirectedEdge(Node client, Node Host, int weight)
+            {
+
+            }
         }
 
 
