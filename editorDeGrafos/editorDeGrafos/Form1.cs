@@ -94,8 +94,8 @@ namespace editorDeGrafos
                     }
                     else // is tryng to do a link between nodes or select for first time
                     {
-                       // if (anyNodeSelected == true)//want to do a link between nodes.
-                       if (selected != null)
+                        // if (anyNodeSelected == true)//want to do a link between nodes.
+                        if (selected != null)
                         {
                             if (selected.Status == 2)//undirected link
                             {
@@ -130,7 +130,10 @@ namespace editorDeGrafos
                     Coordenate newNodePosition = new Coordenate(e.X, e.Y);
                     Node newNode = new Node(newNodePosition, generalRadius, indexCount++);
                     nodeList.Add(newNode);
-                    aListGraph.addNode(newNode);
+                    String estrink = "jeje";
+                    aListGraph.addNode(newNode,ref estrink);
+                    //TERMINAL
+                    terminal.Text = estrink;
                 }
 
             }//left mouse button presed.           
@@ -146,13 +149,13 @@ namespace editorDeGrafos
                        && e.Y < selected.Position.Y + selected.Radius
                        && e.Y > selected.Position.Y - selected.Radius)
                         {
-                        if (selected.Status == 1 && nodeMoved == true)
+                        if (selected.Status == 1)
                             {                             
                             /*selected.Status = 0;//change to the original state.
                             selected.COLOR = Color.Black;//change to black color(original state).
                             selected.SelectedBool = anyNodeSelected = false;
                             selected = null;*/
-                        }
+                          }
                             else
                             {
                                 if(selected.Status == 2)//make a own link
@@ -217,9 +220,10 @@ namespace editorDeGrafos
         {
             if (e.KeyCode == Keys.Escape && selected != null)
             {
-                selected.Status = 0;//change to the original state.
                 selected.COLOR = Color.Black;//change to black color(original state).
+                selected.Status = 0;//change to the original state.               
                 selected.SelectedBool = anyNodeSelected = false;
+                selected = new Node();
                 selected = null;
                 terminal.Text += "esc";
             }
@@ -342,7 +346,10 @@ namespace editorDeGrafos
             /*******************************************************
              *                Methods(Begin)                       *
              *******************************************************/
-           
+            public String ToString()
+            {
+                return " -x = "+this.position.X + " -y = " + this.Position.Y + " -index = " +  this.Index;
+            }
 
         }//Node class.
 
@@ -443,6 +450,8 @@ namespace editorDeGrafos
                 get { return this.weight; }
                 set { this.weight = value; }
             }
+
+          
         }//NodeRef.
 
         public class AdjacencyList
@@ -454,20 +463,28 @@ namespace editorDeGrafos
                 graph = new List<List<NodeRef>>();
             }
 
-            public void addNode(Node nodo)
+          
+
+
+
+            public void addNode(Node nodo, ref String terminal)
             {
                NodeRef nodoRef = new NodeRef(-1,nodo);            //the new Node that is going to be added have no conection, so it have a -1 value.
                List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.             
                                                                   //for controling the new list adding Node indexes.
-
-                if (graph.Count() <= 0)//ther's no elements
+                if (graph.Count() == 0)//ther's no elements
                 {
+
                     newNodeRefList.Add(nodoRef);
                     graph.Add(newNodeRefList);
-                   
+                    terminal = "no hay elementos" + graph.Count();
+                    terminal = "hay elementos" + graph.Count() + graph[0][0].NODO.ToString();
+
+
                 }
                 else//At least one element.
                 {
+                   
                     int indexOfNode = 0;
                     foreach (List<NodeRef> row in graph)
                     {
@@ -479,6 +496,7 @@ namespace editorDeGrafos
                         }                        
                     }
                     graph.Add(newNodeRefList);//adding the list made.
+                    terminal = "hay elementos" + graph.Count() + graph[0][0].NODO.ToString();
                 }            
             }
 
@@ -508,6 +526,8 @@ namespace editorDeGrafos
             {
                 graph[client.Index][server.Index].W = weight;
             }
+
+
         }//AdjacencyList.
 
      
