@@ -213,6 +213,17 @@ namespace editorDeGrafos
 
             nodeMoved = true;
         }
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape && selected != null)
+            {
+                selected.Status = 0;//change to the original state.
+                selected.COLOR = Color.Black;//change to black color(original state).
+                selected.SelectedBool = anyNodeSelected = false;
+                selected = null;
+                terminal.Text += "esc";
+            }
+        }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
@@ -222,7 +233,7 @@ namespace editorDeGrafos
             Rectangle rectangle;
             foreach (Edge edge in edgeList)
             {
-                graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.X);
+                graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
             }
 
             foreach (Node node in nodeList)
@@ -248,7 +259,7 @@ namespace editorDeGrafos
 
             foreach (Edge edge in edgeList)
             {
-                if (edge.Client != node && edge.Host != node)
+                if (edge.Client != node && edge.Server != node)
                 {
                     newEdges.Add(edge);
                 }
@@ -338,7 +349,7 @@ namespace editorDeGrafos
         public class Edge
         {
             Node client = null;
-            Node host = null;
+            Node server = null;
             Boolean directed;
 
             Coordenate a;
@@ -346,39 +357,39 @@ namespace editorDeGrafos
             int weight;
             int direction;
 
-            public Edge(Node client,Node host)
+            public Edge(Node client,Node server)
             {
                 this.client = client;
-                this.host = host;
+                this.server = server;
                 directed = false;
             }
 
-            public Edge(Node client, Node host, Boolean directedBool )
+            public Edge(Node client, Node server, Boolean directedBool )
             {
                 this.client = client;
-                this.host = host;
+                this.server = server;
                 directed = directedBool;
             }
 
             public Coordenate A
             {
-                get { return this.a; }
-                set { this.a = value; }
+                get { return this.client.Position; }
+                //set { this.a = value; }
             }
 
             public Coordenate B
             {
-                get { return this.b; }
-                set { this.b = value; }
+                get { return this.server.Position; }
+                //set { this.b = value; }
             }
 
             public Node Client
             {
                 get { return this.client; }
             }
-            public Node Host
+            public Node Server
             {
-                get { return this.host; }
+                get { return this.server; }
             }
 
         }//Edge.
@@ -480,24 +491,25 @@ namespace editorDeGrafos
                 }
             }
 
-            public void addUndirectedEdge(Node client, Node host, int weight)
+            public void addUndirectedEdge(Node client, Node server, int weight)
             {
                 /*
                 foreach (List<NodeRef> row in graph)
                 {
-                    if (row[0].NODO == host){}
-                    if (row[0].NODO == client){}                  
+                    if (row.NODO == server){}
+                    if (row.NODO == client){}                  
                 }
                 */
-                graph[client.Index][host.Index].W = weight;
-                graph[host.Index][client.Index].W = weight;
+                graph[client.Index][server.Index].W = weight;
+                graph[server.Index][client.Index].W = weight;
             }
 
-            public void addDirectedEdge(Node client, Node host, int weight)
+            public void addDirectedEdge(Node client, Node server, int weight)
             {
-                graph[client.Index][host.Index].W = weight;
+                graph[client.Index][server.Index].W = weight;
             }
         }//AdjacencyList.
 
+     
     }//Form.
 }//namespace.
