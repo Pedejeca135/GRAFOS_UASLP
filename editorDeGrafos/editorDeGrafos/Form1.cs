@@ -23,7 +23,8 @@ namespace editorDeGrafos
         Boolean anyNodeSelected;
         int indexCount;
         AdjacencyList aListGraph;
-        Boolean mousePressed; 
+        Boolean mousePressed;
+        Boolean nodeMoved = false;
 
         public Form1()
         {
@@ -36,6 +37,9 @@ namespace editorDeGrafos
             indexCount = 0;
             mousePressed = false;
             aListGraph = new AdjacencyList();
+            //TERMINAL
+            terminal.Text = "0";
+            
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
@@ -45,6 +49,7 @@ namespace editorDeGrafos
             if (e.Button == System.Windows.Forms.MouseButtons.Left)//if mouse button pressed is left.
             {
                 Node oneNode = null;
+                //Node oneNode = new Node();
 
                 foreach (Node onNode in nodeList)
                 {
@@ -59,12 +64,14 @@ namespace editorDeGrafos
                 if (oneNode != null)//one Node was clicked
                 {
                     if (oneNode.SelectedBool == true)//if the node selected was selected already in any state.
+                    //if(oneNode == selected)
                     {
                         if (oneNode.Status == 3)// in the third state
                         {
                             oneNode.Status = 0;//change to the original state.
                             oneNode.COLOR = Color.Black;//change to black color(original state).
-                            anyNodeSelected = oneNode.SelectedBool = false;
+                            oneNode.SelectedBool = anyNodeSelected = false;
+                            selected = null;
                         }
                         else
                         {
@@ -87,7 +94,8 @@ namespace editorDeGrafos
                     }
                     else // is tryng to do a link between nodes or select for first time
                     {
-                        if (anyNodeSelected == true)//want to do a link between nodes.
+                       // if (anyNodeSelected == true)//want to do a link between nodes.
+                       if (selected != null)
                         {
                             if (selected.Status == 2)//undirected link
                             {
@@ -111,9 +119,9 @@ namespace editorDeGrafos
                             // is not selected, (Status == 0).
                             oneNode.Status = 1;//change to the first selected state.
                             oneNode.COLOR = Color.Green;//change to green color to indicate the status(can move).
+                            oneNode.SelectedBool = true;
                             anyNodeSelected = true;
                             selected = oneNode;
-                            selected.SelectedBool = true;
                         }
                     }
                 }
@@ -128,21 +136,23 @@ namespace editorDeGrafos
             }//left mouse button presed.           
             else
             {
-                if (e.Button == System.Windows.Forms.MouseButtons.Right)//right mouse button clicked.
-                {
-                    if (anyNodeSelected == true)
+                //if (e.Button == System.Windows.Forms.MouseButtons.Right)//right mouse button clicked.
+               // {
+                    //if (anyNodeSelected == true)
+                    if(selected != null)
                     {
                         if (e.X > selected.Position.X - selected.Radius //for conditions in order to determine wheter or not , a click hit the specific node
                        && e.X < selected.Position.X + selected.Radius
                        && e.Y < selected.Position.Y + selected.Radius
                        && e.Y > selected.Position.Y - selected.Radius)
                         {
-                            if(selected.Status == 1)
-                            {
-                                selected.Status = 0;
-                                selected = null;
-                                anyNodeSelected = false;
-                            }
+                        if (selected.Status == 1 && nodeMoved == true)
+                            {                             
+                            /*selected.Status = 0;//change to the original state.
+                            selected.COLOR = Color.Black;//change to black color(original state).
+                            selected.SelectedBool = anyNodeSelected = false;
+                            selected = null;*/
+                        }
                             else
                             {
                                 if(selected.Status == 2)//make a own link
@@ -163,8 +173,8 @@ namespace editorDeGrafos
                             
                         }
                     }
-                }
-            }
+                //}
+            } 
 
             Invalidate();
         }//Form_MouseDown().
@@ -194,12 +204,14 @@ namespace editorDeGrafos
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (mousePressed == true && e.Button == MouseButtons.Right && selectedNode != null && selectedNode.Status == 1)
+            if (mousePressed == true && e.Button == MouseButtons.Right && selected != null && selected.Status == 1)
             {
-                selectedNode.Position.X = e.X;
-                selectedNode.Position.Y = e.Y;
+                selected.Position.X = e.X;
+                selected.Position.Y = e.Y;
                 Invalidate();
             }
+
+            nodeMoved = true;
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -391,7 +403,7 @@ namespace editorDeGrafos
             public int Y
             {
                 get { return this.y; }
-                set { this.x = value; }
+                set { this.y = value; }
             }
         }//Coordenate.
 
@@ -433,7 +445,7 @@ namespace editorDeGrafos
 
             public void addNode(Node nodo)
             {
-               NodeRef nodoRef = new NodeRef(-1,nodo);         //the new Node that is going to be added have no conectio, so it have a -1 value.
+               NodeRef nodoRef = new NodeRef(-1,nodo);            //the new Node that is going to be added have no conection, so it have a -1 value.
                List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.             
                                                                   //for controling the new list adding Node indexes.
 
@@ -441,6 +453,7 @@ namespace editorDeGrafos
                 {
                     newNodeRefList.Add(nodoRef);
                     graph.Add(newNodeRefList);
+                   
                 }
                 else//At least one element.
                 {
@@ -486,7 +499,5 @@ namespace editorDeGrafos
             }
         }//AdjacencyList.
 
-
-       
     }//Form.
 }//namespace.
