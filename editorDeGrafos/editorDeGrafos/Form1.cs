@@ -249,6 +249,7 @@ namespace editorDeGrafos
                 graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
             }
 
+            /*
             foreach (Node node in nodeList)
             {
                 rectangle = new Rectangle(node.Position.X - node.Radius, node.Position.Y - node.Radius, node.Radius * 2, node.Radius * 2);
@@ -257,7 +258,28 @@ namespace editorDeGrafos
                 graphics.DrawEllipse(pen, node.Position.X - node.Radius, node.Position.Y - node.Radius, node.Radius * 2, node.Radius * 2);
 
             }
+            */
+            for (int i = 0; i < aListGraph.GRAPH.Count; i++)
+            {
+                NodeRef nod = aListGraph.GRAPH[i][0];
+                rectangle = new Rectangle(nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
+                graphics.FillEllipse(brush, rectangle);
+                pen = new Pen(nod.NODO.COLOR, 5);
+                graphics.DrawEllipse(pen, nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
 
+
+            }
+
+            /*
+            foreach (NodeRef node in aListGraph.GRAPH[n][0])
+            {
+                rectangle = new Rectangle(node.NODO.Position.X - node.NODO.Radius, node.NODO.Position.Y - node.NODO.Radius, node.NODO.Radius * 2, node.NODO.Radius * 2);
+                graphics.FillEllipse(brush, rectangle);
+                pen = new Pen(node.NODO.COLOR, 5);
+                graphics.DrawEllipse(pen, node.NODO.Position.X - node.NODO.Radius, node.NODO.Position.Y - node.NODO.Radius, node.NODO.Radius * 2, node.NODO.Radius * 2);
+
+            }
+            */
         }
 
         private int AskForAWeight()
@@ -485,6 +507,11 @@ namespace editorDeGrafos
                 get { return this.graph[0].Count(); }
             }
 
+            public List<List<NodeRef>> GRAPH
+            {
+                get { return this.graph; }
+            }
+
             public void addNode(Node nodo, ref String terminal)
             {
                 NodeRef nodoRef = new NodeRef(-1, nodo);            //the new Node that is going to be added have no conection, so it have a -1 value.
@@ -492,18 +519,16 @@ namespace editorDeGrafos
                 terminal = "no hay elementos" + graph.Count();                                         //for controling the new list adding Node indexes.
                 if (graph.Count() == 0)//ther's no elements
                 {
-
                     newNodeRefList.Add(nodoRef);
                     graph.Add(newNodeRefList);
                     // terminal = "no hay elementos" + graph.Count();
                     //terminal = "hay elementos" + graph.Count() + graph[0][0].NODO.ToString();
-
-
                 }
                 else//At least one element.
                 {
-
+                    /*
                     int indexOfNode = 0;
+
                     foreach (List<NodeRef> row in graph)
                     {
                         if (row.Count > indexOfNode)
@@ -513,6 +538,18 @@ namespace editorDeGrafos
                             indexOfNode++;
                         }
                     }
+                    */
+                
+
+                    foreach (List<NodeRef> row in graph)
+                    {
+                        if(row.Count > 0)
+                        {
+                            newNodeRefList.Add(new NodeRef(-1,row[0].NODO)); //making the new list at the end of the "array".
+                        }
+                        row.Add(nodoRef); //adding to each row the new Node.
+                    }
+
                     graph.Add(newNodeRefList);//adding the list made.
                                               // terminal = "hay elementos" + graph.Count() + graph[0][0].NODO.ToString();
                 }
@@ -520,20 +557,7 @@ namespace editorDeGrafos
 
             public void removeANode(Node nodo)//almost the same process as addNode() but vice versa.
             {
-                int nodeIndexToEiminate = nodo.Index;
-
-                foreach (List<NodeRef> row in graph)
-                {
-                    if (nodo.Index < row.Count)// ESTO NO DEBERIA PORQUE ESTAR AQUI(por eso esta en español). pero gracias a esto funciona :(.
-                    {
-                        row.RemoveAt(nodo.Index);//removing the NodeRef of all the list of nodes.
-                    }
-                }
-
-                if (nodo.Index < graph.Count())
-                {
-                    graph.RemoveAt(nodo.Index);//remove the list of adjacency of the node.
-                }
+                int nodeIndexToEiminate = nodo.Index;                
 
                 foreach (List<NodeRef> row in graph)// for changing the inner index of each node;
                 {
@@ -545,7 +569,22 @@ namespace editorDeGrafos
                         }
                     }
                 }
-            }
+
+
+                foreach (List<NodeRef> row in graph)
+                {
+                    if (row.Count > nodeIndexToEiminate)// ESTO NO DEBERIA PORQUE ESTAR AQUI(por eso esta en español) :(.
+                    {
+                        row.RemoveAt(nodeIndexToEiminate);//removing the NodeRef of all the list of nodes.
+                    }
+                }
+
+                if (nodo.Index < graph.Count())
+                {
+                    graph.RemoveAt(nodeIndexToEiminate);//remove the list of adjacency of the node.
+                }
+
+            }//remove a node.
 
             public void addUndirectedEdge(Node client, Node server, int weight, ref String cadena)
             {
