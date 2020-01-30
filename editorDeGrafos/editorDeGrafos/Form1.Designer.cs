@@ -58,7 +58,7 @@
             this.helpToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1064, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1484, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -134,22 +134,22 @@
             this.terminal.Location = new System.Drawing.Point(755, 12);
             this.terminal.Multiline = true;
             this.terminal.Name = "terminal";
-            this.terminal.Size = new System.Drawing.Size(272, 117);
+            this.terminal.Size = new System.Drawing.Size(617, 117);
             this.terminal.TabIndex = 1;
             // 
             // matrixTB
             // 
-            this.matrixTB.Location = new System.Drawing.Point(755, 158);
+            this.matrixTB.Location = new System.Drawing.Point(755, 133);
             this.matrixTB.Multiline = true;
             this.matrixTB.Name = "matrixTB";
-            this.matrixTB.Size = new System.Drawing.Size(272, 398);
+            this.matrixTB.Size = new System.Drawing.Size(617, 716);
             this.matrixTB.TabIndex = 2;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1064, 761);
+            this.ClientSize = new System.Drawing.Size(1484, 861);
             this.Controls.Add(this.matrixTB);
             this.Controls.Add(this.terminal);
             this.Controls.Add(this.toolStrip1);

@@ -174,7 +174,7 @@ namespace editorDeGrafos
                             else//eliminate the node
                             {
                                 eliminateNexetEdges(selected);
-                                aListGraph.removeANode(selected);
+                                aListGraph.removeNode(selected);
                                 nodeList.Remove(selected);
                                 selected = null;
                                 anyNodeSelected = false;
@@ -538,18 +538,12 @@ namespace editorDeGrafos
                                               // terminal = "hay elementos" + graph.Count() + graph[0][0].NODO.ToString();
                     foreach (List<NodeRef> row in graph)
                     {
-                        /*
-                        if(row.Count > 0)
-                        {
-                            newNodeRefList.Add(new NodeRef(-1,row[0].NODO)); //making the new list at the end of the "array".
-                        }
-                        */
                         row.Add(new NodeRef(-1, nodo)); //adding to each row the new Node.
                     }
                 }
             }
 
-            public void removeANode(Node nodo)//almost the same process as addNode() but vice versa.
+            public void removeNode(Node nodo)//almost the same process as addNode() but vice versa.
             {
                 int nodeIndexToEiminate = nodo.Index;                
 
@@ -564,7 +558,6 @@ namespace editorDeGrafos
                     }
                 }
 
-
                 foreach (List<NodeRef> row in graph)
                 {
                     if (row.Count > nodeIndexToEiminate)// ESTO NO DEBERIA PORQUE ESTAR AQUI(por eso esta en español) :(.
@@ -573,11 +566,10 @@ namespace editorDeGrafos
                     }
                 }
 
-                if (nodo.Index < graph.Count())
+                if (nodeIndexToEiminate < graph.Count())
                 {
                     graph.RemoveAt(nodeIndexToEiminate);//remove the list of adjacency of the node.
                 }
-
             }//remove a node.
 
             public void addUndirectedEdge(Node client, Node server, int weight, ref String cadena)
@@ -612,16 +604,12 @@ namespace editorDeGrafos
                 {
                     foreach (NodeRef nodo in row)
                     {
-                        resString += "  " + nodo.W ;
+                        resString += "\t" + nodo.W ;
                     }
-                    resString += "          ";
+                    resString += System.Environment.NewLine;
                 }
-
                 return resString;
             }
-
-
-
         }//AdjacencyList.
 
         
