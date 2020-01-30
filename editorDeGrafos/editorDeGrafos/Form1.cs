@@ -27,7 +27,7 @@ namespace editorDeGrafos
         int indexCount;
         AdjacencyList aListGraph;
         Boolean mousePressed;
-        Boolean nodeMoved = false;
+        //Boolean nodeMoved = false;
 
         public Form1()
         {
@@ -187,6 +187,7 @@ namespace editorDeGrafos
                 //}
             }
 
+            matrixTB.Text = aListGraph.ToString();
             Invalidate();
         }//Form_MouseDown().
 
@@ -222,7 +223,7 @@ namespace editorDeGrafos
                 Invalidate();
             }
 
-            nodeMoved = true;
+            //nodeMoved = true;
         }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -261,7 +262,7 @@ namespace editorDeGrafos
             */
             for (int i = 0; i < aListGraph.GRAPH.Count; i++)
             {
-                NodeRef nod = aListGraph.GRAPH[i][0];
+                NodeRef nod = aListGraph.GRAPH[0][i];
                 rectangle = new Rectangle(nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
                 graphics.FillEllipse(brush, rectangle);
                 pen = new Pen(nod.NODO.COLOR, 5);
@@ -302,6 +303,8 @@ namespace editorDeGrafos
             }
             edgeList = newEdges;
         }
+
+        
 
         /*************************************************************************************************************************
          * 
@@ -379,7 +382,8 @@ namespace editorDeGrafos
             /*******************************************************
              *                Methods(Begin)                       *
              *******************************************************/
-            public String ToString()
+
+            public override String ToString()
             {
                 return " -x = " + this.position.X + " -y = " + this.Position.Y + " -index = " + this.Index;
             }
@@ -392,10 +396,10 @@ namespace editorDeGrafos
             Node server = null;
             Boolean directed;
 
-            Coordenate a;
-            Coordenate b;
-            int weight;
-            int direction;
+            //Coordenate a;
+            //Coordenate b;
+            //int weight;
+            //int direction;
 
             public Edge(Node client, Node server)
             {
@@ -514,44 +518,34 @@ namespace editorDeGrafos
 
             public void addNode(Node nodo, ref String terminal)
             {
-                NodeRef nodoRef = new NodeRef(-1, nodo);            //the new Node that is going to be added have no conection, so it have a -1 value.
+                
                 List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.             
                 terminal = "no hay elementos" + graph.Count();                                         //for controling the new list adding Node indexes.
                 if (graph.Count() == 0)//ther's no elements
                 {
+                    NodeRef nodoRef = new NodeRef(-1, nodo);            //the new Node that is going to be added have no conection, so it have a -1 value.
                     newNodeRefList.Add(nodoRef);
-                    graph.Add(newNodeRefList);
-                    // terminal = "no hay elementos" + graph.Count();
-                    //terminal = "hay elementos" + graph.Count() + graph[0][0].NODO.ToString();
+                    graph.Add(newNodeRefList);                
                 }
                 else//At least one element.
-                {
-                    /*
-                    int indexOfNode = 0;
-
-                    foreach (List<NodeRef> row in graph)
+                {   
+                    for(int i = 0; i < graph.Count; i++)
                     {
-                        if (row.Count > indexOfNode)
-                        {
-                            newNodeRefList.Add(new NodeRef(-1, row[indexOfNode].NODO));//making the new list at the end of the "array".
-                            row.Add(nodoRef);//adding to each row the new Node.
-                            indexOfNode++;
-                        }
-                    }
-                    */
-                
-
-                    foreach (List<NodeRef> row in graph)
-                    {
-                        if(row.Count > 0)
-                        {
-                            newNodeRefList.Add(new NodeRef(-1,row[0].NODO)); //making the new list at the end of the "array".
-                        }
-                        row.Add(nodoRef); //adding to each row the new Node.
+                        newNodeRefList.Add(new NodeRef(-1, graph[i][i].NODO)); //making the new list at the end of the "array".
                     }
 
                     graph.Add(newNodeRefList);//adding the list made.
                                               // terminal = "hay elementos" + graph.Count() + graph[0][0].NODO.ToString();
+                    foreach (List<NodeRef> row in graph)
+                    {
+                        /*
+                        if(row.Count > 0)
+                        {
+                            newNodeRefList.Add(new NodeRef(-1,row[0].NODO)); //making the new list at the end of the "array".
+                        }
+                        */
+                        row.Add(new NodeRef(-1, nodo)); //adding to each row the new Node.
+                    }
                 }
             }
 
@@ -588,24 +582,16 @@ namespace editorDeGrafos
 
             public void addUndirectedEdge(Node client, Node server, int weight, ref String cadena)
             {
-                /*
-                foreach (List<NodeRef> row in graph)
+                if(graph.Count > client.Index && graph.Count > server.Index)
                 {
-                    if (row.NODO == server){}
-                    if (row.NODO == client){}                  
-                }
-                */
-                cadena = " index de cliente " + client.Index + " index de servidor " + server.Index;
-                //graph[client.Index][server.Index].W = weight;
-                // graph[server.Index][client.Index].W = weight;
-
-                /*
-                if(graph.Count > 0)
-                for (int i ; i < graph.Count(); i++)
+                    if (graph[client.Index].Count > server.Index && graph[server.Index].Count > client.Index)
                     {
-                        for
-                    }
-                    */
+                        graph[client.Index][server.Index].W = weight;
+                        graph[server.Index][client.Index].W = weight;
+                    }                       
+                }
+               
+                cadena = " index de cliente " + client.Index + " index de servidor " + server.Index;
             }
 
             public void addDirectedEdge(Node client, Node server, int weight)
@@ -617,6 +603,24 @@ namespace editorDeGrafos
 
                 }
             }
+
+
+            public override String ToString()
+            {
+                String resString = "";
+                foreach (List<NodeRef> row in graph)
+                {
+                    foreach (NodeRef nodo in row)
+                    {
+                        resString += "  " + nodo.W ;
+                    }
+                    resString += "          ";
+                }
+
+                return resString;
+            }
+
+
 
         }//AdjacencyList.
 

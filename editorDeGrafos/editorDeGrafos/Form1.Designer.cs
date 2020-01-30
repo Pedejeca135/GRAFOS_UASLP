@@ -40,6 +40,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.terminal = new System.Windows.Forms.TextBox();
+            this.matrixTB = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,7 +58,7 @@
             this.helpToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(800, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1064, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -130,23 +131,31 @@
             // 
             // terminal
             // 
-            this.terminal.Location = new System.Drawing.Point(400, 228);
+            this.terminal.Location = new System.Drawing.Point(755, 12);
             this.terminal.Multiline = true;
             this.terminal.Name = "terminal";
             this.terminal.Size = new System.Drawing.Size(272, 117);
             this.terminal.TabIndex = 1;
             // 
+            // matrixTB
+            // 
+            this.matrixTB.Location = new System.Drawing.Point(755, 158);
+            this.matrixTB.Multiline = true;
+            this.matrixTB.Name = "matrixTB";
+            this.matrixTB.Size = new System.Drawing.Size(272, 398);
+            this.matrixTB.TabIndex = 2;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1064, 761);
+            this.Controls.Add(this.matrixTB);
             this.Controls.Add(this.terminal);
             this.Controls.Add(this.toolStrip1);
             this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "GraphEditor";
-            //this.Load += new System.EventHandler(this.Form1_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
@@ -172,6 +181,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton helpToolStripButton;
         private System.Windows.Forms.TextBox terminal;
+        private System.Windows.Forms.TextBox matrixTB;
     }
 }
 
