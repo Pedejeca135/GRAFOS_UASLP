@@ -28,6 +28,7 @@ namespace editorDeGrafos
         AdjacencyList aListGraph;
         Boolean mousePressed;
         List<int> IDList;
+        List<Edge> diEdgeList;
 
         Boolean allMoving = false;
         Boolean allDeleting = false;
@@ -42,6 +43,7 @@ namespace editorDeGrafos
             generalRadius = 30; //Here you decide the size of the nodes
             nodeList = new List<Node>();
             edgeList = new List<Edge>();
+            diEdgeList = new List<Edge>();
             selectedNode = new Node();
             anyNodeSelected = false;
             indexCount = 0;
@@ -52,7 +54,6 @@ namespace editorDeGrafos
 
             //TERMINAL
             terminal.Text = "0";
-
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
@@ -120,7 +121,6 @@ namespace editorDeGrafos
 
                                 }
                             }
-
                         }
                         else // is tryng to do a link between nodes or select for first time
                         {
@@ -142,7 +142,7 @@ namespace editorDeGrafos
                                     //here i have to ask the weight of the link.
                                     //int weight = AskForAWeight();
                                     int weight = 0;
-                                    edgeList.Add(new Edge(selected, oneNode, true));
+                                    diEdgeList.Add(new Edge(selected, oneNode, true));
                                     aListGraph.addDirectedEdge(selected, oneNode, weight);
                                 }
                             }
@@ -207,7 +207,6 @@ namespace editorDeGrafos
         private void Move_Click(object sender, EventArgs e)
         {
             keyA_OR_MoveClick();
-
         }
 
         private void Remove_Click(object sender, EventArgs e)
@@ -275,8 +274,6 @@ namespace editorDeGrafos
             Invalidate();
         }
 
-
-
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -305,9 +302,9 @@ namespace editorDeGrafos
                 selectedJustFor.Position.Y = e.Y;
                 Invalidate();
             }
-
             //nodeMoved = true;
         }
+
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyCode == Keys.Escape || e.KeyCode == Keys.S) && selected != null)
@@ -330,10 +327,7 @@ namespace editorDeGrafos
                 keyX_OR_RemoveClick();
             }
             InvalidatePlus();
-
-        }
-
-      
+        }      
 
         public void InvalidatePlus()
         {
@@ -359,6 +353,18 @@ namespace editorDeGrafos
             foreach (Edge edge in edgeList)
             {
                 graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
+            }
+
+            foreach (Edge edge in diEdgeList)
+            {
+                
+                graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
+                int difFromCenterToPin = (int)Math.Pow((generalRadius / 2.0), 0.5);
+                Coordenate pinOfEdge = new Coordenate(edge.B.X-difFromCenterToPin, edge.B.Y-difFromCenterToPin);
+
+
+                graphics.DrawLine(pen, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X-generalRadius/2 , pinOfEdge.Y);
+                graphics.DrawLine(pen, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X, pinOfEdge.Y - generalRadius / 2);
             }
 
             /*
@@ -402,12 +408,24 @@ namespace editorDeGrafos
                 sw = new StreamWriter(saveFileDialog.FileName);
                 MessageBox.Show(saveFileDialog.FileName);
             }
-            foreach (Node node in nodeList)
+            /*
+             * atributes of a node that can be unique
+            Coordenate position; 
+            int radiusLenght; 
+            int index;
+            int uniqueID;
+            */
+            foreach (Node node in nodeList)//all about the node
             {
-                sw.WriteLine(node.Position.X + "," + node.Position.Y);
+                sw.WriteLine(node.ID + "," + node.Index + "," + node.Position.X + "," + node.Position.Y + "," + node.Radius);
             }
-            sw.WriteLine("Lines");
+            sw.WriteLine("Edges");
             foreach (Edge edge in edgeList)
+            {
+                sw.WriteLine(edge.A.X + "," + edge.A.Y + "," + edge.B.X + "," + edge.B.Y);
+            }
+            sw.WriteLine("D_Edges");
+            foreach (Edge edge in diEdgeList)
             {
                 sw.WriteLine(edge.A.X + "," + edge.A.Y + "," + edge.B.X + "," + edge.B.Y);
             }
@@ -426,7 +444,7 @@ namespace editorDeGrafos
             {
                 sr = new StreamReader(openFileDialog.FileName);
                 auxiliar = sr.ReadLine().Split(',');
-                while (sr != null && !sr.EndOfStream && auxiliar[0] != "Lines")
+                while (sr != null && !sr.EndOfStream && auxiliar[0] != "Edges")
                 {
                     int x = int.Parse(auxiliar[0]);
                     int y = int.Parse(auxiliar[1]);
@@ -434,7 +452,7 @@ namespace editorDeGrafos
                     nodeList.Add(nodo);
                     auxiliar = sr.ReadLine().Split(',');
                 }
-                while (sr != null && !sr.EndOfStream)
+                while (sr != null && !sr.EndOfStream && auxiliar[0] != "D_Edges")
                 {
                     Node server = new Node();
                     Node client = new Node();
@@ -460,6 +478,33 @@ namespace editorDeGrafos
                     }
                     Edge edge = new Edge(server, client);
                     edgeList.Add(edge);
+                }
+                while (sr != null && !sr.EndOfStream )
+                {
+                    Node server = new Node();
+                    Node client = new Node();
+                    auxiliar = sr.ReadLine().Split(',');
+                    int nodo1X = int.Parse(auxiliar[0]);
+                    int nodo1Y = int.Parse(auxiliar[1]);
+                    int nodo2X = int.Parse(auxiliar[2]);
+                    int nodo2Y = int.Parse(auxiliar[3]);
+
+                    foreach (Node node in nodeList)
+                    {
+                        if (node.Position.X == nodo1X && node.Position.Y == nodo1Y)//it just can be one of all
+                        {
+                            server = node;
+                        }
+                        else
+                        {
+                            if (node.Position.X == nodo2X && node.Position.Y == nodo2Y)//it also can be just one of all
+                            {
+                                client = node;
+                            }
+                        }
+                    }
+                    Edge edge = new Edge(server, client);
+                    diEdgeList.Add(edge);
                 }
                 sr.Close();
             }
@@ -556,8 +601,6 @@ namespace editorDeGrafos
             InvalidatePlus();
         }      
 
-
-
         public Node findNodeClicked(Coordenate cor)
         {
             Node resNode = null;
@@ -642,9 +685,7 @@ namespace editorDeGrafos
                 }                
             }
             while (different == false);
-
-            return res;
-            
+            return res;            
         }
 
         private int AskForAWeight()
