@@ -30,14 +30,13 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.Save = new System.Windows.Forms.ToolStripLabel();
-            this.Load = new System.Windows.Forms.ToolStripLabel();
-            this.New = new System.Windows.Forms.ToolStripLabel();
             this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.openToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.saveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.Move = new System.Windows.Forms.ToolStripLabel();
+            this.Remove = new System.Windows.Forms.ToolStripLabel();
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.terminal = new System.Windows.Forms.TextBox();
             this.matrixTB = new System.Windows.Forms.TextBox();
@@ -47,41 +46,19 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.Save,
-            this.Load,
-            this.New,
             this.newToolStripButton,
             this.openToolStripButton,
             this.saveToolStripButton,
             this.toolStripSeparator,
             this.toolStripSeparator1,
+            this.Move,
+            this.Remove,
             this.helpToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1484, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // Save
-            // 
-            this.Save.Name = "Save";
-            this.Save.Size = new System.Drawing.Size(31, 22);
-            this.Save.Text = "Save";
-            this.Save.Click += new System.EventHandler(this.Save_Click);
-            // 
-            // Load
-            // 
-            this.Load.Name = "Load";
-            this.Load.Size = new System.Drawing.Size(33, 22);
-            this.Load.Text = "Load";
-            this.Load.Click += new System.EventHandler(this.Load_Click);
-            // 
-            // New
-            // 
-            this.New.Name = "New";
-            this.New.Size = new System.Drawing.Size(31, 22);
-            this.New.Text = "New";
-            this.New.Click += new System.EventHandler(this.New_Click);
             // 
             // newToolStripButton
             // 
@@ -119,6 +96,20 @@
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // Move
+            // 
+            this.Move.Name = "Move";
+            this.Move.Size = new System.Drawing.Size(37, 22);
+            this.Move.Text = "Move";
+            this.Move.Click += new System.EventHandler(this.Move_Click);
+            // 
+            // Remove
+            // 
+            this.Remove.Name = "Remove";
+            this.Remove.Size = new System.Drawing.Size(50, 22);
+            this.Remove.Text = "Remove";
+            this.Remove.Click += new System.EventHandler(this.Remove_Click);
             // 
             // helpToolStripButton
             // 
@@ -171,9 +162,6 @@
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripLabel Save;
-        private System.Windows.Forms.ToolStripLabel Load;
-        private System.Windows.Forms.ToolStripLabel New;
         private System.Windows.Forms.ToolStripButton newToolStripButton;
         private System.Windows.Forms.ToolStripButton openToolStripButton;
         private System.Windows.Forms.ToolStripButton saveToolStripButton;
@@ -182,6 +170,8 @@
         private System.Windows.Forms.ToolStripButton helpToolStripButton;
         private System.Windows.Forms.TextBox terminal;
         private System.Windows.Forms.TextBox matrixTB;
+        private System.Windows.Forms.ToolStripLabel Move;
+        private System.Windows.Forms.ToolStripLabel Remove;
     }
 }
 

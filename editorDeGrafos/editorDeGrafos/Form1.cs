@@ -15,12 +15,12 @@ namespace editorDeGrafos
     public partial class Form1 : Form
     {
 
-
         List<Node> nodeList;
         List<Edge> edgeList;
 
         Node selectedNode;
         Node selected = null;
+        Node selectedJustFor = null;
 
         public int generalRadius;
         Boolean anyNodeSelected;
@@ -28,6 +28,8 @@ namespace editorDeGrafos
         AdjacencyList aListGraph;
         Boolean mousePressed;
         List<int> IDList;
+        Boolean allMoving = false;
+        Boolean allDeleting = false;
         //Boolean nodeMoved = false;
 
         public Form1()
@@ -43,7 +45,7 @@ namespace editorDeGrafos
             aListGraph = new AdjacencyList();
             IDList = new List<int>();
             IDList.Add(1000);
-            
+
             //TERMINAL
             terminal.Text = "0";
 
@@ -52,161 +54,159 @@ namespace editorDeGrafos
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
             mousePressed = true;
-
-            if (e.Button == System.Windows.Forms.MouseButtons.Left)//if mouse button pressed is left.
+            if (allMoving || allDeleting)
             {
-                Node oneNode = null;
-                //Node oneNode = new Node();
+                selectedJustFor = findNodeClicked(new Coordenate(e.X, e.Y));
+                if (allDeleting)
+                {
+                    selected = selectedJustFor;
+                    eliminate();
+                }
+            }
+            else
+            {
+                if (e.Button == System.Windows.Forms.MouseButtons.Left)//if mouse button pressed is left.
+                {
+                    Node oneNode = null;
+                    //Node oneNode = new Node();
+                //one node clicked.//check all the node list.
+                    
+                    oneNode = findNodeClicked(new Coordenate(e.X,e.Y));
 
-                foreach (Node onNode in nodeList)
-                {
-                    if (e.X > onNode.Position.X - onNode.Radius //for conditions in order to determine wheter or not , a click hit the specific node
-                       && e.X < onNode.Position.X + onNode.Radius
-                       && e.Y < onNode.Position.Y + onNode.Radius
-                       && e.Y > onNode.Position.Y - onNode.Radius)
+                    if (oneNode != null)//one Node was clicked
                     {
-                        oneNode = onNode;
-                    }//one node clicked.
-                }//check all the node list.
-                if (oneNode != null)//one Node was clicked
-                {
-                    if (oneNode.SelectedBool == true)//if the node selected was selected already in any state.
-                    //if(oneNode == selected)
-                    {
-                        if (oneNode.Status == 3)// in the third state
+                        if (oneNode.SelectedBool == true)//if the node selected was selected already in any state.
+                                                         //if(oneNode == selected)
                         {
-                            /*
-                            oneNode.Status = 0;//change to the original state.
-                            oneNode.COLOR = Color.Black;//change to black color(original state).
-                            oneNode.SelectedBool = anyNodeSelected = false;
-                            selected = null;
-                            */
-                            deselect();
-                        }
-                        else
-                        {
-                            if (oneNode.Status == 2)//selected more than one time(second State).
+                            if (oneNode.Status == 3)// in the third state
                             {
-                                oneNode.Status = 3;//change to thid state for directed links.
-                                oneNode.COLOR = Color.Red;//change to red color(third state).
+                                deselect();
                             }
                             else
                             {
-                                if (oneNode.Status == 1)//selected one time.
+                                if (oneNode.Status == 2)//selected more than one time(second State).
                                 {
-                                    oneNode.Status = 2;//change to the second selected State.
-                                    oneNode.COLOR = Color.Blue;//change to blue color to indicate the status(can do undirected Edges).
+                                    oneNode.Status = 3;//change to thid state for directed links.
+                                    oneNode.COLOR = Color.Red;//change to red color(third state).
                                 }
+                                else
+                                {
+                                    if (oneNode.Status == 1)//selected one time.
+                                    {
+                                        oneNode.Status = 2;//change to the second selected State.
+                                        oneNode.COLOR = Color.Blue;//change to blue color to indicate the status(can do undirected Edges).
+                                    }
 
+                                }
+                            }
+
+                        }
+                        else // is tryng to do a link between nodes or select for first time
+                        {
+                            // if (anyNodeSelected == true)//want to do a link between nodes.
+                            if (selected != null)
+                            {
+                                if (selected.Status == 2)//undirected link
+                                {
+                                    //here i have to ask the weight of the link.
+                                    //int weight = AskForAWeight();
+                                    int weight = 0;
+                                    edgeList.Add(new Edge(selected, oneNode));
+                                    String estrink = "jeje";
+                                    aListGraph.addUndirectedEdge(selected, oneNode, weight, ref estrink);
+                                    terminal.Text += estrink;
+                                }
+                                if (selected.Status == 3)//directed link
+                                {
+                                    //here i have to ask the weight of the link.
+                                    //int weight = AskForAWeight();
+                                    int weight = 0;
+                                    edgeList.Add(new Edge(selected, oneNode, true));
+                                    aListGraph.addDirectedEdge(selected, oneNode, weight);
+                                }
+                            }
+                            else // select for the first time.                            
+                            {
+                                // is not selected, (Status == 0).
+                                oneNode.Status = 1;//change to the first selected state.
+                                oneNode.COLOR = Color.Green;//change to green color to indicate the status(can move).
+                                oneNode.SelectedBool = true;
+                                anyNodeSelected = true;
+                                selected = oneNode;
                             }
                         }
-
                     }
-                    else // is tryng to do a link between nodes or select for first time
+                    else // want to make and add a new node 
                     {
-                        // if (anyNodeSelected == true)//want to do a link between nodes.
-                        if (selected != null)
-                        {
-                            if (selected.Status == 2)//undirected link
-                            {
-                                //here i have to ask the weight of the link.
-                                //int weight = AskForAWeight();
-                                int weight = 0;
-                                edgeList.Add(new Edge(selected, oneNode));
-                                String estrink = "jeje";
-                                aListGraph.addUndirectedEdge(selected, oneNode, weight, ref estrink);
-                                terminal.Text += estrink;
-                            }
-                            if (selected.Status == 3)//directed link
-                            {
-                                //here i have to ask the weight of the link.
-                                //int weight = AskForAWeight();
-                                int weight = 0;
-                                edgeList.Add(new Edge(selected, oneNode, true));
-                                aListGraph.addDirectedEdge(selected, oneNode, weight);
-                            }
-                        }
-                        else // select for the first time.                            
-                        {
-                            // is not selected, (Status == 0).
-                            oneNode.Status = 1;//change to the first selected state.
-                            oneNode.COLOR = Color.Green;//change to green color to indicate the status(can move).
-                            oneNode.SelectedBool = true;
-                            anyNodeSelected = true;
-                            selected = oneNode;
-                        }
+                        Coordenate newNodePosition = new Coordenate(e.X, e.Y);
+                        Node newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID());
+                        indexCount++;
+                        nodeList.Add(newNode);
+                        String estrink = "jeje";
+                        aListGraph.addNode(newNode, ref estrink);
+                        //TERMINAL
+                        //terminal.Text = estrink;
+                        terminal.Text = "numero de listas normal = " + aListGraph.NumberOfLists + " numero de lista anidada = " + aListGraph.NumberOfNestedLists;
                     }
-                }
-                else // want to make and add a new node 
-                {
-                    Coordenate newNodePosition = new Coordenate(e.X, e.Y);
-                    Node newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID());
-                    indexCount++;
-                    nodeList.Add(newNode);
-                    String estrink = "jeje";
-                    aListGraph.addNode(newNode, ref estrink);
-                    //TERMINAL
-                    //terminal.Text = estrink;
-                    terminal.Text = "numero de listas normal = " + aListGraph.NumberOfLists + " numero de lista anidada = " + aListGraph.NumberOfNestedLists;
-                }
 
-            }//left mouse button presed.           
-            else
-            {
-                //if (e.Button == System.Windows.Forms.MouseButtons.Right)//right mouse button clicked.
-                // {
-                //if (anyNodeSelected == true)
-                if (selected != null)
+                }//left mouse button presed.           
+                else
                 {
-                    if (e.X > selected.Position.X - selected.Radius //for conditions in order to determine wheter or not , a click hit the specific node
-                   && e.X < selected.Position.X + selected.Radius
-                   && e.Y < selected.Position.Y + selected.Radius
-                   && e.Y > selected.Position.Y - selected.Radius)
+                    if (selected != null)
                     {
-                        if (selected.Status == 1)
+                        if (e.X > selected.Position.X - selected.Radius //for conditions in order to determine wheter or not , a click hit the specific node
+                       && e.X < selected.Position.X + selected.Radius
+                       && e.Y < selected.Position.Y + selected.Radius
+                       && e.Y > selected.Position.Y - selected.Radius)
                         {
-                            /*selected.Status = 0;//change to the original state.
-                            selected.COLOR = Color.Black;//change to black color(original state).
-                            selected.SelectedBool = anyNodeSelected = false;
-                            selected = null;*/
-                        }
-                        else
-                        {
-                            if (selected.Status == 2)//make a own link
+                            if (selected.Status == 1)
                             {
-                                //int weight = AskForAWeight();
-                                int weight = 0;
-                                aListGraph.addDirectedEdge(selected, selected, weight);
+                                /*selected.Status = 0;//change to the original state.
+                                selected.COLOR = Color.Black;//change to black color(original state).
+                                selected.SelectedBool = anyNodeSelected = false;
+                                selected = null;*/
                             }
-                            else//eliminate the node
+                            else
                             {
-                                eliminate();
-                                /*
-                                eliminateNexetEdges(selected);
-                                aListGraph.removeNode(selected);
-                                nodeList.Remove(selected);
-                                selected = null;
-                                anyNodeSelected = false;
-                                indexCount--;
-                                */
+                                if (selected.Status == 2)//make a own link
+                                {
+                                    //int weight = AskForAWeight();
+                                    int weight = 0;
+                                    aListGraph.addDirectedEdge(selected, selected, weight);
+                                }
+                                else//eliminate the node
+                                {
+                                    eliminate();
+                                }
                             }
-                        }
 
+                        }
                     }
+                    //}
                 }
-                //}
-            }
-            if (selected != null)
-            {
-                matrixTB.Text = "node selected : "+ "ID = " + selected.ID + " Index = " + selected.Index + "\t" + System.Environment.NewLine + aListGraph.ToString();
-                matrixTB.Text += System.Environment.NewLine;
-            }
 
+            }
             InvalidatePlus();
         }//Form_MouseDown().
+    
 
+         /*************************************************************************************************************************
+         * 
+         * |||||||||||||||||||||||||||||||||||||||||||||||||||||   EVENTS   |||||||||||||||||||||||||||||||||||||||||||||||||||
+         * 
+         * ***********************************************************************************************************************/
+    private void Move_Click(object sender, EventArgs e)
+    {
+            keyA_OR_MoveClick();
+        
+    }
 
-        private void Save_Click(object sender, EventArgs e)
+    private void Remove_Click(object sender, EventArgs e)
+    {
+            keyX_OR_RemoveClick();
+    }
+
+    private void Save_Click(object sender, EventArgs e)
         {
 
         }
@@ -236,36 +236,53 @@ namespace editorDeGrafos
                 selected.Position.Y = e.Y;
                 Invalidate();
             }
+            if(mousePressed == true && allMoving == true && selectedJustFor != null )
+            {
+                selectedJustFor.Position.X = e.X;
+                selectedJustFor.Position.Y = e.Y;
+                Invalidate();
+            }
 
             //nodeMoved = true;
         }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Escape && selected != null)
+            if ((e.KeyCode == Keys.Escape || e.KeyCode == Keys.S) && selected != null)
             {
-                /*
-                selected.COLOR = Color.Black;//change to black color(original state).
-                selected.Status = 0;//change to the original state.               
-                selected.SelectedBool = anyNodeSelected = false;
-                selected = new Node();
-                selected = null;
-                InvalidatePlus();
-                terminal.Text += "esc";
-                */
-                deselect();
-                InvalidatePlus();
-            }
-            if (e.KeyCode == Keys.S && selected != null)
-            {
-                deselect();
-                InvalidatePlus();
-            }
-            if(e.KeyCode == Keys.D && selected != null)
-            {
-                eliminate();
-                InvalidatePlus();
+                deselect();               
             }
 
+            if(e.KeyCode == Keys.D && selected != null)
+            {
+               eliminate();
+            }
+
+            if(e.KeyCode == Keys.A)
+            {
+                keyA_OR_MoveClick();  
+            }
+
+            if (e.KeyCode == Keys.X)
+            {
+                keyX_OR_RemoveClick();
+            }
+            InvalidatePlus();
+
+        }
+
+        public void InvalidatePlus()
+        {
+            if (selected != null)
+            {
+                matrixTB.Text = "node selected : " + "ID = " + selected.ID + " Index = " + selected.Index + "\t" + System.Environment.NewLine ;
+                matrixTB.Text += System.Environment.NewLine;
+            }
+            else
+            {
+                matrixTB.Text = System.Environment.NewLine;
+            }
+            matrixTB.Text += aListGraph.ToString();
+            Invalidate();
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -298,39 +315,122 @@ namespace editorDeGrafos
                 graphics.FillEllipse(brush, rectangle);
                 pen = new Pen(nod.NODO.COLOR, 5);
                 graphics.DrawEllipse(pen, nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
-
-
             }
-            
-            /*
-            foreach (NodeRef node in aListGraph.GRAPH[n][0])
+
+        }
+
+    /*************************************************************************************************************************
+     * 
+     * |||||||||||||||||||||||||||||||||||||||||||||||||||||   METHODS   |||||||||||||||||||||||||||||||||||||||||||||||||||
+     * 
+     * ***********************************************************************************************************************/
+
+
+
+       public void keyA_OR_MoveClick()
+        {
+            if (selected != null)
             {
-                rectangle = new Rectangle(node.NODO.Position.X - node.NODO.Radius, node.NODO.Position.Y - node.NODO.Radius, node.NODO.Radius * 2, node.NODO.Radius * 2);
-                graphics.FillEllipse(brush, rectangle);
-                pen = new Pen(node.NODO.COLOR, 5);
-                graphics.DrawEllipse(pen, node.NODO.Position.X - node.NODO.Radius, node.NODO.Position.Y - node.NODO.Radius, node.NODO.Radius * 2, node.NODO.Radius * 2);
-
+                deselect();
             }
-            */
+
+            if (allMoving)
+            {
+                foreach (Node node in nodeList)
+                {
+                    node.COLOR = Color.Black;
+                }
+                allMoving = (!allMoving);
+            }
+            else
+            {
+                if (allDeleting == false)
+                {
+                    foreach (Node node in nodeList)
+                    {
+                        node.COLOR = Color.Indigo;
+                    }
+                    allMoving = (!allMoving);
+                }
+            }
+            InvalidatePlus();
+        }
+
+
+        public void keyX_OR_RemoveClick()
+        {
+            if (selected != null)
+            {
+                deselect();
+            }
+
+            if (allDeleting)
+            {
+                foreach (Node node in nodeList)
+                {
+                    node.COLOR = Color.Black;
+                }
+                allDeleting = (!allDeleting);
+            }
+            else
+            {
+                if (allMoving == false)
+                {
+
+                    foreach (Node node in nodeList)
+                    {
+                        node.COLOR = Color.IndianRed;
+                    }
+                    allDeleting = (!allDeleting);
+                }
+            }
+            deselect();
+            InvalidatePlus();
+        }
+
+
+
+        public Node findNodeClicked(Coordenate cor)
+        {
+            Node resNode = null;
+
+            foreach (Node onNode in nodeList)
+            {
+                if (cor.X > onNode.Position.X - onNode.Radius //for conditions in order to determine wheter or not , a click hit the specific node
+                   && cor.X < onNode.Position.X + onNode.Radius
+                   && cor.Y < onNode.Position.Y + onNode.Radius
+                   && cor.Y > onNode.Position.Y - onNode.Radius)
+                {
+                    resNode = onNode;
+                }//one node clicked.
+            }//check all the node list.
+            return resNode;
         }
 
         public void deselect()
         {
-            selected.Status = 0;//change to the original state.
-            selected.COLOR = Color.Black;//change to black color(original state).
-            selected.SelectedBool = anyNodeSelected = false;
-            selected = null;
+            if (selected != null)
+            {
+                selected.Status = 0;//change to the original state.
+                selected.COLOR = Color.Black;//change to black color(original state).
+                selected.SelectedBool = anyNodeSelected = false;
+                selected = null;
+            }
         }
 
         public void eliminate()
         {
-            eliminateNexetEdges(selected);
-            aListGraph.removeNode(selected);
-            nodeList.Remove(selected);
-            selected = null;
-            anyNodeSelected = false;
-            indexCount--;
+            if (selected != null)
+            {
+                eliminateNexetEdges(selected);
+                aListGraph.removeNode(selected);
+                nodeList.Remove(selected);
+                selected = null;
+                anyNodeSelected = false;
+                indexCount--;
+            }
         }
+        
 
         public int uniqueID()
         {
@@ -365,11 +465,7 @@ namespace editorDeGrafos
             return weight;
         }
 
-        public void InvalidatePlus()
-        {
-            matrixTB.Text = aListGraph.ToString();
-            Invalidate();
-        }
+       
 
         public void InvalidatePlus(String terminalText )
         {
@@ -575,7 +671,7 @@ namespace editorDeGrafos
             public override String ToString()
             {
                 // return " x = " + this.X + " y = " + this.Y;
-                return this.X + ":" + this.Y;
+                return this.Y + ":" + this.X;
             }
         }
 
@@ -754,33 +850,33 @@ namespace editorDeGrafos
 
             public void addDirectedEdge(Node client, Node server, int weight)
             {
-                if (graph.Count > client.Index)
-                {
-                    if (graph[client.Index].Count > server.Index)
+                //if (graph.Count > client.Index)
+                //{
+                    //if (graph[client.Index].Count > server.Index)
                         graph[client.Index][server.Index].W = weight;
 
-                }
+                //}
             }
 
 
             public override String ToString()
             {
                 String resString = "";
+                int i = 0;
                 foreach (List<NodeRef> row in graph)
                 {
+                    resString += "@" + i;
                     foreach (NodeRef nodoR in row)
                     {
                        resString += "\t" + "+" + nodoR.NODO.Index + "+" + "(" + nodoR.TidyPair.ToString() + ")=" + nodoR.W ;
                     }
                     resString += System.Environment.NewLine;
+                    i++;
                 }
                 return resString;
             }
         }//AdjacencyList.
-        
-        
 
-
-        
+       
     }//Form.
 }//namespace.
