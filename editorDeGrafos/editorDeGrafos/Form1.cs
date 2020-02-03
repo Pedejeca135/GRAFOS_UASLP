@@ -75,10 +75,13 @@ namespace editorDeGrafos
                     {
                         if (oneNode.Status == 3)// in the third state
                         {
+                            /*
                             oneNode.Status = 0;//change to the original state.
                             oneNode.COLOR = Color.Black;//change to black color(original state).
                             oneNode.SelectedBool = anyNodeSelected = false;
                             selected = null;
+                            */
+                            deselect();
                         }
                         else
                         {
@@ -177,12 +180,15 @@ namespace editorDeGrafos
                             }
                             else//eliminate the node
                             {
+                                eliminate();
+                                /*
                                 eliminateNexetEdges(selected);
                                 aListGraph.removeNode(selected);
                                 nodeList.Remove(selected);
                                 selected = null;
                                 anyNodeSelected = false;
                                 indexCount--;
+                                */
                             }
                         }
 
@@ -196,7 +202,7 @@ namespace editorDeGrafos
                 matrixTB.Text += System.Environment.NewLine;
             }
 
-            Invalidate();
+            InvalidatePlus();
         }//Form_MouseDown().
 
 
@@ -237,6 +243,7 @@ namespace editorDeGrafos
         {
             if (e.KeyCode == Keys.Escape && selected != null)
             {
+                /*
                 selected.COLOR = Color.Black;//change to black color(original state).
                 selected.Status = 0;//change to the original state.               
                 selected.SelectedBool = anyNodeSelected = false;
@@ -244,7 +251,21 @@ namespace editorDeGrafos
                 selected = null;
                 InvalidatePlus();
                 terminal.Text += "esc";
+                */
+                deselect();
+                InvalidatePlus();
             }
+            if (e.KeyCode == Keys.S && selected != null)
+            {
+                deselect();
+                InvalidatePlus();
+            }
+            if(e.KeyCode == Keys.D && selected != null)
+            {
+                eliminate();
+                InvalidatePlus();
+            }
+
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -271,7 +292,8 @@ namespace editorDeGrafos
             
             for (int i = 0; i < aListGraph.GRAPH.Count; i++)
             {
-                NodeRef nod = aListGraph.GRAPH[0][i];
+                
+                NodeRef nod = aListGraph.GRAPH[i][i];
                 rectangle = new Rectangle(nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
                 graphics.FillEllipse(brush, rectangle);
                 pen = new Pen(nod.NODO.COLOR, 5);
@@ -290,6 +312,24 @@ namespace editorDeGrafos
 
             }
             */
+        }
+
+        public void deselect()
+        {
+            selected.Status = 0;//change to the original state.
+            selected.COLOR = Color.Black;//change to black color(original state).
+            selected.SelectedBool = anyNodeSelected = false;
+            selected = null;
+        }
+
+        public void eliminate()
+        {
+            eliminateNexetEdges(selected);
+            aListGraph.removeNode(selected);
+            nodeList.Remove(selected);
+            selected = null;
+            anyNodeSelected = false;
+            indexCount--;
         }
 
         public int uniqueID()
