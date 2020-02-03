@@ -134,7 +134,7 @@
             this.terminal.Location = new System.Drawing.Point(755, 12);
             this.terminal.Multiline = true;
             this.terminal.Name = "terminal";
-            this.terminal.Size = new System.Drawing.Size(617, 117);
+            this.terminal.Size = new System.Drawing.Size(717, 117);
             this.terminal.TabIndex = 1;
             // 
             // matrixTB
@@ -142,7 +142,7 @@
             this.matrixTB.Location = new System.Drawing.Point(755, 133);
             this.matrixTB.Multiline = true;
             this.matrixTB.Name = "matrixTB";
-            this.matrixTB.Size = new System.Drawing.Size(617, 716);
+            this.matrixTB.Size = new System.Drawing.Size(717, 716);
             this.matrixTB.TabIndex = 2;
             // 
             // Form1

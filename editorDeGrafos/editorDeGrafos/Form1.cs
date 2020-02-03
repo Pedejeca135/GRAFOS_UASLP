@@ -27,6 +27,7 @@ namespace editorDeGrafos
         int indexCount;
         AdjacencyList aListGraph;
         Boolean mousePressed;
+        List<int> IDList;
         //Boolean nodeMoved = false;
 
         public Form1()
@@ -40,6 +41,9 @@ namespace editorDeGrafos
             indexCount = 0;
             mousePressed = false;
             aListGraph = new AdjacencyList();
+            IDList = new List<int>();
+            IDList.Add(1000);
+            
             //TERMINAL
             terminal.Text = "0";
 
@@ -133,7 +137,7 @@ namespace editorDeGrafos
                 else // want to make and add a new node 
                 {
                     Coordenate newNodePosition = new Coordenate(e.X, e.Y);
-                    Node newNode = new Node(newNodePosition, generalRadius, indexCount);
+                    Node newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID());
                     indexCount++;
                     nodeList.Add(newNode);
                     String estrink = "jeje";
@@ -186,8 +190,12 @@ namespace editorDeGrafos
                 }
                 //}
             }
+            if (selected != null)
+            {
+                matrixTB.Text = "node selected : "+ "ID = " + selected.ID + " Index = " + selected.Index + "\t" + System.Environment.NewLine + aListGraph.ToString();
+                matrixTB.Text += System.Environment.NewLine;
+            }
 
-            matrixTB.Text = aListGraph.ToString();
             Invalidate();
         }//Form_MouseDown().
 
@@ -234,7 +242,7 @@ namespace editorDeGrafos
                 selected.SelectedBool = anyNodeSelected = false;
                 selected = new Node();
                 selected = null;
-                Invalidate();
+                InvalidatePlus();
                 terminal.Text += "esc";
             }
         }
@@ -260,6 +268,7 @@ namespace editorDeGrafos
 
             }
             */
+            
             for (int i = 0; i < aListGraph.GRAPH.Count; i++)
             {
                 NodeRef nod = aListGraph.GRAPH[0][i];
@@ -270,7 +279,7 @@ namespace editorDeGrafos
 
 
             }
-
+            
             /*
             foreach (NodeRef node in aListGraph.GRAPH[n][0])
             {
@@ -283,11 +292,50 @@ namespace editorDeGrafos
             */
         }
 
+        public int uniqueID()
+        {
+
+            Boolean different;
+            int res;
+            Random random = new Random();
+        
+            do
+            {
+                different = true;
+                res = random.Next(1000, 9999);
+                foreach(int num in IDList)//ID list should be a tree so the time-complexity to compruebe the exixtence of the random number generated could decresse
+                {
+                    if(res == num )
+                    {
+                        different = false;
+                        break;//doesn't make sense continuing serching. Basic heuristic avrd.
+                    }
+                }                
+            }
+            while (different == false);
+
+            return res;
+            
+        }
+
         private int AskForAWeight()
         {
             int weight = 0;
 
             return weight;
+        }
+
+        public void InvalidatePlus()
+        {
+            matrixTB.Text = aListGraph.ToString();
+            Invalidate();
+        }
+
+        public void InvalidatePlus(String terminalText )
+        {
+            terminal.Text = terminalText;
+            matrixTB.Text = aListGraph.ToString();
+            Invalidate();
         }
 
         public void eliminateNexetEdges(Node node)
@@ -321,8 +369,9 @@ namespace editorDeGrafos
             Boolean justSelected;
             int selected;
             int index;
+            int uniqueID;
 
-            public Node(Coordenate position, int radius, int index)
+            public Node(Coordenate position, int radius, int index, int identifier)
             {
                 this.position = position;
                 this.radiusLenght = radius;
@@ -330,6 +379,7 @@ namespace editorDeGrafos
                 selected = 0;
                 this.index = index;//ID of the node
                 color = Color.Black;
+                uniqueID = identifier;
             }
             public Node() //default constructor of the class Node
             {
@@ -375,6 +425,12 @@ namespace editorDeGrafos
                 get { return this.index; }
                 set { this.index = value; }
             }
+
+            public int ID
+            {
+                get { return this.uniqueID; }
+                set { this.uniqueID = value; }
+            }
             /*******************************************************
              *                Geters and seters(End)               *
              *******************************************************/
@@ -385,7 +441,7 @@ namespace editorDeGrafos
 
             public override String ToString()
             {
-                return " -x = " + this.position.X + " -y = " + this.Position.Y + " -index = " + this.Index;
+                return this.ID + this.position.ToString() + " -index = " + this.Index;
             }
 
         }//Node class.
@@ -440,8 +496,8 @@ namespace editorDeGrafos
 
         public class Coordenate
         {
-            int x;
-            int y;
+            protected int x;
+            protected int y;
 
             public Coordenate(int x, int y)
             {
@@ -460,7 +516,28 @@ namespace editorDeGrafos
                 get { return this.y; }
                 set { this.y = value; }
             }
+
+                public override String ToString()
+            {
+                // return " x = " + this.X + " y = " + this.Y;
+                return this.X + "," + this.Y;
+            }
+        
+
         }//Coordenate.
+
+        public class TidyPair : Coordenate
+        {
+            public TidyPair(int x, int y) : base(x,y)
+            {
+                              
+            }
+            public override String ToString()
+            {
+                // return " x = " + this.X + " y = " + this.Y;
+                return this.X + ":" + this.Y;
+            }
+        }
 
         public class WeightMatrixGraph
         {
@@ -471,12 +548,25 @@ namespace editorDeGrafos
         {
             int weight;
             Node nodo;
+            TidyPair tidy;
+            Boolean activeNode;
 
-            public NodeRef(int weight, Node nodo)
+            public NodeRef(int weight, Node nodo, TidyPair tidyPair)
             {
+                this.tidy = tidyPair;
                 this.nodo = nodo;
                 this.weight = weight;
+                activeNode = false;
             }
+
+            public NodeRef(int weight, Node nodo, TidyPair tidyPair,Boolean active)
+            {
+                this.tidy = tidyPair;
+                this.nodo = nodo;
+                this.weight = weight;
+                activeNode = active;
+            }
+
             public Node NODO
             {
                 get { return this.nodo; }
@@ -488,6 +578,16 @@ namespace editorDeGrafos
                 set { this.weight = value; }
             }
 
+            public TidyPair TidyPair
+            {
+                get { return this.tidy; }
+                set { this.tidy = value; }
+            }
+
+            public Boolean ACTIVATION
+            {
+                get { return activeNode; }
+            }
 
         }//NodeRef.
 
@@ -517,59 +617,85 @@ namespace editorDeGrafos
             }
 
             public void addNode(Node nodo, ref String terminal)
-            {
-                
+            {                
                 List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.             
                 terminal = "no hay elementos" + graph.Count();                                         //for controling the new list adding Node indexes.
                 if (graph.Count() == 0)//ther's no elements
                 {
-                    NodeRef nodoRef = new NodeRef(-1, nodo);            //the new Node that is going to be added have no conection, so it have a -1 value.
+                    TidyPair tidyP = new TidyPair(0, 0); ;
+                    NodeRef nodoRef = new NodeRef(-1, nodo, tidyP ,true);            //the new Node that is going to be added have no conection, so it have a -1 value.
                     newNodeRefList.Add(nodoRef);
                     graph.Add(newNodeRefList);                
                 }
                 else//At least one element.
-                {   
+                {
+                    //int j = 0;
                     for(int i = 0; i < graph.Count; i++)
                     {
-                        newNodeRefList.Add(new NodeRef(-1, graph[i][i].NODO)); //making the new list at the end of the "array".
+                        if(i == graph.Count)
+                        {
+                            newNodeRefList.Add(new NodeRef(-1, graph[i][i].NODO, new TidyPair(i, graph.Count()),true)); //making the new list for the end of the "array".
+                        }
+                        else
+                        {
+                           newNodeRefList.Add(new NodeRef(-1, graph[i][i].NODO, new TidyPair(i, graph.Count() ) ) ); //making the new list for the end of the "array".
+                        }
+                        
                     }
 
                     graph.Add(newNodeRefList);//adding the list made.
                                               // terminal = "hay elementos" + graph.Count() + graph[0][0].NODO.ToString();
+                    int iF = 0;
                     foreach (List<NodeRef> row in graph)
                     {
-                        row.Add(new NodeRef(-1, nodo)); //adding to each row the new Node.
+                        row.Add(new NodeRef(-1, nodo,new TidyPair(nodo.Index,iF))); //adding to each row the new Node.
+                        iF++;
                     }
                 }
             }
 
             public void removeNode(Node nodo)//almost the same process as addNode() but vice versa.
             {
-                int nodeIndexToEiminate = nodo.Index;                
+                int nodeIndexToEiminate = nodo.Index;         
+
+                foreach (List<NodeRef> row in graph)
+                {
+                  //  if (row.Count > nodeIndexToEiminate)// ESTO NO DEBERIA PORQUE ESTAR AQUI(por eso esta en español) :(.
+                    //{
+                        row.RemoveAt(nodeIndexToEiminate);//removing the NodeRef of all the list of nodes.
+                    //}
+                }
+
+                //if (nodeIndexToEiminate < graph.Count())
+                //{
+                    graph.RemoveAt(nodeIndexToEiminate);//remove the list of adjacency of the node.
+                //}
+                /*
 
                 foreach (List<NodeRef> row in graph)// for changing the inner index of each node;
                 {
                     foreach (NodeRef node in row)
                     {
-                        if (node.NODO.Index > nodeIndexToEiminate)
+                        if (node.ACTIVATION == true && node.NODO.Index > nodeIndexToEiminate)
                         {
-                            node.NODO.Index--;
+                            node.NODO.Index --;
+                        }
+                    }
+                }
+                */
+
+                for (int j = 0; j < graph.Count(); j++)
+                {
+                    List<NodeRef> noRe = graph[j];
+                    for (int i = 0; i < noRe.Count();i++ )
+                    {
+                        if(i == j && noRe[i].NODO.Index > nodeIndexToEiminate)
+                        {
+                            noRe[i].NODO.Index--;
                         }
                     }
                 }
 
-                foreach (List<NodeRef> row in graph)
-                {
-                    if (row.Count > nodeIndexToEiminate)// ESTO NO DEBERIA PORQUE ESTAR AQUI(por eso esta en español) :(.
-                    {
-                        row.RemoveAt(nodeIndexToEiminate);//removing the NodeRef of all the list of nodes.
-                    }
-                }
-
-                if (nodeIndexToEiminate < graph.Count())
-                {
-                    graph.RemoveAt(nodeIndexToEiminate);//remove the list of adjacency of the node.
-                }
             }//remove a node.
 
             public void addUndirectedEdge(Node client, Node server, int weight, ref String cadena)
@@ -602,16 +728,16 @@ namespace editorDeGrafos
                 String resString = "";
                 foreach (List<NodeRef> row in graph)
                 {
-                    foreach (NodeRef nodo in row)
+                    foreach (NodeRef nodoR in row)
                     {
-                        resString += "\t" + nodo.W ;
+                       resString += "\t" + "+" + nodoR.NODO.Index + "+" + "(" + nodoR.TidyPair.ToString() + ")=" + nodoR.W ;
                     }
                     resString += System.Environment.NewLine;
                 }
                 return resString;
             }
         }//AdjacencyList.
-
+        
         
 
 
