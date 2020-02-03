@@ -28,8 +28,12 @@ namespace editorDeGrafos
         AdjacencyList aListGraph;
         Boolean mousePressed;
         List<int> IDList;
+
         Boolean allMoving = false;
         Boolean allDeleting = false;
+        Boolean allMoRe = false;
+        Boolean justSaved = false;
+
         //Boolean nodeMoved = false;
 
         public Form1()
@@ -54,13 +58,30 @@ namespace editorDeGrafos
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
             mousePressed = true;
-            if (allMoving || allDeleting)
+            if (allMoving || allDeleting || allMoRe)
             {
                 selectedJustFor = findNodeClicked(new Coordenate(e.X, e.Y));
+                selected = selectedJustFor;
+
                 if (allDeleting)
                 {
-                    selected = selectedJustFor;
+                    //selected = selectedJustFor;
                     eliminate();
+                }
+                if(allMoRe)
+                {
+                    //selected = selectedJustFor;
+                    if (e.Button == System.Windows.Forms.MouseButtons.Right)
+                    {                                       
+                        eliminate();                        
+                    }
+                    else
+                    {
+                        if (selected == null)
+                        {
+                            create(new Coordenate(e.X, e.Y));
+                        }
+                    }
                 }
             }
             else
@@ -69,9 +90,9 @@ namespace editorDeGrafos
                 {
                     Node oneNode = null;
                     //Node oneNode = new Node();
-                //one node clicked.//check all the node list.
-                    
-                    oneNode = findNodeClicked(new Coordenate(e.X,e.Y));
+                    //one node clicked.//check all the node list.
+
+                    oneNode = findNodeClicked(new Coordenate(e.X, e.Y));
 
                     if (oneNode != null)//one Node was clicked
                     {
@@ -129,7 +150,7 @@ namespace editorDeGrafos
                             {
                                 // is not selected, (Status == 0).
                                 oneNode.Status = 1;//change to the first selected state.
-                                oneNode.COLOR = Color.Green;//change to green color to indicate the status(can move).
+                                oneNode.COLOR = Color.ForestGreen;//change to green color to indicate the status(can move).
                                 oneNode.SelectedBool = true;
                                 anyNodeSelected = true;
                                 selected = oneNode;
@@ -154,72 +175,108 @@ namespace editorDeGrafos
                 {
                     if (selected != null)
                     {
-                        if (e.X > selected.Position.X - selected.Radius //for conditions in order to determine wheter or not , a click hit the specific node
-                       && e.X < selected.Position.X + selected.Radius
-                       && e.Y < selected.Position.Y + selected.Radius
-                       && e.Y > selected.Position.Y - selected.Radius)
+                        if (selected == findNodeClicked(new Coordenate(e.X, e.Y)))
                         {
-                            if (selected.Status == 1)
-                            {
-                                /*selected.Status = 0;//change to the original state.
-                                selected.COLOR = Color.Black;//change to black color(original state).
-                                selected.SelectedBool = anyNodeSelected = false;
-                                selected = null;*/
-                            }
-                            else
-                            {
-                                if (selected.Status == 2)//make a own link
-                                {
-                                    //int weight = AskForAWeight();
-                                    int weight = 0;
-                                    aListGraph.addDirectedEdge(selected, selected, weight);
-                                }
-                                else//eliminate the node
-                                {
-                                    eliminate();
-                                }
-                            }
+                            if (selected.Status > 1)
 
-                        }
-                    }
-                    //}
+                                {
+                                    if (selected.Status == 2)//make a own link
+                                    {
+                                        //int weight = AskForAWeight();
+                                        int weight = 0;
+                                        aListGraph.addDirectedEdge(selected, selected, weight);
+                                    }
+                                    else//eliminate the node
+                                    {
+                                        eliminate();
+                                    }
+                                }
+                        }                        
+                    }                   
                 }
-
             }
             InvalidatePlus();
         }//Form_MouseDown().
-    
 
-         /*************************************************************************************************************************
-         * 
-         * |||||||||||||||||||||||||||||||||||||||||||||||||||||   EVENTS   |||||||||||||||||||||||||||||||||||||||||||||||||||
-         * 
-         * ***********************************************************************************************************************/
-    private void Move_Click(object sender, EventArgs e)
-    {
-            keyA_OR_MoveClick();
-        
-    }
 
-    private void Remove_Click(object sender, EventArgs e)
-    {
-            keyX_OR_RemoveClick();
-    }
-
-    private void Save_Click(object sender, EventArgs e)
+        /*************************************************************************************************************************
+        * 
+        * |||||||||||||||||||||||||||||||||||||||||||||||||||||   EVENTS   |||||||||||||||||||||||||||||||||||||||||||||||||||
+        * 
+        * ***********************************************************************************************************************/
+        private void Move_Click(object sender, EventArgs e)
         {
+            keyA_OR_MoveClick();
 
+        }
+
+        private void Remove_Click(object sender, EventArgs e)
+        {
+            keyX_OR_RemoveClick();
+        }
+
+        private void MoRe_Click(object sender, EventArgs e)
+        {
+            keyF_OR_MoRe();
+        }
+
+        private void Save_Click(object sender, EventArgs e)
+        {
+            saveFile();
         }
 
         private void Load_Click(object sender, EventArgs e)
         {
+            if (justSaved == false)
+            {
+                SaveChangesWindow gdc = new SaveChangesWindow();
+                gdc.ShowDialog();
+                if (gdc.Operation == 1 || gdc.Operation == 2)
+                {
+                    if (gdc.Operation == 1)
+                    {
+                        saveFile();
+                    }
 
+                    foreach (Node node in nodeList)
+                    {
+                        eliminateNexetEdges(node);
+                    }
+                    nodeList = new List<Node>();
+                    justSaved = true;
+                    openFile();
+
+                }
+            }
+            InvalidatePlus();
         }
 
         private void New_Click(object sender, EventArgs e)
         {
+            if (justSaved == false)
+            {
+                SaveChangesWindow gdc = new SaveChangesWindow();
+                gdc.ShowDialog();
+                if (gdc.Operation == 1 || gdc.Operation == 2)
+                {
+                    if (gdc.Operation == 1)
+                    {
+                        saveFile();
+                    }
 
+                    foreach (Node node in nodeList)
+                    {
+                        eliminateNexetEdges(node);
+                    }
+                    nodeList = new List<Node>();
+                    justSaved = true;
+                }
+            }
+            Invalidate();
         }
+
+
+
         private void Form1_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -236,7 +293,13 @@ namespace editorDeGrafos
                 selected.Position.Y = e.Y;
                 Invalidate();
             }
-            if(mousePressed == true && allMoving == true && selectedJustFor != null )
+            if (mousePressed == true && allMoving == true && selectedJustFor != null)
+            {
+                selectedJustFor.Position.X = e.X;
+                selectedJustFor.Position.Y = e.Y;
+                Invalidate();
+            }
+            if(mousePressed == true && e.Button == MouseButtons.Left && allMoRe == true && selectedJustFor != null)
             {
                 selectedJustFor.Position.X = e.X;
                 selectedJustFor.Position.Y = e.Y;
@@ -249,17 +312,17 @@ namespace editorDeGrafos
         {
             if ((e.KeyCode == Keys.Escape || e.KeyCode == Keys.S) && selected != null)
             {
-                deselect();               
+                deselect();
             }
 
-            if(e.KeyCode == Keys.D && selected != null)
+            if (e.KeyCode == Keys.D && selected != null)
             {
-               eliminate();
+                eliminate();
             }
 
-            if(e.KeyCode == Keys.A)
+            if (e.KeyCode == Keys.A)
             {
-                keyA_OR_MoveClick();  
+                keyA_OR_MoveClick();
             }
 
             if (e.KeyCode == Keys.X)
@@ -270,11 +333,13 @@ namespace editorDeGrafos
 
         }
 
+      
+
         public void InvalidatePlus()
         {
             if (selected != null)
             {
-                matrixTB.Text = "node selected : " + "ID = " + selected.ID + " Index = " + selected.Index + "\t" + System.Environment.NewLine ;
+                matrixTB.Text = "node selected : " + "ID = " + selected.ID + " Index = " + selected.Index + "\t" + System.Environment.NewLine;
                 matrixTB.Text += System.Environment.NewLine;
             }
             else
@@ -306,10 +371,10 @@ namespace editorDeGrafos
 
             }
             */
-            
+
             for (int i = 0; i < aListGraph.GRAPH.Count; i++)
             {
-                
+
                 NodeRef nod = aListGraph.GRAPH[i][i];
                 rectangle = new Rectangle(nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
                 graphics.FillEllipse(brush, rectangle);
@@ -319,15 +384,89 @@ namespace editorDeGrafos
 
         }
 
-    /*************************************************************************************************************************
-     * 
-     * |||||||||||||||||||||||||||||||||||||||||||||||||||||   METHODS   |||||||||||||||||||||||||||||||||||||||||||||||||||
-     * 
-     * ***********************************************************************************************************************/
+        /*************************************************************************************************************************
+         * 
+         * |||||||||||||||||||||||||||||||||||||||||||||||||||||   METHODS ()  |||||||||||||||||||||||||||||||||||||||||||||||||||
+         * 
+         * ***********************************************************************************************************************/
+
+        public void saveFile()
+        {
+            TextWriter sw = null;
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save text Files";
+            saveFileDialog.DefaultExt = "txt";
+            saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                sw = new StreamWriter(saveFileDialog.FileName);
+                MessageBox.Show(saveFileDialog.FileName);
+            }
+            foreach (Node node in nodeList)
+            {
+                sw.WriteLine(node.Position.X + "," + node.Position.Y);
+            }
+            sw.WriteLine("Lines");
+            foreach (Edge edge in edgeList)
+            {
+                sw.WriteLine(edge.A.X + "," + edge.A.Y + "," + edge.B.X + "," + edge.B.Y);
+            }
+            sw.Close();
+            justSaved = true;
+        }
+
+        public void openFile()
+        {
+            string[] auxiliar;
+            StreamReader sr = null;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
 
 
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                sr = new StreamReader(openFileDialog.FileName);
+                auxiliar = sr.ReadLine().Split(',');
+                while (sr != null && !sr.EndOfStream && auxiliar[0] != "Lines")
+                {
+                    int x = int.Parse(auxiliar[0]);
+                    int y = int.Parse(auxiliar[1]);
+                    Node nodo = new Node(x, y);
+                    nodeList.Add(nodo);
+                    auxiliar = sr.ReadLine().Split(',');
+                }
+                while (sr != null && !sr.EndOfStream)
+                {
+                    Node server = new Node();
+                    Node client = new Node();
+                    auxiliar = sr.ReadLine().Split(',');
+                    int nodo1X = int.Parse(auxiliar[0]);
+                    int nodo1Y = int.Parse(auxiliar[1]);
+                    int nodo2X = int.Parse(auxiliar[2]);
+                    int nodo2Y = int.Parse(auxiliar[3]);
 
-       public void keyA_OR_MoveClick()
+                    foreach (Node node in nodeList)
+                    {
+                        if (node.Position.X == nodo1X && node.Position.Y == nodo1Y)//it just can be one of all
+                        {
+                            server = node;
+                        }
+                        else
+                        {
+                            if (node.Position.X == nodo2X && node.Position.Y == nodo2Y)//it also can be just one of all
+                            {
+                                client = node;
+                            }
+                        }
+                    }
+                    Edge edge = new Edge(server, client);
+                    edgeList.Add(edge);
+                }
+                sr.Close();
+            }
+
+        }
+
+        public void keyA_OR_MoveClick()
         {
             if (selected != null)
             {
@@ -344,11 +483,11 @@ namespace editorDeGrafos
             }
             else
             {
-                if (allDeleting == false)
+                if (allDeleting == false && allMoRe == false)
                 {
                     foreach (Node node in nodeList)
                     {
-                        node.COLOR = Color.Indigo;
+                        node.COLOR = Color.Green;
                     }
                     allMoving = (!allMoving);
                 }
@@ -374,12 +513,11 @@ namespace editorDeGrafos
             }
             else
             {
-                if (allMoving == false)
+                if (allMoving == false && allMoRe == false)
                 {
-
                     foreach (Node node in nodeList)
                     {
-                        node.COLOR = Color.IndianRed;
+                        node.COLOR = Color.Red;
                     }
                     allDeleting = (!allDeleting);
                 }
@@ -387,6 +525,36 @@ namespace editorDeGrafos
             deselect();
             InvalidatePlus();
         }
+
+        public void keyF_OR_MoRe()
+        {
+            if (selected != null)
+            {
+                deselect();
+            }
+
+            if (allMoRe)
+            {
+                foreach (Node node in nodeList)
+                {
+                    node.COLOR = Color.Black;
+                }
+                allMoRe = (!allMoRe);
+            }
+            else
+            {
+                if (allDeleting == false && allMoving == false)
+                {
+                    foreach (Node node in nodeList)
+                    {
+                        node.COLOR = Color.Indigo;
+                    }
+                    allMoRe = (!allMoRe);
+                }
+            }
+            deselect();
+            InvalidatePlus();
+        }      
 
 
 
@@ -431,6 +599,27 @@ namespace editorDeGrafos
             }
         }
         
+        public void create(Coordenate cor)
+        {
+            Coordenate newNodePosition = new Coordenate(cor.X, cor.Y);
+            Node newNode;
+            if (allMoRe)
+            {
+               newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID(),Color.Indigo);
+            }
+            else
+            {
+               newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID());
+            }           
+            indexCount++;
+            nodeList.Add(newNode);
+            String estrink = "jeje";
+            aListGraph.addNode(newNode, ref estrink);
+            //TERMINAL
+            //terminal.Text = estrink;
+            terminal.Text = "numero de listas normal = " + aListGraph.NumberOfLists + " numero de lista anidada = " + aListGraph.NumberOfNestedLists;
+            InvalidatePlus();
+        }
 
         public int uniqueID()
         {
@@ -507,6 +696,16 @@ namespace editorDeGrafos
             int index;
             int uniqueID;
 
+            public Node() //default constructor of the class Node
+            {
+
+            }
+
+            public Node(int x, int y)
+            {
+                this.Position = new Coordenate(x, y);
+            }
+
             public Node(Coordenate position, int radius, int index, int identifier)
             {
                 this.position = position;
@@ -517,10 +716,19 @@ namespace editorDeGrafos
                 color = Color.Black;
                 uniqueID = identifier;
             }
-            public Node() //default constructor of the class Node
+            public Node(Coordenate position, int radius, int index, int identifier,Color color)
             {
-
+                this.position = position;
+                this.radiusLenght = radius;
+                justSelected = false;
+                selected = 0;
+                this.index = index;//ID of the node
+                this.color = color;
+                uniqueID = identifier;
             }
+
+
+            
 
             /*******************************************************
              *               Geters and seters(Begin)              *
@@ -857,7 +1065,6 @@ namespace editorDeGrafos
 
                 //}
             }
-
 
             public override String ToString()
             {

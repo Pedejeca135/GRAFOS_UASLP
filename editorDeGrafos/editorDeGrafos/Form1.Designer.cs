@@ -40,6 +40,7 @@
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.terminal = new System.Windows.Forms.TextBox();
             this.matrixTB = new System.Windows.Forms.TextBox();
+            this.MoRe = new System.Windows.Forms.ToolStripLabel();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,6 +54,7 @@
             this.toolStripSeparator1,
             this.Move,
             this.Remove,
+            this.MoRe,
             this.helpToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
@@ -68,6 +70,7 @@
             this.newToolStripButton.Name = "newToolStripButton";
             this.newToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.newToolStripButton.Text = "&New";
+            this.newToolStripButton.Click += new System.EventHandler(this.New_Click);
             // 
             // openToolStripButton
             // 
@@ -77,6 +80,7 @@
             this.openToolStripButton.Name = "openToolStripButton";
             this.openToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.openToolStripButton.Text = "&Open";
+            this.openToolStripButton.Click += new System.EventHandler(this.Load_Click);
             // 
             // saveToolStripButton
             // 
@@ -86,6 +90,7 @@
             this.saveToolStripButton.Name = "saveToolStripButton";
             this.saveToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.saveToolStripButton.Text = "&Save";
+            this.saveToolStripButton.Click += new System.EventHandler(this.Save_Click);
             // 
             // toolStripSeparator
             // 
@@ -100,15 +105,15 @@
             // Move
             // 
             this.Move.Name = "Move";
-            this.Move.Size = new System.Drawing.Size(37, 22);
-            this.Move.Text = "Move";
+            this.Move.Size = new System.Drawing.Size(67, 22);
+            this.Move.Text = "Move(A,M)";
             this.Move.Click += new System.EventHandler(this.Move_Click);
             // 
             // Remove
             // 
             this.Remove.Name = "Remove";
-            this.Remove.Size = new System.Drawing.Size(50, 22);
-            this.Remove.Text = "Remove";
+            this.Remove.Size = new System.Drawing.Size(75, 22);
+            this.Remove.Text = "Remove(X,R)";
             this.Remove.Click += new System.EventHandler(this.Remove_Click);
             // 
             // helpToolStripButton
@@ -135,6 +140,13 @@
             this.matrixTB.Name = "matrixTB";
             this.matrixTB.Size = new System.Drawing.Size(717, 716);
             this.matrixTB.TabIndex = 2;
+            // 
+            // MoRe
+            // 
+            this.MoRe.Name = "MoRe";
+            this.MoRe.Size = new System.Drawing.Size(52, 22);
+            this.MoRe.Text = "MoRe(F)";
+            this.MoRe.Click += new System.EventHandler(this.MoRe_Click);
             // 
             // Form1
             // 
@@ -172,6 +184,7 @@
         private System.Windows.Forms.TextBox matrixTB;
         private System.Windows.Forms.ToolStripLabel Move;
         private System.Windows.Forms.ToolStripLabel Remove;
+        private System.Windows.Forms.ToolStripLabel MoRe;
     }
 }
 
