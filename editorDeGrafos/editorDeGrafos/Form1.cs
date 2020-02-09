@@ -17,6 +17,8 @@ namespace editorDeGrafos
 
         List<Node> nodeList;
         List<Edge> edgeList;
+        List<Edge> diEdgeList;
+        List<Edge> cicleEdgeList;
 
         Node selectedNode;
         Node selected = null;
@@ -28,12 +30,11 @@ namespace editorDeGrafos
         AdjacencyList aListGraph;
         Boolean mousePressed;
         List<int> IDList;
-        List<Edge> diEdgeList;
 
         Boolean allMoving = false;
         Boolean allDeleting = false;
         Boolean allMoRe = false;
-        Boolean justSaved = false;
+        Boolean justSaved = true;
 
         //Boolean nodeMoved = false;
 
@@ -44,6 +45,8 @@ namespace editorDeGrafos
             nodeList = new List<Node>();
             edgeList = new List<Edge>();
             diEdgeList = new List<Edge>();
+            cicleEdgeList = new List<Edge>();
+
             selectedNode = new Node();
             anyNodeSelected = false;
             indexCount = 0;
@@ -90,9 +93,7 @@ namespace editorDeGrafos
                 if (e.Button == System.Windows.Forms.MouseButtons.Left)//if mouse button pressed is left.
                 {
                     Node oneNode = null;
-                    //Node oneNode = new Node();
                     //one node clicked.//check all the node list.
-
                     oneNode = findNodeClicked(new Coordenate(e.X, e.Y));
 
                     if (oneNode != null)//one Node was clicked
@@ -124,8 +125,7 @@ namespace editorDeGrafos
                         }
                         else // is tryng to do a link between nodes or select for first time
                         {
-                            // if (anyNodeSelected == true)//want to do a link between nodes.
-                            if (selected != null)
+                            if (selected != null)//want to do a link between nodes.
                             {
                                 if (selected.Status == 2)//undirected link
                                 {
@@ -133,9 +133,7 @@ namespace editorDeGrafos
                                     //int weight = AskForAWeight();
                                     int weight = 0;
                                     edgeList.Add(new Edge(selected, oneNode));
-                                    String estrink = "jeje";
-                                    aListGraph.addUndirectedEdge(selected, oneNode, weight, ref estrink);
-                                    terminal.Text += estrink;
+                                    aListGraph.addUndirectedEdge(selected, oneNode, weight);
                                 }
                                 if (selected.Status == 3)//directed link
                                 {
@@ -145,6 +143,7 @@ namespace editorDeGrafos
                                     diEdgeList.Add(new Edge(selected, oneNode, true));
                                     aListGraph.addDirectedEdge(selected, oneNode, weight);
                                 }
+                                InvalidatePlus();
                             }
                             else // select for the first time.                            
                             {
@@ -159,32 +158,24 @@ namespace editorDeGrafos
                     }
                     else // want to make and add a new node 
                     {
-                        Coordenate newNodePosition = new Coordenate(e.X, e.Y);
-                        Node newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID());
-                        indexCount++;
-                        nodeList.Add(newNode);
-                        String estrink = "jeje";
-                        aListGraph.addNode(newNode, ref estrink);
-                        //TERMINAL
-                        //terminal.Text = estrink;
-                        terminal.Text = "numero de listas normal = " + aListGraph.NumberOfLists + " numero de lista anidada = " + aListGraph.NumberOfNestedLists;
+                        create(new Coordenate(e.X, e.Y));                       
                     }
 
                 }//left mouse button presed.           
-                else
+                else//right mouse button pressed.
                 {
                     if (selected != null)
                     {
                         if (selected == findNodeClicked(new Coordenate(e.X, e.Y)))
                         {
-                            if (selected.Status > 1)
-
+                            if (selected.Status > 1)                                {
+                                if (selected.Status == 2)//make a own link
                                 {
-                                    if (selected.Status == 2)//make a own link
-                                    {
-                                        //int weight = AskForAWeight();
-                                        int weight = 0;
-                                        aListGraph.addDirectedEdge(selected, selected, weight);
+                                    //int weight = AskForAWeight();
+                                    int weight = 0;
+                                    aListGraph.addDirectedEdge(selected, selected, weight);
+                                    cicleEdgeList.Add(new Edge(selected));
+                                    InvalidatePlus();
                                     }
                                     else//eliminate the node
                                     {
@@ -195,7 +186,7 @@ namespace editorDeGrafos
                     }                   
                 }
             }
-            InvalidatePlus();
+            InvalidatePlus(1);
         }//Form_MouseDown().
 
 
@@ -288,19 +279,20 @@ namespace editorDeGrafos
             {
                 selected.Position.X = e.X;
                 selected.Position.Y = e.Y;
-                Invalidate();
+                InvalidatePlus();
             }
             if (mousePressed == true && allMoving == true && selectedJustFor != null)
             {
                 selectedJustFor.Position.X = e.X;
                 selectedJustFor.Position.Y = e.Y;
-                Invalidate();
+                InvalidatePlus();
             }
             if(mousePressed == true && e.Button == MouseButtons.Left && allMoRe == true && selectedJustFor != null)
             {
                 selectedJustFor.Position.X = e.X;
-                selectedJustFor.Position.Y = e.Y;
-                Invalidate();
+                selectedJustFor.Position.Y = e.Y;             
+                InvalidatePlus();
+                
             }
             //nodeMoved = true;
         }
@@ -331,40 +323,105 @@ namespace editorDeGrafos
 
         public void InvalidatePlus()
         {
-            if (selected != null)
-            {
-                matrixTB.Text = "node selected : " + "ID = " + selected.ID + " Index = " + selected.Index + "\t" + System.Environment.NewLine;
-                matrixTB.Text += System.Environment.NewLine;
-            }
-            else
-            {
-                matrixTB.Text = System.Environment.NewLine;
-            }
-            matrixTB.Text += aListGraph.ToString();
+            justSaved = false;// all that requires invalidate also should change the jusSaved state.
+            commonInvalidateActions();
             Invalidate();
         }
 
+        public void InvalidatePlus(int code)
+        {
+            commonInvalidateActions();
+            Invalidate();
+        }
+
+        public void commonInvalidateActions()
+        {
+            if (selected != null)
+            {
+                terminal.Text = "Node selected : " + System.Environment.NewLine + "ID = " + selected.ID + System.Environment.NewLine + "Index = " + selected.Index + "\t" + System.Environment.NewLine;
+               if (aListGraph.Directed() == true)
+                {
+                    DirectedGrade dG;
+                    dG = aListGraph.GradeOfDirectedNode(selected);
+                    terminal.Text += "Grado(Nodo): " + dG.Total;
+                    terminal.Text += System.Environment.NewLine;
+                    terminal.Text += "  GradoEntrada ( [<-] ): " + dG.Input;
+                    terminal.Text += System.Environment.NewLine;
+                    terminal.Text += "  GradoSalida    ( [->] ): " + dG.Output;                 
+               }
+                else
+                {
+
+                    terminal.Text += "Grado(Nodo): " + aListGraph.GradeOfNode(selected);
+                }
+            }
+            else
+            {
+                terminal.Text = "";
+            }
+            statusTB.Text = "Grado(Grafo) : " + aListGraph.Grade();
+            statusTB.Text += System.Environment.NewLine;
+            statusTB.Text += "Dirigido : " + aListGraph.Directed();
+            
+            statusTB.Text += System.Environment.NewLine;
+            statusTB.Text += "Completo : " + aListGraph.Complete();
+            statusTB.Text += System.Environment.NewLine;
+            statusTB.Text += "Pseudo: "+ aListGraph.Pseudo();
+            statusTB.Text += System.Environment.NewLine;
+            statusTB.Text += "Cíclico : ";// + aListGraph.Ciclo();
+            statusTB.Text += System.Environment.NewLine;
+            statusTB.Text += "Bipartita : ";// + aListGraph.Bip();
+            statusTB.Text += System.Environment.NewLine;
+
+            matrixTB.Text = aListGraph.ToString();
+        }
+
+        /*****************************
+         * 
+         *      method for painting.
+         * 
+         * ****************************/
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             Graphics graphics = e.Graphics;
             Pen pen = new Pen(Color.Black, 5);
             Brush brush = new SolidBrush(BackColor);
             Rectangle rectangle;
-            foreach (Edge edge in edgeList)
+
+            
+            foreach (Edge edge in edgeList)//undirected edges.
             {
                 graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
             }
-
-            foreach (Edge edge in diEdgeList)
+            foreach (Edge edge in cicleEdgeList)//cicled edge.
+            {
+                Point StartPoint = new Point(edge.A.X, edge.A.Y);
+                Point unoP = new Point(edge.A.X - generalRadius*4 , edge.A.Y - generalRadius*4);
+                Point dosP = new Point(edge.A.X - generalRadius*4 , edge.A.Y + generalRadius*4);
+                graphics.DrawBezier(pen, StartPoint,unoP,dosP,StartPoint);
+            }
+            foreach (Edge edge in diEdgeList)//directed edges.
             {
                 
                 graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
                 int difFromCenterToPin = (int)Math.Pow((generalRadius / 2.0), 0.5);
                 Coordenate pinOfEdge = new Coordenate(edge.B.X-difFromCenterToPin, edge.B.Y-difFromCenterToPin);
 
-
                 graphics.DrawLine(pen, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X-generalRadius/2 , pinOfEdge.Y);
-                graphics.DrawLine(pen, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X, pinOfEdge.Y - generalRadius / 2);
+                graphics.DrawLine(pen, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X, pinOfEdge.Y - generalRadius / 2);               
+            }
+            for (int i = 0; i < aListGraph.GRAPH.Count; i++)//Nodes.
+            {
+                NodeRef nod = aListGraph.GRAPH[i][i];
+                rectangle = new Rectangle(nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
+                graphics.FillEllipse(brush, rectangle);
+                pen = new Pen(nod.NODO.COLOR, 5);
+                graphics.DrawEllipse(pen, nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
+
+                //draw inside the node a index.
+                String index_S = "" + nod.NODO.Index;
+                int fontSize = generalRadius - 10;
+                graphics.DrawString(index_S, new Font(FontFamily.GenericSansSerif, fontSize), new SolidBrush(Color.Black), nod.NODO.Position.X - (fontSize / 2), nod.NODO.Position.Y - (fontSize / 2));
             }
 
             /*
@@ -377,17 +434,6 @@ namespace editorDeGrafos
 
             }
             */
-
-            for (int i = 0; i < aListGraph.GRAPH.Count; i++)
-            {
-
-                NodeRef nod = aListGraph.GRAPH[i][i];
-                rectangle = new Rectangle(nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
-                graphics.FillEllipse(brush, rectangle);
-                pen = new Pen(nod.NODO.COLOR, 5);
-                graphics.DrawEllipse(pen, nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
-            }
-
         }
 
         /*************************************************************************************************************************
@@ -398,6 +444,7 @@ namespace editorDeGrafos
 
         public void saveFile()
         {
+            
             TextWriter sw = null;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Title = "Save text Files";
@@ -415,22 +462,34 @@ namespace editorDeGrafos
             int index;
             int uniqueID;
             */
-            foreach (Node node in nodeList)//all about the node
+            if (justSaved == false)
             {
-                sw.WriteLine(node.ID + "," + node.Index + "," + node.Position.X + "," + node.Position.Y + "," + node.Radius);
+                foreach (Node node in nodeList)//all about the node
+                {
+                    sw.WriteLine(node.ID + "," + node.Index + "," + node.Position.X + "," + node.Position.Y + "," + node.Radius);
+                }
+                sw.WriteLine("Marix");
+                foreach (List<NodeRef> row in aListGraph.GRAPH)
+                {
+                    foreach (NodeRef nodeR in row)
+                    {
+                        sw.Write("|" + nodeR.W);
+                    }
+                    sw.WriteLine();
+                }
+                sw.WriteLine("Edges");
+                foreach (Edge edge in edgeList)
+                {
+                    sw.WriteLine(edge.A.X + "," + edge.A.Y + "," + edge.B.X + "," + edge.B.Y);
+                }
+                sw.WriteLine("D_Edges");
+                foreach (Edge edge in diEdgeList)
+                {
+                    sw.WriteLine(edge.A.X + "," + edge.A.Y + "," + edge.B.X + "," + edge.B.Y);
+                }
+                sw.Close();
+                justSaved = true;
             }
-            sw.WriteLine("Edges");
-            foreach (Edge edge in edgeList)
-            {
-                sw.WriteLine(edge.A.X + "," + edge.A.Y + "," + edge.B.X + "," + edge.B.Y);
-            }
-            sw.WriteLine("D_Edges");
-            foreach (Edge edge in diEdgeList)
-            {
-                sw.WriteLine(edge.A.X + "," + edge.A.Y + "," + edge.B.X + "," + edge.B.Y);
-            }
-            sw.Close();
-            justSaved = true;
         }
 
         public void openFile()
@@ -631,6 +690,9 @@ namespace editorDeGrafos
 
         public void eliminate()
         {
+            if (aListGraph.GRAPH.Count <= 1)
+                justSaved = true;
+
             if (selected != null)
             {
                 eliminateNexetEdges(selected);
@@ -640,6 +702,7 @@ namespace editorDeGrafos
                 anyNodeSelected = false;
                 indexCount--;
             }
+            InvalidatePlus();
         }
         
         public void create(Coordenate cor)
@@ -656,11 +719,7 @@ namespace editorDeGrafos
             }           
             indexCount++;
             nodeList.Add(newNode);
-            String estrink = "jeje";
-            aListGraph.addNode(newNode, ref estrink);
-            //TERMINAL
-            //terminal.Text = estrink;
-            terminal.Text = "numero de listas normal = " + aListGraph.NumberOfLists + " numero de lista anidada = " + aListGraph.NumberOfNestedLists;
+            aListGraph.addNode(newNode);
             InvalidatePlus();
         }
 
@@ -695,15 +754,7 @@ namespace editorDeGrafos
             return weight;
         }
 
-       
-
-        public void InvalidatePlus(String terminalText )
-        {
-            terminal.Text = terminalText;
-            matrixTB.Text = aListGraph.ToString();
-            Invalidate();
-        }
-
+      
         public void eliminateNexetEdges(Node node)
         {
             List<Edge> newEdges = new List<Edge>();
@@ -842,6 +893,7 @@ namespace editorDeGrafos
             //int weight;
             //int direction;
 
+                //for undirected edges.
             public Edge(Node client, Node server)
             {
                 this.client = client;
@@ -849,11 +901,20 @@ namespace editorDeGrafos
                 directed = false;
             }
 
+            //for directed edges.
             public Edge(Node client, Node server, Boolean directedBool)
             {
                 this.client = client;
                 this.server = server;
                 directed = directedBool;
+            }
+
+            //for cicle edge
+            public Edge(Node unique)
+            {
+                this.client = unique;
+                this.server = unique;
+                directed = false;
             }
 
             public Coordenate A
@@ -929,12 +990,43 @@ namespace editorDeGrafos
 
         }
 
+        public class DirectedGrade
+        {
+            int input;
+            int output;
+
+            public DirectedGrade()
+            {
+
+            }
+            public DirectedGrade(int input, int output)
+            {
+                this.input = input;
+                this.output = output;
+            }
+        
+            public int Input
+            {
+                get { return this.input; }
+            }
+            public int Output
+            {
+                get { return this.output; }
+            }
+
+           public int Total
+            {
+                get { return input + output; }
+            }
+        }//DirectedGrade.
+
         public class NodeRef
         {
             int weight;
             Node nodo;
             TidyPair tidy;
             Boolean activeNode;
+            
 
             public NodeRef(int weight, Node nodo, TidyPair tidyPair)
             {
@@ -1001,31 +1093,31 @@ namespace editorDeGrafos
                 get { return this.graph; }
             }
 
-            public void addNode(Node nodo, ref String terminal)
-            {                
-                List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.             
-                terminal = "no hay elementos" + graph.Count();                                         //for controling the new list adding Node indexes.
+            public void addNode(Node nodo)
+            {
+                List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.           
+
                 if (graph.Count() == 0)//ther's no elements
                 {
                     TidyPair tidyP = new TidyPair(0, 0); ;
-                    NodeRef nodoRef = new NodeRef(-1, nodo, tidyP ,true);            //the new Node that is going to be added have no conection, so it have a -1 value.
+                    NodeRef nodoRef = new NodeRef(-1, nodo, tidyP, true);            //the new Node that is going to be added have no conection, so it have a -1 value.
                     newNodeRefList.Add(nodoRef);
-                    graph.Add(newNodeRefList);                
+                    graph.Add(newNodeRefList);
                 }
                 else//At least one element.
                 {
                     //int j = 0;
-                    for(int i = 0; i < graph.Count; i++)
+                    for (int i = 0; i < graph.Count; i++)
                     {
-                        if(i == graph.Count)
+                        if (i == graph.Count)
                         {
-                            newNodeRefList.Add(new NodeRef(-1, graph[i][i].NODO, new TidyPair(i, graph.Count()),true)); //making the new list for the end of the "array".
+                            newNodeRefList.Add(new NodeRef(-1, graph[i][i].NODO, new TidyPair(i, graph.Count()), true)); //making the new list for the end of the "array".
                         }
                         else
                         {
-                           newNodeRefList.Add(new NodeRef(-1, graph[i][i].NODO, new TidyPair(i, graph.Count() ) ) ); //making the new list for the end of the "array".
+                            newNodeRefList.Add(new NodeRef(-1, graph[i][i].NODO, new TidyPair(i, graph.Count()))); //making the new list for the end of the "array".
                         }
-                        
+
                     }
 
                     graph.Add(newNodeRefList);//adding the list made.
@@ -1033,7 +1125,7 @@ namespace editorDeGrafos
                     int iF = 0;
                     foreach (List<NodeRef> row in graph)
                     {
-                        row.Add(new NodeRef(-1, nodo,new TidyPair(nodo.Index,iF))); //adding to each row the new Node.
+                        row.Add(new NodeRef(-1, nodo, new TidyPair(nodo.Index, iF))); //adding to each row the new Node.
                         iF++;
                     }
                 }
@@ -1041,19 +1133,19 @@ namespace editorDeGrafos
 
             public void removeNode(Node nodo)//almost the same process as addNode() but vice versa.
             {
-                int nodeIndexToEiminate = nodo.Index;         
+                int nodeIndexToEiminate = nodo.Index;
 
                 foreach (List<NodeRef> row in graph)
                 {
-                  //  if (row.Count > nodeIndexToEiminate)// ESTO NO DEBERIA PORQUE ESTAR AQUI(por eso esta en español) :(.
+                    //  if (row.Count > nodeIndexToEiminate)// ESTO NO DEBERIA PORQUE ESTAR AQUI(por eso esta en español) :(.
                     //{
-                        row.RemoveAt(nodeIndexToEiminate);//removing the NodeRef of all the list of nodes.
+                    row.RemoveAt(nodeIndexToEiminate);//removing the NodeRef of all the list of nodes.
                     //}
                 }
 
                 //if (nodeIndexToEiminate < graph.Count())
                 //{
-                    graph.RemoveAt(nodeIndexToEiminate);//remove the list of adjacency of the node.
+                graph.RemoveAt(nodeIndexToEiminate);//remove the list of adjacency of the node.
                 //}
                 /*
 
@@ -1072,9 +1164,9 @@ namespace editorDeGrafos
                 for (int j = 0; j < graph.Count(); j++)
                 {
                     List<NodeRef> noRe = graph[j];
-                    for (int i = 0; i < noRe.Count();i++ )
+                    for (int i = 0; i < noRe.Count(); i++)
                     {
-                        if(i == j && noRe[i].NODO.Index > nodeIndexToEiminate)
+                        if (i == j && noRe[i].NODO.Index > nodeIndexToEiminate)
                         {
                             noRe[i].NODO.Index--;
                         }
@@ -1083,26 +1175,26 @@ namespace editorDeGrafos
 
             }//remove a node.
 
-            public void addUndirectedEdge(Node client, Node server, int weight, ref String cadena)
+            public void addUndirectedEdge(Node client, Node server, int weight)
             {
-                if(graph.Count > client.Index && graph.Count > server.Index)
+                if (graph.Count > client.Index && graph.Count > server.Index)
                 {
                     if (graph[client.Index].Count > server.Index && graph[server.Index].Count > client.Index)
                     {
                         graph[client.Index][server.Index].W = weight;
                         graph[server.Index][client.Index].W = weight;
-                    }                       
+                    }
                 }
-               
-                cadena = " index de cliente " + client.Index + " index de servidor " + server.Index;
+
+                //cadena = " index de cliente " + client.Index + " index de servidor " + server.Index;
             }
 
             public void addDirectedEdge(Node client, Node server, int weight)
             {
                 //if (graph.Count > client.Index)
                 //{
-                    //if (graph[client.Index].Count > server.Index)
-                        graph[client.Index][server.Index].W = weight;
+                //if (graph[client.Index].Count > server.Index)
+                graph[client.Index][server.Index].W = weight;
 
                 //}
             }
@@ -1116,15 +1208,136 @@ namespace editorDeGrafos
                     resString += "@" + i;
                     foreach (NodeRef nodoR in row)
                     {
-                       resString += "\t" + "+" + nodoR.NODO.Index + "+" + "(" + nodoR.TidyPair.ToString() + ")=" + nodoR.W ;
+                        resString += "\t" + "+" + nodoR.NODO.Index + "+" + "(" + nodoR.TidyPair.ToString() + ")=" + nodoR.W;
                     }
                     resString += System.Environment.NewLine;
                     i++;
                 }
                 return resString;
             }
-        }//AdjacencyList.
 
-       
+            public int Grade()
+            {
+                int res = 0;
+                for (int i = 0; i < graph.Count(); i++)
+                {
+                  res += GradeOfNode(graph[i][i].NODO);                 
+                }
+                return res;
+            }
+
+            public Boolean Pseudo()
+            {
+                Boolean res = false;
+                for (int i = 0; i < graph.Count(); i++)
+                {
+                    if(graph[i][i].W > -1)
+                    {
+                        res = true;
+                    }
+                }
+                return res;
+            }
+
+            public int GradeOfNode(Node nodo)
+            {
+                int res = 0;
+                int i = 0;
+                int nodeIndex = nodo.Index;
+                foreach (NodeRef nodeR in graph[nodeIndex])
+                {
+                    if (nodeR.W > -1)
+                    {
+                        if (nodeIndex == i)
+                        {
+                            res += 2;
+                        }
+                        else
+                        {
+                            res++;
+                        }
+                    }
+                    i++;
+                }
+                return res;
+            }
+
+    
+           public DirectedGrade GradeOfDirectedNode(Node nodo)
+            {
+                DirectedGrade res;
+                int input = 0;
+                int output = 0;
+                foreach (List<NodeRef> row in graph)
+                {
+                    foreach (NodeRef nodeR in row)
+                    {
+                        if (graph.IndexOf(row) == row.IndexOf(nodeR))
+                        {
+                            if (nodeR.W > -1)
+                            {
+                               input++;
+                               output++;
+                            }
+                        }
+                        else
+                        {
+                            if (graph.IndexOf(row) == nodo.Index)
+                            {
+                                if (nodeR.W > -1)
+                                {
+                                    output++;
+                                }
+                            }
+                            if (row.IndexOf(nodeR) == nodo.Index)
+                            {
+                                if (nodeR.W > -1)
+                                {
+                                    input++;
+                                }
+                            }
+
+                        }
+                    }
+                }
+                res = new DirectedGrade(input,output);
+                return res;
+            }
+
+            public Boolean Directed()
+            {
+                for (int i = 0; i < graph.Count(); i++)
+                {
+                    for (int j = 0; j < graph.Count(); j++)
+                    {
+                        if (graph[i][j].W != graph[j][i].W)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            public Boolean Complete()
+            {
+                Boolean res = true;
+                for (int i = 0; i < graph.Count(); i++)
+                {
+                    for (int j = 0; j < graph[i].Count(); j++)
+                    {
+                        if (graph[i][j].W < 0 && i != j)
+                        {
+                            res = false;
+                        }
+                    }
+                   
+                }
+                return res;
+            }
+
+
+        }//AdjacencyList.      
+
     }//Form.
 }//namespace.

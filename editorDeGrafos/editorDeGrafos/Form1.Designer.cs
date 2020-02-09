@@ -37,10 +37,11 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.Move = new System.Windows.Forms.ToolStripLabel();
             this.Remove = new System.Windows.Forms.ToolStripLabel();
+            this.MoRe = new System.Windows.Forms.ToolStripLabel();
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.terminal = new System.Windows.Forms.TextBox();
             this.matrixTB = new System.Windows.Forms.TextBox();
-            this.MoRe = new System.Windows.Forms.ToolStripLabel();
+            this.statusTB = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -116,6 +117,13 @@
             this.Remove.Text = "Remove(X,R)";
             this.Remove.Click += new System.EventHandler(this.Remove_Click);
             // 
+            // MoRe
+            // 
+            this.MoRe.Name = "MoRe";
+            this.MoRe.Size = new System.Drawing.Size(52, 22);
+            this.MoRe.Text = "MoRe(F)";
+            this.MoRe.Click += new System.EventHandler(this.MoRe_Click);
+            // 
             // helpToolStripButton
             // 
             this.helpToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -127,32 +135,34 @@
             // 
             // terminal
             // 
-            this.terminal.Location = new System.Drawing.Point(755, 12);
+            this.terminal.Location = new System.Drawing.Point(978, 12);
             this.terminal.Multiline = true;
             this.terminal.Name = "terminal";
-            this.terminal.Size = new System.Drawing.Size(717, 117);
+            this.terminal.Size = new System.Drawing.Size(151, 122);
             this.terminal.TabIndex = 1;
             // 
             // matrixTB
             // 
-            this.matrixTB.Location = new System.Drawing.Point(755, 133);
+            this.matrixTB.Location = new System.Drawing.Point(755, 140);
             this.matrixTB.Multiline = true;
             this.matrixTB.Name = "matrixTB";
-            this.matrixTB.Size = new System.Drawing.Size(717, 716);
+            this.matrixTB.Size = new System.Drawing.Size(717, 709);
             this.matrixTB.TabIndex = 2;
             // 
-            // MoRe
+            // statusTB
             // 
-            this.MoRe.Name = "MoRe";
-            this.MoRe.Size = new System.Drawing.Size(52, 22);
-            this.MoRe.Text = "MoRe(F)";
-            this.MoRe.Click += new System.EventHandler(this.MoRe_Click);
+            this.statusTB.Location = new System.Drawing.Point(755, 12);
+            this.statusTB.Multiline = true;
+            this.statusTB.Name = "statusTB";
+            this.statusTB.Size = new System.Drawing.Size(217, 122);
+            this.statusTB.TabIndex = 3;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1484, 861);
+            this.Controls.Add(this.statusTB);
             this.Controls.Add(this.matrixTB);
             this.Controls.Add(this.terminal);
             this.Controls.Add(this.toolStrip1);
@@ -185,6 +195,7 @@
         private System.Windows.Forms.ToolStripLabel Move;
         private System.Windows.Forms.ToolStripLabel Remove;
         private System.Windows.Forms.ToolStripLabel MoRe;
+        private System.Windows.Forms.TextBox statusTB;
     }
 }
 
