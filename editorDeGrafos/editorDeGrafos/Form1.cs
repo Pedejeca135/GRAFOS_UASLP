@@ -391,7 +391,11 @@ namespace editorDeGrafos
             Brush brush = new SolidBrush(BackColor);
             Rectangle rectangle;
 
-            
+            Pen penDirect = new Pen(Color.Black, 8);
+            penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor; 
+            penDirect.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
+
+
             foreach (Edge edge in edgeList)//undirected edges.
             {
                 graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
@@ -403,15 +407,22 @@ namespace editorDeGrafos
                 Point dosP = new Point(edge.A.X - generalRadius*4 , edge.A.Y + generalRadius*4);
                 graphics.DrawBezier(pen, StartPoint,unoP,dosP,StartPoint);
             }
+
+            Double equis_X;
+            Double ye_Y;
             foreach (Edge edge in diEdgeList)//directed edges.
             {
-                
-                graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
-                int difFromCenterToPin = (int)Math.Pow((generalRadius / 2.0), 0.5);
-                Coordenate pinOfEdge = new Coordenate(edge.B.X-difFromCenterToPin, edge.B.Y-difFromCenterToPin);
+                Double rate = edge.Distancia/generalRadius;
+                equis_X = (edge.A.X + rate * edge.B.X)/(1+rate);
+                ye_Y = (edge.A.Y + rate * edge.B.Y)/(1 + rate);
+                //graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
+                graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, (float)equis_X, (float)ye_Y);
+                //int difFromCenterToPin = (int)Math.Pow((generalRadius / 2.0), 0.5);
+                //Coordenate pinOfEdge = new Coordenate(edge.B.X-difFromCenterToPin, edge.B.Y-difFromCenterToPin);              
 
-                graphics.DrawLine(pen, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X-generalRadius/2 , pinOfEdge.Y);
-                graphics.DrawLine(pen, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X, pinOfEdge.Y - generalRadius / 2);               
+
+                //graphics.DrawLine(penDirect, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X-generalRadius/2 , pinOfEdge.Y);
+                //graphics.DrawLine(penDirect, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X, pinOfEdge.Y - generalRadius / 2);               
             }
             for (int i = 0; i < aListGraph.GRAPH.Count; i++)//Nodes.
             {
@@ -970,6 +981,8 @@ namespace editorDeGrafos
                 get { return this.server; }
             }
 
+            public Double Distancia => Math.Pow(Math.Pow(B.X - A.X, 2.0) + Math.Pow(B.Y - A.Y, 2.0), 0.5); 
+            
         }//Edge.
 
         public class Coordenate
@@ -1240,7 +1253,7 @@ namespace editorDeGrafos
                     resString += "@" + i;
                     foreach (NodeRef nodoR in row)
                     {
-                        resString += "\t" + "+" + nodoR.NODO.Index + "+" + "(" + nodoR.TidyPair.ToString() + ")=" + nodoR.W;
+                        resString += "\t"  + "("+ i + ":" + nodoR.NODO.Index + ")= " + nodoR.W;
                     }
                     resString += System.Environment.NewLine;
                     i++;
