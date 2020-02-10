@@ -68,6 +68,9 @@
     <Compile Include="SaveChangesWindow.Designer.cs">
       <DependentUpon>SaveChangesWindow.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AskForWeight.resx">
+      <DependentUpon>AskForWeight.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

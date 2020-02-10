@@ -132,16 +132,16 @@ namespace editorDeGrafos
                                 if (selected.Status == 2)//undirected link
                                 {
                                     //here i have to ask the weight of the link.
-                                    //int weight = AskForAWeight();
-                                    int weight = 0;
+                                    int weight = AFWeight("Bidireccional");
+                                    //int weight = 0;
                                     edgeList.Add(new Edge(selected, oneNode));
                                     aListGraph.addUndirectedEdge(selected, oneNode, weight);
                                 }
                                 if (selected.Status == 3)//directed link
                                 {
                                     //here i have to ask the weight of the link.
-                                    //int weight = AskForAWeight();
-                                    int weight = 0;
+                                    int weight = AFWeight("Dirijido");
+                                    //int weight = 0;
                                     diEdgeList.Add(new Edge(selected, oneNode, true));
                                     aListGraph.addDirectedEdge(selected, oneNode, weight);
                                 }
@@ -170,20 +170,21 @@ namespace editorDeGrafos
                     {
                         if (selected == findNodeClicked(new Coordenate(e.X, e.Y)))
                         {
-                            if (selected.Status > 1)                                {
+                            if (selected.Status > 1)                               
+                            {
                                 if (selected.Status == 2)//make a own link
                                 {
-                                    //int weight = AskForAWeight();
-                                    int weight = 0;
+                                    int weight = AFWeight("Ciclo");
+                                    //int weight = 0;
                                     aListGraph.addDirectedEdge(selected, selected, weight);
                                     cicleEdgeList.Add(new Edge(selected));
                                     InvalidatePlus();
-                                    }
-                                    else//eliminate the node
-                                    {
-                                        eliminate();
-                                    }
                                 }
+                                else//eliminate the node
+                                {
+                                        eliminate();
+                                }
+                            }
                         }                        
                     }                   
                 }
@@ -459,6 +460,15 @@ namespace editorDeGrafos
          * |||||||||||||||||||||||||||||||||||||||||||||||||||||   METHODS ()  |||||||||||||||||||||||||||||||||||||||||||||||||||
          * 
          * ***********************************************************************************************************************/
+
+        public int AFWeight(String type)
+        {
+            int res = 0;
+            AskForWeight afaw = new AskForWeight(type);
+            afaw.ShowDialog();
+            res = afaw.getX;
+            return res;
+        }
 
         public void saveFile()
         {
@@ -940,7 +950,7 @@ namespace editorDeGrafos
             //int weight;
             //int direction;
 
-                //for undirected edges.
+            //for undirected edges.
             public Edge(Node client, Node server)
             {
                 this.client = client;

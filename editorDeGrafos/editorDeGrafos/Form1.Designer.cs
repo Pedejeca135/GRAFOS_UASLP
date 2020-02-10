@@ -169,7 +169,6 @@
             this.Controls.Add(this.toolStrip1);
             this.KeyPreview = true;
             this.Name = "Form1";
-            this.Text = "GraphEditor";
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
