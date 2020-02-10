@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Drawing.Drawing2D;
 
 namespace editorDeGrafos
 {
@@ -391,7 +392,7 @@ namespace editorDeGrafos
             Brush brush = new SolidBrush(BackColor);
             Rectangle rectangle;
 
-            Pen penDirect = new Pen(Color.Black, 8);
+            Pen penDirect = new Pen(Color.DimGray, 8);
             penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor; 
             penDirect.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
 
@@ -405,7 +406,10 @@ namespace editorDeGrafos
                 Point StartPoint = new Point(edge.A.X, edge.A.Y);
                 Point unoP = new Point(edge.A.X - generalRadius*4 , edge.A.Y - generalRadius*4);
                 Point dosP = new Point(edge.A.X - generalRadius*4 , edge.A.Y + generalRadius*4);
-                graphics.DrawBezier(pen, StartPoint,unoP,dosP,StartPoint);
+                //graphics.DrawBezier(pen, StartPoint,unoP,dosP,StartPoint);
+                GraphicsPath gPath = new GraphicsPath();
+                gPath.AddBezier(StartPoint, unoP, dosP, StartPoint);
+                e.Graphics.DrawPath(pen, gPath);
             }
 
             Double equis_X;
