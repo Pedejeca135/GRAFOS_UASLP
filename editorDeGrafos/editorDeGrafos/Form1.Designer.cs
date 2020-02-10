@@ -140,6 +140,7 @@
             this.terminal.Name = "terminal";
             this.terminal.Size = new System.Drawing.Size(151, 122);
             this.terminal.TabIndex = 1;
+            this.terminal.TextChanged += new System.EventHandler(this.terminal_TextChanged);
             // 
             // matrixTB
             // 

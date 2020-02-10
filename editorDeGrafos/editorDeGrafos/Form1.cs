@@ -35,6 +35,7 @@ namespace editorDeGrafos
         Boolean allDeleting = false;
         Boolean allMoRe = false;
         Boolean justSaved = true;
+        String nombreArchivo = "";
 
         //Boolean nodeMoved = false;
 
@@ -231,6 +232,7 @@ namespace editorDeGrafos
                     foreach (Node node in nodeList)
                     {
                         eliminateNexetEdges(node);
+                        //
                     }
                     nodeList = new List<Node>();
                     justSaved = true;
@@ -253,10 +255,10 @@ namespace editorDeGrafos
                     {
                         saveFile();
                     }
-
                     foreach (Node node in nodeList)
                     {
                         eliminateNexetEdges(node);
+                        //eliminateNexetDirectedEdges(node);
                     }
                     nodeList = new List<Node>();
                     justSaved = true;
@@ -336,6 +338,7 @@ namespace editorDeGrafos
 
         public void commonInvalidateActions()
         {
+            
             if (selected != null)
             {
                 terminal.Text = "Node selected : " + System.Environment.NewLine + "ID = " + selected.ID + System.Environment.NewLine + "Index = " + selected.Index + "\t" + System.Environment.NewLine;
@@ -357,12 +360,12 @@ namespace editorDeGrafos
             }
             else
             {
-                terminal.Text = "";
+                terminal.Text = "Node selected : ";
             }
-            statusTB.Text = "Grado(Grafo) : " + aListGraph.Grade();
+            statusTB.Text = "Nombre :" + nombreArchivo;
+            statusTB.Text += "Grado(Grafo) : " + aListGraph.Grade();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Dirigido : " + aListGraph.Directed();
-            
+            statusTB.Text += "Dirigido : " + aListGraph.Directed();            
             statusTB.Text += System.Environment.NewLine;
             statusTB.Text += "Completo : " + aListGraph.Complete();
             statusTB.Text += System.Environment.NewLine;
@@ -448,8 +451,8 @@ namespace editorDeGrafos
             TextWriter sw = null;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Title = "Save text Files";
-            saveFileDialog.DefaultExt = "txt";
-            saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            saveFileDialog.DefaultExt = "grp";
+            saveFileDialog.Filter = "Text files (*.grp)|*.grp|All files (*.*)|*.*";
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 sw = new StreamWriter(saveFileDialog.FileName);
@@ -696,6 +699,9 @@ namespace editorDeGrafos
             if (selected != null)
             {
                 eliminateNexetEdges(selected);
+                eliminateNexetDirectedEdges(selected);
+                eliminateCicledEdges(selected);
+
                 aListGraph.removeNode(selected);
                 nodeList.Remove(selected);
                 selected = null;
@@ -769,7 +775,33 @@ namespace editorDeGrafos
             edgeList = newEdges;
         }
 
-        
+        public void eliminateNexetDirectedEdges(Node node)
+        {
+            List<Edge> newEdges = new List<Edge>();
+
+            foreach (Edge edge in diEdgeList)
+            {
+                if (edge.Client != node && edge.Server != node)
+                {
+                    newEdges.Add(edge);
+                }
+            }
+            diEdgeList = newEdges;
+        }
+
+        public void eliminateCicledEdges(Node node)
+        {
+            List<Edge> newEdges = new List<Edge>();
+
+            foreach (Edge edge in cicleEdgeList)
+            {
+                if (edge.Client != node && edge.Server != node)
+                {
+                    newEdges.Add(edge);
+                }
+            }
+            cicleEdgeList = newEdges;
+        }
 
         /*************************************************************************************************************************
          * 
@@ -1339,5 +1371,9 @@ namespace editorDeGrafos
 
         }//AdjacencyList.      
 
+        private void terminal_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }//Form.
 }//namespace.
