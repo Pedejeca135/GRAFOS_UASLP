@@ -41,7 +41,8 @@
             this.textBox.Multiline = true;
             this.textBox.Name = "textBox";
             this.textBox.Size = new System.Drawing.Size(332, 31);
-            this.textBox.TabIndex = 0;
+            this.textBox.TabIndex = 2;
+            this.textBox.TabStop = false;
             this.textBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_KeyDown);
             // 
             // Aceptar
@@ -53,6 +54,9 @@
             this.Aceptar.Text = "Aceptar";
             this.Aceptar.UseVisualStyleBackColor = true;
             this.Aceptar.Click += new System.EventHandler(this.Aceptar_Click);
+            this.Aceptar.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Aceptar_MouseClick);
+            this.Aceptar.MouseEnter += new System.EventHandler(this.Aceptar_MouseEnter);
+            this.Aceptar.MouseLeave += new System.EventHandler(this.Aceptar_MouseLeave);
             // 
             // Cancelar
             // 
@@ -93,6 +97,8 @@
             this.Controls.Add(this.textBox);
             this.Name = "AskForWeight";
             this.Text = "AskForWeight";
+            this.Load += new System.EventHandler(this.AskForWeight_Load);
+            this.Click += new System.EventHandler(this.AskForWeight_Click);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.AskForWeight_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();

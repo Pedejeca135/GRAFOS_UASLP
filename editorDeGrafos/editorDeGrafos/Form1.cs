@@ -57,8 +57,9 @@ namespace editorDeGrafos
             IDList = new List<int>();
             IDList.Add(1000);
 
-            //TERMINAL
-            terminal.Text = "0";
+
+            statusTB.Text = "Nombre :" + nombreArchivo;
+            terminal.Text = "Node selected : ";
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
@@ -134,16 +135,22 @@ namespace editorDeGrafos
                                     //here i have to ask the weight of the link.
                                     int weight = AFWeight("Bidireccional");
                                     //int weight = 0;
-                                    edgeList.Add(new Edge(selected, oneNode));
-                                    aListGraph.addUndirectedEdge(selected, oneNode, weight);
+                                    if (weight >= 0)
+                                    {
+                                        edgeList.Add(new Edge(selected, oneNode));
+                                        aListGraph.addUndirectedEdge(selected, oneNode, weight);
+                                    }
                                 }
                                 if (selected.Status == 3)//directed link
                                 {
                                     //here i have to ask the weight of the link.
                                     int weight = AFWeight("Dirijido");
                                     //int weight = 0;
-                                    diEdgeList.Add(new Edge(selected, oneNode, true));
-                                    aListGraph.addDirectedEdge(selected, oneNode, weight);
+                                    if (weight >= 0)
+                                    {
+                                        diEdgeList.Add(new Edge(selected, oneNode, true));
+                                        aListGraph.addDirectedEdge(selected, oneNode, weight);
+                                    }
                                 }
                                 InvalidatePlus();
                             }
@@ -176,8 +183,11 @@ namespace editorDeGrafos
                                 {
                                     int weight = AFWeight("Ciclo");
                                     //int weight = 0;
-                                    aListGraph.addDirectedEdge(selected, selected, weight);
-                                    cicleEdgeList.Add(new Edge(selected));
+                                    if (weight >= 0)
+                                    {
+                                        aListGraph.addDirectedEdge(selected, selected, weight);
+                                        cicleEdgeList.Add(new Edge(selected));
+                                    }
                                     InvalidatePlus();
                                 }
                                 else//eliminate the node
@@ -364,7 +374,7 @@ namespace editorDeGrafos
             {
                 terminal.Text = "Node selected : ";
             }
-            statusTB.Text = "Nombre :" + nombreArchivo;
+            statusTB.Text = "Nombre :" + nombreArchivo + System.Environment.NewLine;
             statusTB.Text += "Grado(Grafo) : " + aListGraph.Grade();
             statusTB.Text += System.Environment.NewLine;
             statusTB.Text += "Dirigido : " + aListGraph.Directed();            

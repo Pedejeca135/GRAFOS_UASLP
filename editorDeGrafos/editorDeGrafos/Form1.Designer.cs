@@ -59,7 +59,7 @@
             this.helpToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1484, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1370, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -135,34 +135,44 @@
             // 
             // terminal
             // 
+            this.terminal.AccessibleRole = System.Windows.Forms.AccessibleRole.Text;
+            this.terminal.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.terminal.Location = new System.Drawing.Point(978, 12);
             this.terminal.Multiline = true;
             this.terminal.Name = "terminal";
+            this.terminal.ReadOnly = true;
             this.terminal.Size = new System.Drawing.Size(151, 122);
             this.terminal.TabIndex = 1;
+            this.terminal.TabStop = false;
             this.terminal.TextChanged += new System.EventHandler(this.terminal_TextChanged);
             // 
             // matrixTB
             // 
+            this.matrixTB.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.matrixTB.Location = new System.Drawing.Point(755, 140);
             this.matrixTB.Multiline = true;
             this.matrixTB.Name = "matrixTB";
+            this.matrixTB.ReadOnly = true;
             this.matrixTB.Size = new System.Drawing.Size(717, 709);
             this.matrixTB.TabIndex = 2;
+            this.matrixTB.TabStop = false;
             // 
             // statusTB
             // 
+            this.statusTB.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.statusTB.Location = new System.Drawing.Point(755, 12);
             this.statusTB.Multiline = true;
             this.statusTB.Name = "statusTB";
+            this.statusTB.ReadOnly = true;
             this.statusTB.Size = new System.Drawing.Size(217, 122);
             this.statusTB.TabIndex = 3;
+            this.statusTB.TabStop = false;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1484, 861);
+            this.ClientSize = new System.Drawing.Size(1370, 749);
             this.Controls.Add(this.statusTB);
             this.Controls.Add(this.matrixTB);
             this.Controls.Add(this.terminal);
