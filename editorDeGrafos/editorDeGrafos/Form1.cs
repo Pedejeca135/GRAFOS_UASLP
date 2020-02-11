@@ -383,7 +383,7 @@ namespace editorDeGrafos
             statusTB.Text += System.Environment.NewLine;
             statusTB.Text += "Pseudo: "+ aListGraph.Pseudo();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Cíclico : ";// + aListGraph.Ciclo();
+            statusTB.Text += "Cíclico : " + aListGraph.Cicled();
             statusTB.Text += System.Environment.NewLine;
             statusTB.Text += "Bipartita : ";// + aListGraph.Bip();
             statusTB.Text += System.Environment.NewLine;
@@ -1405,6 +1405,67 @@ namespace editorDeGrafos
                 return res;
             }
 
+            //Determine if a graph is cicled with BFS algorithm.
+            //watch this video: https://www.youtube.com/watch?v=rKQaZuoUR4M 
+            public Boolean Cicled()
+            {
+                Boolean res = false;
+
+                HashSet<int> whiteSet = new HashSet<int>();
+                HashSet<int> graySet = new HashSet<int>();
+                HashSet<int> blackSet = new HashSet<int>();
+
+                for (int i = 0; i < graph.Count(); i++)
+                {
+                    whiteSet.Add(i);
+                }
+
+                while(whiteSet.Count() > 0)
+                {
+                    int current = whiteSet.First();
+                    if (dfs(current, whiteSet, graySet, blackSet))
+                    {
+                        return true;
+                    }
+                }
+
+                return res;
+            }
+
+            private Boolean dfs(int currentIndex, HashSet<int> whiteS, HashSet<int> grayS, HashSet<int> blackS)
+            {
+
+                //move current to gray set from white set and then explore it.
+                moveVertex(currentIndex, whiteS, grayS);
+                    foreach(NodeRef nodeR in graph[currentIndex])
+                { 
+                    //if in black set means already explored so continue.
+                    if (blackS.Contains(nodeR.NODO.Index))
+                    {
+                        //continue;
+                    }
+                    //if in gray set then cycle found.
+                    if (grayS.Contains(nodeR.NODO.Index))
+                    {
+                        return true;
+                    }
+                    if (dfs(nodeR.NODO.Index, whiteS, grayS, blackS))
+                    {
+                        return true;
+                    }
+                }
+                //move vertex from gray set to black set when done exploring.
+                moveVertex(currentIndex, grayS, blackS);
+
+
+                return false;
+            }
+
+            private void moveVertex(int v_Index, HashSet<int> sourceSet, HashSet<int> destinationSet)
+            {
+                sourceSet.Remove(v_Index);
+                destinationSet.Add(v_Index);
+            }
 
         }//AdjacencyList.      
 
