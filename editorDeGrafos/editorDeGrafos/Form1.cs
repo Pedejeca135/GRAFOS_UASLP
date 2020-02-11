@@ -385,7 +385,7 @@ namespace editorDeGrafos
             statusTB.Text += System.Environment.NewLine;
             statusTB.Text += "Cíclico : " + aListGraph.Cicled();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Bipartita : ";// + aListGraph.Bip();
+            statusTB.Text += "Bipartita : " + aListGraph.Bip();
             statusTB.Text += System.Environment.NewLine;
 
             matrixTB.Text = aListGraph.ToString();
@@ -1316,6 +1316,7 @@ namespace editorDeGrafos
                 return res;
             }
 
+
             public int GradeOfNode(Node nodo)
             {
                 int res = 0;
@@ -1338,7 +1339,6 @@ namespace editorDeGrafos
                 }
                 return res;
             }
-
 
             public DirectedGrade GradeOfDirectedNode(Node nodo)
             {
@@ -1536,12 +1536,136 @@ namespace editorDeGrafos
 
             public Boolean Bipartita()
             {
-                return true;
+                HashSet<int> whiteSet = new HashSet<int>();
+                HashSet<int> blueSet = new HashSet<int>();
+                HashSet<int> redSet = new HashSet<int>();
+                HashSet<int> visited = new HashSet<int>();
+
+                for(int i = 0; i < graph.Count(); i++)
+                {
+                    whiteSet.Add(i);
+                }
+                moveVertex(0, whiteSet, blueSet);
+                visited.Add(0);
+                return Bipartita2(0,visited,blueSet,redSet,whiteSet);
             }
 
-           
+        public Boolean Bipartita2( int origin, HashSet<int> visited, HashSet<int> originColorSet , HashSet<int> destinationColorSet, HashSet<int> whiteSet)
+        {
 
-        }//AdjacencyList.      
+            
+            foreach(NodeRef nodeR in graph[origin])
+            {
+                    if (nodeR.W > -1)
+                    {
+                       if(!visited.Contains(nodeR.NODO.Index))
+                        {
+                            // mark present vertic as visited 
+                            visited.Add(nodeR.NODO.Index);
+
+                            // mark its color opposite to its parent 
+                            this.moveVertex(nodeR.NODO.Index,whiteSet,destinationColorSet);
+
+                            // if the subtree rooted at vertex v is not bipartite 
+                            if (Bipartita2(nodeR.NODO.Index,  visited,destinationColorSet, originColorSet, whiteSet))
+                                return false;
+                        }
+                        else 
+                        if (originColorSet.Contains(nodeR.NODO.Index) && originColorSet.Contains(origin))
+                            return false;
+                    }
+            }
+            return true;
+        }
+            public Boolean Bip()
+            {
+                // Create a color array to store  
+                // colors assigned to all veritces. 
+                // Vertex number is used as index  
+                // in this array. The value '-1' 
+                // of colorArr[i] is used to indicate  
+                // that no color is assigned 
+                // to vertex 'i'. The value 1 is  
+                // used to indicate first color 
+                // is assigned and value 0 indicates  
+                // second color is assigned. 
+                int[] colorArr = new int[graph.Count()];
+                for (int i = 0; i < graph.Count(); ++i)
+                    colorArr[i] = -1;
+
+                // Assign first color to source 
+                colorArr[0] = 1;
+
+                // Create a queue (FIFO) of vertex numbers  
+                // and enqueue source vertex for BFS traversal 
+                List<int> q = new List<int>();
+                q.Add(0);
+
+                // Run while there are vertices 
+                // in queue (Similar to BFS) 
+                while (q.Count != 0)
+                {
+                    // Dequeue a vertex from queue 
+                    int u = q[0];
+                    q.RemoveAt(0);
+
+                    // Return false if there is a self-loop  
+                    if (graph[u][u].W > -1)
+                        return false;
+
+                    // Find all non-colored adjacent vertices 
+                    for (int v = 0; v < graph.Count(); ++v)
+                    {
+                        // An edge from u to v exists  
+                        // and destination v is not colored 
+                        if (graph[u][v].W > -1 && colorArr[v] == -1)
+                        {
+                            // Assign alternate color  
+                            // to this adjacent v of u 
+                            colorArr[v] = 1 - colorArr[u];
+                            q.Add(v);
+                        }
+
+                        // An edge from u to v exists and  
+                        // destination v is colored with 
+                        // same color as u 
+                        else if (graph[u][v].W > -1 &&
+                                 colorArr[v] == colorArr[u])
+                            return false;
+                    }
+                }
+
+                for (int i = 0; i < graph.Count(); i++)
+                {
+                    for (int j = 0; j < graph.Count(); j++)
+                    {
+                        if(this.Directed() == true)
+                        {
+                            if (this.GradeOfDirectedNode(graph[i][j].NODO).Total == 0)
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            if (this.GradeOfNode(graph[i][j].NODO) == 0)
+                            {
+                                return false;
+                            }
+                        }
+                        if (graph[i][i].W > -1)
+                        {
+                            return false;
+                        }
+
+                    }
+                }
+
+                // If we reach here, then all adjacent vertices 
+                // can be colored with alternate color 
+                return true;
+            }
+    }//AdjacencyList.      
 
         private void terminal_TextChanged(object sender, EventArgs e)
         {
