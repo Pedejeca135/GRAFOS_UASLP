@@ -1161,7 +1161,15 @@ namespace editorDeGrafos
             {
                 get { return this.graph; }
             }
-
+            /*
+            public <List<NodeRef>> Vertex()
+            {
+                for(int i = 0 ; i< this.)
+                    {
+                    }
+             
+            }
+            */
             public void addNode(Node nodo)
             {
                 List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.           
@@ -1277,7 +1285,7 @@ namespace editorDeGrafos
                     resString += "@" + i;
                     foreach (NodeRef nodoR in row)
                     {
-                        resString += "\t"  + "("+ i + ":" + nodoR.NODO.Index + ")= " + nodoR.W;
+                        resString += "\t" + "(" + i + ":" + nodoR.NODO.Index + ")= " + nodoR.W;
                     }
                     resString += System.Environment.NewLine;
                     i++;
@@ -1290,7 +1298,7 @@ namespace editorDeGrafos
                 int res = 0;
                 for (int i = 0; i < graph.Count(); i++)
                 {
-                  res += GradeOfNode(graph[i][i].NODO);                 
+                    res += GradeOfNode(graph[i][i].NODO);
                 }
                 return res;
             }
@@ -1300,7 +1308,7 @@ namespace editorDeGrafos
                 Boolean res = false;
                 for (int i = 0; i < graph.Count(); i++)
                 {
-                    if(graph[i][i].W > -1)
+                    if (graph[i][i].W > -1)
                     {
                         res = true;
                     }
@@ -1331,8 +1339,8 @@ namespace editorDeGrafos
                 return res;
             }
 
-    
-           public DirectedGrade GradeOfDirectedNode(Node nodo)
+
+            public DirectedGrade GradeOfDirectedNode(Node nodo)
             {
                 DirectedGrade res;
                 int input = 0;
@@ -1345,8 +1353,8 @@ namespace editorDeGrafos
                         {
                             if (nodeR.W > -1)
                             {
-                               input++;
-                               output++;
+                                input++;
+                                output++;
                             }
                         }
                         else
@@ -1369,7 +1377,7 @@ namespace editorDeGrafos
                         }
                     }
                 }
-                res = new DirectedGrade(input,output);
+                res = new DirectedGrade(input, output);
                 return res;
             }
 
@@ -1400,14 +1408,71 @@ namespace editorDeGrafos
                             res = false;
                         }
                     }
-                   
+
                 }
                 return res;
             }
 
+            public Boolean UndirectedCicled()
+            {
+                HashSet<int> visited = new HashSet<int>();
+                for (int vertex = 0; vertex < graph.Count(); vertex++)
+                {
+                    if (visited.Contains(vertex))
+                    {
+                        continue;
+                    }
+                    Boolean flag = dfsU(vertex, visited, -1);
+                    if (flag)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            public Boolean dfsU( int vertex, HashSet<int> visited, int parent)
+            {
+                visited.Add(vertex);
+                foreach(NodeRef nodeR in graph[vertex])
+                {
+                    if (nodeR.W > -1)
+                    {
+                        if (nodeR.NODO.Index.Equals(parent))
+                        {
+                            continue;
+                        }
+                        if (visited.Contains(nodeR.NODO.Index))
+                        {
+                            return true;
+                        }
+                        Boolean hasCycle = dfsU(nodeR.NODO.Index, visited, vertex);
+                        if (hasCycle)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+
+
+
+            public Boolean Cicled()
+            {
+                if (this.Directed())
+                    return this.directedCicled();
+                else
+                    return this.UndirectedCicled();
+            }
+
+           
+
+
             //Determine if a graph is cicled with BFS algorithm.
             //watch this video: https://www.youtube.com/watch?v=rKQaZuoUR4M 
-            public Boolean Cicled()
+            public Boolean directedCicled()
             {
                 Boolean res = false;
 
@@ -1420,38 +1485,40 @@ namespace editorDeGrafos
                     whiteSet.Add(i);
                 }
 
-                while(whiteSet.Count() > 0)
+                while (whiteSet.Count() > 0)
                 {
-                    int current = whiteSet.First();
+                   // int current = whiteSet.First();
+                   int current = whiteSet.Min();
                     if (dfs(current, whiteSet, graySet, blackSet))
                     {
                         return true;
                     }
                 }
-
                 return res;
             }
 
             private Boolean dfs(int currentIndex, HashSet<int> whiteS, HashSet<int> grayS, HashSet<int> blackS)
             {
-
                 //move current to gray set from white set and then explore it.
                 moveVertex(currentIndex, whiteS, grayS);
-                    foreach(NodeRef nodeR in graph[currentIndex])
-                { 
-                    //if in black set means already explored so continue.
-                    if (blackS.Contains(nodeR.NODO.Index))
+                foreach (NodeRef nodeR in graph[currentIndex])
+                {
+                    if (nodeR.W > -1)
                     {
-                        //continue;
-                    }
-                    //if in gray set then cycle found.
-                    if (grayS.Contains(nodeR.NODO.Index))
-                    {
-                        return true;
-                    }
-                    if (dfs(nodeR.NODO.Index, whiteS, grayS, blackS))
-                    {
-                        return true;
+                        //if in black set means already explored so continue.
+                        if (blackS.Contains(nodeR.NODO.Index))
+                        {
+                            continue;
+                        }
+                        //if in gray set then cycle found.
+                        if (grayS.Contains(nodeR.NODO.Index))
+                        {
+                            return true;
+                        }
+                        if (dfs(nodeR.NODO.Index, whiteS, grayS, blackS))
+                        {
+                            return true;
+                        }
                     }
                 }
                 //move vertex from gray set to black set when done exploring.
@@ -1466,6 +1533,13 @@ namespace editorDeGrafos
                 sourceSet.Remove(v_Index);
                 destinationSet.Add(v_Index);
             }
+
+            public Boolean Bipartita()
+            {
+                return true;
+            }
+
+           
 
         }//AdjacencyList.      
 
