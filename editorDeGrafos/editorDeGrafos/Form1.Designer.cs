@@ -42,6 +42,7 @@
             this.terminal = new System.Windows.Forms.TextBox();
             this.matrixTB = new System.Windows.Forms.TextBox();
             this.statusTB = new System.Windows.Forms.TextBox();
+            this.maIn = new System.Windows.Forms.ToolStripLabel();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,7 +57,8 @@
             this.Move,
             this.Remove,
             this.MoRe,
-            this.helpToolStripButton});
+            this.helpToolStripButton,
+            this.maIn});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1370, 25);
@@ -168,6 +170,14 @@
             this.statusTB.TabIndex = 3;
             this.statusTB.TabStop = false;
             // 
+            // maIn
+            // 
+            this.maIn.Name = "maIn";
+            this.maIn.Size = new System.Drawing.Size(113, 22);
+            this.maIn.Text = "Matriz de Incidencia";
+            this.maIn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.maIn.Click += new System.EventHandler(this.maIn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -206,6 +216,7 @@
         private System.Windows.Forms.ToolStripLabel Remove;
         private System.Windows.Forms.ToolStripLabel MoRe;
         private System.Windows.Forms.TextBox statusTB;
+        private System.Windows.Forms.ToolStripLabel maIn;
     }
 }
 

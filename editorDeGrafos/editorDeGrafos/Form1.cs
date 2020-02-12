@@ -38,6 +38,8 @@ namespace editorDeGrafos
         Boolean justSaved = true;
         String nombreArchivo = "";
 
+        Boolean matIn = false;
+
         //Boolean nodeMoved = false;
 
         public Form1()
@@ -246,9 +248,14 @@ namespace editorDeGrafos
                         eliminateNexetEdges(node);
                         //
                     }
+
                     nodeList = new List<Node>();
-                    justSaved = true;
+                    aListGraph = new AdjacencyList();
+                    diEdgeList = new List<Edge>();
+                    edgeList = new List<Edge>();
+                    cicleEdgeList = new List<Edge>();
                     openFile();
+                    justSaved = true;
 
                 }
             }
@@ -350,7 +357,9 @@ namespace editorDeGrafos
 
         public void commonInvalidateActions()
         {
-            
+
+            matrixTB.Text = aListGraph.ToString(matIn);
+
             if (selected != null)
             {
                 terminal.Text = "Node selected : " + System.Environment.NewLine + "ID = " + selected.ID + System.Environment.NewLine + "Index = " + selected.Index + "\t" + System.Environment.NewLine;
@@ -388,7 +397,6 @@ namespace editorDeGrafos
             statusTB.Text += "Bipartita : " + aListGraph.Bip();
             statusTB.Text += System.Environment.NewLine;
 
-            matrixTB.Text = aListGraph.ToString();
         }
 
         /*****************************
@@ -541,23 +549,58 @@ namespace editorDeGrafos
             {
                 sr = new StreamReader(openFileDialog.FileName);
                 auxiliar = sr.ReadLine().Split(',');
+                while (sr != null && !sr.EndOfStream && auxiliar[0] != "Matrix")
+                {
+                    int idON;
+                    int indexON;
+                    int x;
+                    int y;
+                    int radiusON;
+                    /*
+                    
+                    int.TryParse(auxiliar[0], out idON);                    
+                    int.TryParse(auxiliar[1], out indexON);                    
+                    int.TryParse(auxiliar[2], out x);                    
+                    int.TryParse(auxiliar[3], out y);                    
+                    int.TryParse(auxiliar[4], out radiusON);
+                    */
+                    idON = int.Parse(auxiliar[0]);
+                    indexON = int.Parse(auxiliar[1]);
+                    x = int.Parse(auxiliar[2]);
+                    y = int.Parse(auxiliar[3]);
+                    radiusON = int.Parse(auxiliar[4]);
+
+                    Coordenate cor = new Coordenate(x, y);
+                    Node node = new Node(cor,radiusON, indexON, idON);
+                    aListGraph.addNode(node);
+                    auxiliar = sr.ReadLine().Split(',');
+                }
                 while (sr != null && !sr.EndOfStream && auxiliar[0] != "Edges")
                 {
-                    int x = int.Parse(auxiliar[0]);
-                    int y = int.Parse(auxiliar[1]);
-                    Node nodo = new Node(x, y);
-                    nodeList.Add(nodo);
-                    auxiliar = sr.ReadLine().Split(',');
+                    int i = 0;
+                    auxiliar = sr.ReadLine().Split(',');                
+
+                    int Peso;
+                    for(int j = 0; j< aListGraph.GRAPH.Count(); j++)
+                    {
+                        int.TryParse(auxiliar[j], out Peso);
+                        aListGraph.GRAPH[i][j].W = Peso;
+                    }
+                    i++;
                 }
                 while (sr != null && !sr.EndOfStream && auxiliar[0] != "D_Edges")
                 {
                     Node server = new Node();
                     Node client = new Node();
                     auxiliar = sr.ReadLine().Split(',');
-                    int nodo1X = int.Parse(auxiliar[0]);
-                    int nodo1Y = int.Parse(auxiliar[1]);
-                    int nodo2X = int.Parse(auxiliar[2]);
-                    int nodo2Y = int.Parse(auxiliar[3]);
+                    int nodo1X;
+                    int.TryParse(auxiliar[0], out nodo1X);
+                    int nodo1Y;
+                    int.TryParse(auxiliar[1], out nodo1Y);
+                    int nodo2X;
+                    int.TryParse(auxiliar[2], out nodo2X);
+                    int nodo2Y;
+                    int.TryParse(auxiliar[3],out nodo2Y);
 
                     foreach (Node node in nodeList)
                     {
@@ -574,17 +617,21 @@ namespace editorDeGrafos
                         }
                     }
                     Edge edge = new Edge(server, client);
-                    edgeList.Add(edge);
+                    edgeList.Add(edge);                    
                 }
                 while (sr != null && !sr.EndOfStream )
                 {
                     Node server = new Node();
                     Node client = new Node();
                     auxiliar = sr.ReadLine().Split(',');
-                    int nodo1X = int.Parse(auxiliar[0]);
-                    int nodo1Y = int.Parse(auxiliar[1]);
-                    int nodo2X = int.Parse(auxiliar[2]);
-                    int nodo2Y = int.Parse(auxiliar[3]);
+                    int nodo1X;
+                    int.TryParse(auxiliar[0], out nodo1X);
+                    int nodo1Y;
+                    int.TryParse(auxiliar[1], out nodo1Y);
+                    int nodo2X;
+                    int.TryParse(auxiliar[2], out nodo2X);
+                    int nodo2Y;
+                    int.TryParse(auxiliar[3], out nodo2Y);
 
                     foreach (Node node in nodeList)
                     {
@@ -1276,7 +1323,7 @@ namespace editorDeGrafos
                 //}
             }
 
-            public override String ToString()
+            public String ToString(bool paramBool)
             {
                 String resString = "";
                 int i = 0;
@@ -1285,7 +1332,18 @@ namespace editorDeGrafos
                     resString += "@" + i;
                     foreach (NodeRef nodoR in row)
                     {
-                        resString += "\t" + "(" + i + ":" + nodoR.NODO.Index + ")= " + nodoR.W;
+                        if (paramBool == false)
+                        {
+                            resString += "\t" + "(" + i + ":" + nodoR.NODO.Index + ")= " + nodoR.W;
+                        }
+                        else
+                        {
+                            if(nodoR.W > -1)
+                            resString += "\t" + 1;
+                            else
+                            resString += "\t" + 0;
+
+                        }
                     }
                     resString += System.Environment.NewLine;
                     i++;
@@ -1579,97 +1637,114 @@ namespace editorDeGrafos
         }
             public Boolean Bip()
             {
-                // Create a color array to store  
-                // colors assigned to all veritces. 
-                // Vertex number is used as index  
-                // in this array. The value '-1' 
-                // of colorArr[i] is used to indicate  
-                // that no color is assigned 
-                // to vertex 'i'. The value 1 is  
-                // used to indicate first color 
-                // is assigned and value 0 indicates  
-                // second color is assigned. 
-                int[] colorArr = new int[graph.Count()];
-                for (int i = 0; i < graph.Count(); ++i)
-                    colorArr[i] = -1;
-
-                // Assign first color to source 
-                colorArr[0] = 1;
-
-                // Create a queue (FIFO) of vertex numbers  
-                // and enqueue source vertex for BFS traversal 
-                List<int> q = new List<int>();
-                q.Add(0);
-
-                // Run while there are vertices 
-                // in queue (Similar to BFS) 
-                while (q.Count != 0)
+                if (graph.Count() > 0)
                 {
-                    // Dequeue a vertex from queue 
-                    int u = q[0];
-                    q.RemoveAt(0);
+                    // Create a color array to store  
+                    // colors assigned to all veritces. 
+                    // Vertex number is used as index  
+                    // in this array. The value '-1' 
+                    // of colorArr[i] is used to indicate  
+                    // that no color is assigned 
+                    // to vertex 'i'. The value 1 is  
+                    // used to indicate first color 
+                    // is assigned and value 0 indicates  
+                    // second color is assigned. 
+                    int[] colorArr = new int[graph.Count()];
+                    for (int i = 0; i < graph.Count(); ++i)
+                        colorArr[i] = -1;
 
-                    // Return false if there is a self-loop  
-                    if (graph[u][u].W > -1)
-                        return false;
+                    // Assign first color to source 
+                    colorArr[0] = 1;
 
-                    // Find all non-colored adjacent vertices 
-                    for (int v = 0; v < graph.Count(); ++v)
+                    // Create a queue (FIFO) of vertex numbers  
+                    // and enqueue source vertex for BFS traversal 
+                    List<int> q = new List<int>();
+                    q.Add(0);
+
+                    // Run while there are vertices 
+                    // in queue (Similar to BFS) 
+                    while (q.Count != 0)
                     {
-                        // An edge from u to v exists  
-                        // and destination v is not colored 
-                        if (graph[u][v].W > -1 && colorArr[v] == -1)
-                        {
-                            // Assign alternate color  
-                            // to this adjacent v of u 
-                            colorArr[v] = 1 - colorArr[u];
-                            q.Add(v);
-                        }
+                        // Dequeue a vertex from queue 
+                        int u = q[0];
+                        q.RemoveAt(0);
 
-                        // An edge from u to v exists and  
-                        // destination v is colored with 
-                        // same color as u 
-                        else if (graph[u][v].W > -1 &&
-                                 colorArr[v] == colorArr[u])
+                        // Return false if there is a self-loop  
+                        if (graph[u][u].W > -1)
                             return false;
-                    }
-                }
 
-                for (int i = 0; i < graph.Count(); i++)
-                {
-                    for (int j = 0; j < graph.Count(); j++)
-                    {
-                        if(this.Directed() == true)
+                        // Find all non-colored adjacent vertices 
+                        for (int v = 0; v < graph.Count(); ++v)
                         {
-                            if (this.GradeOfDirectedNode(graph[i][j].NODO).Total == 0)
+                            // An edge from u to v exists  
+                            // and destination v is not colored 
+                            if (graph[u][v].W > -1 && colorArr[v] == -1)
+                            {
+                                // Assign alternate color  
+                                // to this adjacent v of u 
+                                colorArr[v] = 1 - colorArr[u];
+                                q.Add(v);
+                            }
+
+                            // An edge from u to v exists and  
+                            // destination v is colored with 
+                            // same color as u 
+                            else if (graph[u][v].W > -1 &&
+                                     colorArr[v] == colorArr[u])
+                                return false;
+                        }
+                    }
+
+                    for (int i = 0; i < graph.Count(); i++)
+                    {
+                        for (int j = 0; j < graph.Count(); j++)
+                        {
+                            if (this.Directed() == true)
+                            {
+                                if (this.GradeOfDirectedNode(graph[i][j].NODO).Total == 0)
+                                {
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                if (this.GradeOfNode(graph[i][j].NODO) == 0)
+                                {
+                                    return false;
+                                }
+                            }
+                            if (graph[i][i].W > -1)
                             {
                                 return false;
                             }
-                        }
-                        else
-                        {
-                            if (this.GradeOfNode(graph[i][j].NODO) == 0)
-                            {
-                                return false;
-                            }
-                        }
-                        if (graph[i][i].W > -1)
-                        {
-                            return false;
-                        }
 
+                        }
                     }
-                }
 
-                // If we reach here, then all adjacent vertices 
-                // can be colored with alternate color 
-                return true;
+                    // If we reach here, then all adjacent vertices 
+                    // can be colored with alternate color 
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
+           
     }//AdjacencyList.      
 
         private void terminal_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void maIn_Click(object sender, EventArgs e)
+        {
+            if (matIn)
+                matIn = false;
+            else
+                matIn = true;
+            InvalidatePlus(1);
         }
     }//Form.
 }//namespace.
