@@ -232,6 +232,7 @@ namespace editorDeGrafos
 
         private void Load_Click(object sender, EventArgs e)
         {
+            
             if (justSaved == false)
             {
                 SaveChangesWindow gdc = new SaveChangesWindow();
@@ -242,24 +243,42 @@ namespace editorDeGrafos
                     {
                         saveFile();
                     }
-
-                    foreach (Node node in nodeList)
-                    {
-                        eliminateNexetEdges(node);
-                        //
-                    }
-
-                    nodeList = new List<Node>();
-                    aListGraph = new AdjacencyList();
-                    diEdgeList = new List<Edge>();
-                    edgeList = new List<Edge>();
-                    cicleEdgeList = new List<Edge>();
-                    openFile();
-                    justSaved = true;
-
+                   loadCommonActions();                   
                 }
             }
-            InvalidatePlus();
+            else
+            {
+                loadCommonActions();
+            }
+        }
+
+        private void loadCommonActions()
+        {
+            List<Node> nodeList_BU = nodeList;
+            AdjacencyList aListGraph_BU = aListGraph;
+            List<Edge> diEdgeList_BU = diEdgeList;
+            List<Edge> edgeList_BU = edgeList;
+            List<Edge> cicleEdgeList_BU = cicleEdgeList;
+
+            nodeList = new List<Node>();
+            aListGraph = new AdjacencyList();
+            diEdgeList = new List<Edge>();
+            edgeList = new List<Edge>();
+            cicleEdgeList = new List<Edge>();
+
+            if (openFile() == 0)
+            {
+                nodeList = nodeList_BU;
+                aListGraph = aListGraph_BU;
+                diEdgeList = diEdgeList_BU;
+                edgeList = edgeList_BU;
+                cicleEdgeList = cicleEdgeList_BU;
+            }
+            else
+            {
+                InvalidatePlus(1);
+                justSaved = true;
+            }
         }
 
         private void New_Click(object sender, EventArgs e)
@@ -494,8 +513,8 @@ namespace editorDeGrafos
             TextWriter sw = null;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Title = "Save text Files";
-            saveFileDialog.DefaultExt = "grp";
-            saveFileDialog.Filter = "Text files (*.grp)|*.grp|All files (*.*)|*.*";
+            saveFileDialog.DefaultExt = "txt";
+            saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 sw = new StreamWriter(saveFileDialog.FileName);
@@ -508,39 +527,43 @@ namespace editorDeGrafos
             int index;
             int uniqueID;
             */
-            if (justSaved == false)
-            {
                 foreach (Node node in nodeList)//all about the node
                 {
                     sw.WriteLine(node.ID + "," + node.Index + "," + node.Position.X + "," + node.Position.Y + "," + node.Radius);
                 }
-                sw.WriteLine("Marix");
+                sw.WriteLine("Matrix");
                 foreach (List<NodeRef> row in aListGraph.GRAPH)
                 {
                     foreach (NodeRef nodeR in row)
                     {
-                        sw.Write("|" + nodeR.W);
+                        sw.Write(nodeR.W+",");
                     }
                     sw.WriteLine();
                 }
                 sw.WriteLine("Edges");
                 foreach (Edge edge in edgeList)
                 {
-                    sw.WriteLine(edge.A.X + "," + edge.A.Y + "," + edge.B.X + "," + edge.B.Y);
+                    sw.WriteLine(edge.Client.Index+","+ edge.Server.Index);
                 }
                 sw.WriteLine("D_Edges");
                 foreach (Edge edge in diEdgeList)
                 {
-                    sw.WriteLine(edge.A.X + "," + edge.A.Y + "," + edge.B.X + "," + edge.B.Y);
+                    sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
+                }
+                sw.WriteLine("C_Edges");
+                foreach (Edge edge in cicleEdgeList)
+                {
+                    sw.WriteLine(edge.Client.Index);
                 }
                 sw.Close();
                 justSaved = true;
-            }
+            
         }
 
-        public void openFile()
+        public int openFile()
         {
-            string[] auxiliar;
+            int statusRes = 0;
+            
             StreamReader sr = null;
             OpenFileDialog openFileDialog = new OpenFileDialog();
 
@@ -548,111 +571,160 @@ namespace editorDeGrafos
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 sr = new StreamReader(openFileDialog.FileName);
-                auxiliar = sr.ReadLine().Split(',');
-                while (sr != null && !sr.EndOfStream && auxiliar[0] != "Matrix")
+                char[] Delimiters = new char[] { ',' };
+                string[] Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+
+                while (sr != null && !sr.EndOfStream && Input[0] != "Matrix" )
                 {
                     int idON;
                     int indexON;
                     int x;
                     int y;
                     int radiusON;
-                    /*
-                    
-                    int.TryParse(auxiliar[0], out idON);                    
-                    int.TryParse(auxiliar[1], out indexON);                    
-                    int.TryParse(auxiliar[2], out x);                    
-                    int.TryParse(auxiliar[3], out y);                    
-                    int.TryParse(auxiliar[4], out radiusON);
-                    */
-                    idON = int.Parse(auxiliar[0]);
-                    indexON = int.Parse(auxiliar[1]);
-                    x = int.Parse(auxiliar[2]);
-                    y = int.Parse(auxiliar[3]);
-                    radiusON = int.Parse(auxiliar[4]);
 
-                    Coordenate cor = new Coordenate(x, y);
-                    Node node = new Node(cor,radiusON, indexON, idON);
-                    aListGraph.addNode(node);
-                    auxiliar = sr.ReadLine().Split(',');
+                   
+                        int.TryParse(Input[0], out idON);
+                        int.TryParse(Input[1], out indexON);
+                        int.TryParse(Input[2], out x);
+                        int.TryParse(Input[3], out y);
+                        int.TryParse(Input[4], out radiusON);
+
+                        Coordenate cor = new Coordenate(x, y);
+                        Node node = new Node(cor, radiusON, indexON, idON);
+                        aListGraph.addNode(node);
+                        nodeList.Add(node);
+                        Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);                    
                 }
-                while (sr != null && !sr.EndOfStream && auxiliar[0] != "Edges")
+                if(Input[0] == "Matrix")
                 {
-                    int i = 0;
-                    auxiliar = sr.ReadLine().Split(',');                
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+                }
 
+                int i = 0;
+                while (sr != null && !sr.EndOfStream && Input[0] != "Edges" )
+                {
                     int Peso;
-                    for(int j = 0; j< aListGraph.GRAPH.Count(); j++)
+
+                    for (int j = 0; j < Input.Length ; j++)
                     {
-                        int.TryParse(auxiliar[j], out Peso);
+                        int.TryParse(Input[j], out Peso);
                         aListGraph.GRAPH[i][j].W = Peso;
-                    }
+                    }                    
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                     i++;
                 }
-                while (sr != null && !sr.EndOfStream && auxiliar[0] != "D_Edges")
+                if (Input[0] == "Edges")
+                {
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+                }
+                while (sr != null && !sr.EndOfStream && Input[0] != "D_Edges"  )
                 {
                     Node server = new Node();
                     Node client = new Node();
-                    auxiliar = sr.ReadLine().Split(',');
-                    int nodo1X;
-                    int.TryParse(auxiliar[0], out nodo1X);
-                    int nodo1Y;
-                    int.TryParse(auxiliar[1], out nodo1Y);
-                    int nodo2X;
-                    int.TryParse(auxiliar[2], out nodo2X);
-                    int nodo2Y;
-                    int.TryParse(auxiliar[3],out nodo2Y);
 
-                    foreach (Node node in nodeList)
+                    int nodo_C;
+                    int.TryParse(Input[1], out nodo_C);
+                    int nodo_S;
+                    int.TryParse(Input[0], out nodo_S);
+
+                    for (int j = 0; j < aListGraph.GRAPH.Count; j++)
                     {
-                        if (node.Position.X == nodo1X && node.Position.Y == nodo1Y)//it just can be one of all
-                        {
-                            server = node;
-                        }
-                        else
-                        {
-                            if (node.Position.X == nodo2X && node.Position.Y == nodo2Y)//it also can be just one of all
+                            if (aListGraph.GRAPH[j][j].NODO.Index == nodo_C)
                             {
-                                client = node;
+                                client = aListGraph.GRAPH[j][j].NODO;
                             }
+                            if(aListGraph.GRAPH[j][j].NODO.Index == nodo_S)
+                            {
+                                server = aListGraph.GRAPH[j][j].NODO;
+                            }
+                    }
+
+                    Edge edge = new Edge(server, client);
+                    edgeList.Add(edge);
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+                }
+                if (Input[0] == "D_Edges" && !sr.EndOfStream)
+                {
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+                }
+                while (sr != null && !sr.EndOfStream && Input[0] != "C_Edges")
+                {
+                    Node server = new Node();
+                    Node client = new Node();
+
+                    int nodo_C;
+                    int.TryParse(Input[1], out nodo_C);
+                    int nodo_S;
+                    int.TryParse(Input[0], out nodo_S);
+
+                    for (int j = 0; j < aListGraph.GRAPH.Count; j++)
+                    {
+                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_C)
+                        {
+                            client = aListGraph.GRAPH[j][j].NODO;
+                        }
+                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_S)
+                        {
+                            server = aListGraph.GRAPH[j][j].NODO;
                         }
                     }
+
                     Edge edge = new Edge(server, client);
-                    edgeList.Add(edge);                    
+                    diEdgeList.Add(edge);
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+                }
+                if (Input[0] == "C_Edges" && !sr.EndOfStream)
+                {
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
                 while (sr != null && !sr.EndOfStream )
                 {
                     Node server = new Node();
-                    Node client = new Node();
-                    auxiliar = sr.ReadLine().Split(',');
-                    int nodo1X;
-                    int.TryParse(auxiliar[0], out nodo1X);
-                    int nodo1Y;
-                    int.TryParse(auxiliar[1], out nodo1Y);
-                    int nodo2X;
-                    int.TryParse(auxiliar[2], out nodo2X);
-                    int nodo2Y;
-                    int.TryParse(auxiliar[3], out nodo2Y);
 
-                    foreach (Node node in nodeList)
+                    int nodo_S;
+                    int.TryParse(Input[0], out nodo_S);
+
+                    for (int j = 0; j < aListGraph.GRAPH.Count; j++)
                     {
-                        if (node.Position.X == nodo1X && node.Position.Y == nodo1Y)//it just can be one of all
+                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_S)
                         {
-                            server = node;
-                        }
-                        else
-                        {
-                            if (node.Position.X == nodo2X && node.Position.Y == nodo2Y)//it also can be just one of all
-                            {
-                                client = node;
-                            }
+                            server = aListGraph.GRAPH[j][j].NODO;
                         }
                     }
-                    Edge edge = new Edge(server, client);
-                    diEdgeList.Add(edge);
+
+                    Edge edge = new Edge(server, server);
+                    cicleEdgeList.Add(edge);
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
                 sr.Close();
+                statusRes = 1;
             }
 
+            /*
+            StreamReader sr = null;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+           
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                sr = new StreamReader(openFileDialog.FileName);
+                char[] Delimiters = new char[] { ',' };
+                string[] Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+                while ( !sr.EndOfStream )
+                {
+                    foreach (string pal in Input)
+                    {
+                        matrixTB.Text += pal + System.Environment.NewLine;
+                    }
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+                }
+
+            }
+
+            
+            */
+            return statusRes;
         }
 
         public void keyA_OR_MoveClick()

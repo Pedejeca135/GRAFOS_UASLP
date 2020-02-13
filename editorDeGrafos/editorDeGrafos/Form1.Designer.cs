@@ -39,10 +39,10 @@
             this.Remove = new System.Windows.Forms.ToolStripLabel();
             this.MoRe = new System.Windows.Forms.ToolStripLabel();
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.maIn = new System.Windows.Forms.ToolStripLabel();
             this.terminal = new System.Windows.Forms.TextBox();
             this.matrixTB = new System.Windows.Forms.TextBox();
             this.statusTB = new System.Windows.Forms.TextBox();
-            this.maIn = new System.Windows.Forms.ToolStripLabel();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -135,6 +135,14 @@
             this.helpToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.helpToolStripButton.Text = "He&lp";
             // 
+            // maIn
+            // 
+            this.maIn.Name = "maIn";
+            this.maIn.Size = new System.Drawing.Size(113, 22);
+            this.maIn.Text = "Matriz de Incidencia";
+            this.maIn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.maIn.Click += new System.EventHandler(this.maIn_Click);
+            // 
             // terminal
             // 
             this.terminal.AccessibleRole = System.Windows.Forms.AccessibleRole.Text;
@@ -155,7 +163,7 @@
             this.matrixTB.Multiline = true;
             this.matrixTB.Name = "matrixTB";
             this.matrixTB.ReadOnly = true;
-            this.matrixTB.Size = new System.Drawing.Size(717, 709);
+            this.matrixTB.Size = new System.Drawing.Size(603, 709);
             this.matrixTB.TabIndex = 2;
             this.matrixTB.TabStop = false;
             // 
@@ -169,14 +177,6 @@
             this.statusTB.Size = new System.Drawing.Size(217, 122);
             this.statusTB.TabIndex = 3;
             this.statusTB.TabStop = false;
-            // 
-            // maIn
-            // 
-            this.maIn.Name = "maIn";
-            this.maIn.Size = new System.Drawing.Size(113, 22);
-            this.maIn.Text = "Matriz de Incidencia";
-            this.maIn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.maIn.Click += new System.EventHandler(this.maIn_Click);
             // 
             // Form1
             // 
