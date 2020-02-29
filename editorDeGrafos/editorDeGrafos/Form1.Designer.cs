@@ -35,33 +35,36 @@
             this.saveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.Move = new System.Windows.Forms.ToolStripLabel();
-            this.Remove = new System.Windows.Forms.ToolStripLabel();
-            this.MoRe = new System.Windows.Forms.ToolStripLabel();
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.maIn = new System.Windows.Forms.ToolStripLabel();
             this.terminal = new System.Windows.Forms.TextBox();
             this.matrixTB = new System.Windows.Forms.TextBox();
             this.statusTB = new System.Windows.Forms.TextBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeXRToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.moreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.matrizIncidenciaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.isomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fuerzaBrutaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.traspuestaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.intercambioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStrip1
             // 
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newToolStripButton,
             this.openToolStripButton,
             this.saveToolStripButton,
             this.toolStripSeparator,
             this.toolStripSeparator1,
-            this.Move,
-            this.Remove,
-            this.MoRe,
-            this.helpToolStripButton,
-            this.maIn});
+            this.helpToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1370, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(116, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -105,27 +108,6 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
-            // Move
-            // 
-            this.Move.Name = "Move";
-            this.Move.Size = new System.Drawing.Size(67, 22);
-            this.Move.Text = "Move(A,M)";
-            this.Move.Click += new System.EventHandler(this.Move_Click);
-            // 
-            // Remove
-            // 
-            this.Remove.Name = "Remove";
-            this.Remove.Size = new System.Drawing.Size(75, 22);
-            this.Remove.Text = "Remove(X,R)";
-            this.Remove.Click += new System.EventHandler(this.Remove_Click);
-            // 
-            // MoRe
-            // 
-            this.MoRe.Name = "MoRe";
-            this.MoRe.Size = new System.Drawing.Size(52, 22);
-            this.MoRe.Text = "MoRe(F)";
-            this.MoRe.Click += new System.EventHandler(this.MoRe_Click);
-            // 
             // helpToolStripButton
             // 
             this.helpToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -134,14 +116,6 @@
             this.helpToolStripButton.Name = "helpToolStripButton";
             this.helpToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.helpToolStripButton.Text = "He&lp";
-            // 
-            // maIn
-            // 
-            this.maIn.Name = "maIn";
-            this.maIn.Size = new System.Drawing.Size(113, 22);
-            this.maIn.Text = "Matriz de Incidencia";
-            this.maIn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.maIn.Click += new System.EventHandler(this.maIn_Click);
             // 
             // terminal
             // 
@@ -178,6 +152,78 @@
             this.statusTB.TabIndex = 3;
             this.statusTB.TabStop = false;
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.moveToolStripMenuItem,
+            this.removeXRToolStripMenuItem,
+            this.moreToolStripMenuItem,
+            this.matrizIncidenciaToolStripMenuItem,
+            this.isomToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(116, 1);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(408, 24);
+            this.menuStrip1.TabIndex = 4;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // moveToolStripMenuItem
+            // 
+            this.moveToolStripMenuItem.Name = "moveToolStripMenuItem";
+            this.moveToolStripMenuItem.Size = new System.Drawing.Size(79, 20);
+            this.moveToolStripMenuItem.Text = "Move(A,M)";
+            this.moveToolStripMenuItem.Click += new System.EventHandler(this.Move_Click);
+            // 
+            // removeXRToolStripMenuItem
+            // 
+            this.removeXRToolStripMenuItem.Name = "removeXRToolStripMenuItem";
+            this.removeXRToolStripMenuItem.Size = new System.Drawing.Size(87, 20);
+            this.removeXRToolStripMenuItem.Text = "Remove(X,R)";
+            this.removeXRToolStripMenuItem.Click += new System.EventHandler(this.Remove_Click);
+            // 
+            // moreToolStripMenuItem
+            // 
+            this.moreToolStripMenuItem.Name = "moreToolStripMenuItem";
+            this.moreToolStripMenuItem.Size = new System.Drawing.Size(64, 20);
+            this.moreToolStripMenuItem.Text = "MoRe(F)";
+            this.moreToolStripMenuItem.Click += new System.EventHandler(this.MoRe_Click);
+            // 
+            // matrizIncidenciaToolStripMenuItem
+            // 
+            this.matrizIncidenciaToolStripMenuItem.Name = "matrizIncidenciaToolStripMenuItem";
+            this.matrizIncidenciaToolStripMenuItem.Size = new System.Drawing.Size(125, 20);
+            this.matrizIncidenciaToolStripMenuItem.Text = "Matriz de Incidencia";
+            this.matrizIncidenciaToolStripMenuItem.Click += new System.EventHandler(this.maIn_Click);
+            // 
+            // isomToolStripMenuItem
+            // 
+            this.isomToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fuerzaBrutaToolStripMenuItem,
+            this.traspuestaToolStripMenuItem,
+            this.intercambioToolStripMenuItem});
+            this.isomToolStripMenuItem.Name = "isomToolStripMenuItem";
+            this.isomToolStripMenuItem.Size = new System.Drawing.Size(45, 20);
+            this.isomToolStripMenuItem.Text = "Isom";
+            this.isomToolStripMenuItem.Click += new System.EventHandler(this.isoForm_Click);
+            // 
+            // fuerzaBrutaToolStripMenuItem
+            // 
+            this.fuerzaBrutaToolStripMenuItem.Name = "fuerzaBrutaToolStripMenuItem";
+            this.fuerzaBrutaToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.fuerzaBrutaToolStripMenuItem.Text = "Fuerza Bruta";
+            // 
+            // traspuestaToolStripMenuItem
+            // 
+            this.traspuestaToolStripMenuItem.Name = "traspuestaToolStripMenuItem";
+            this.traspuestaToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.traspuestaToolStripMenuItem.Text = "Traspuesta";
+            // 
+            // intercambioToolStripMenuItem
+            // 
+            this.intercambioToolStripMenuItem.Name = "intercambioToolStripMenuItem";
+            this.intercambioToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.intercambioToolStripMenuItem.Text = "Intercambio(Manual)";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -187,8 +233,11 @@
             this.Controls.Add(this.matrixTB);
             this.Controls.Add(this.terminal);
             this.Controls.Add(this.toolStrip1);
+            this.Controls.Add(this.menuStrip1);
             this.KeyPreview = true;
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
@@ -196,6 +245,8 @@
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -212,11 +263,16 @@
         private System.Windows.Forms.ToolStripButton helpToolStripButton;
         private System.Windows.Forms.TextBox terminal;
         private System.Windows.Forms.TextBox matrixTB;
-        private System.Windows.Forms.ToolStripLabel Move;
-        private System.Windows.Forms.ToolStripLabel Remove;
-        private System.Windows.Forms.ToolStripLabel MoRe;
         private System.Windows.Forms.TextBox statusTB;
-        private System.Windows.Forms.ToolStripLabel maIn;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem moveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeXRToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem moreToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem matrizIncidenciaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem isomToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fuerzaBrutaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem traspuestaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem intercambioToolStripMenuItem;
     }
 }
 

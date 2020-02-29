@@ -62,7 +62,10 @@ namespace editorDeGrafos
 
             statusTB.Text = "Nombre :" + nombreArchivo;
             terminal.Text = "Node selected : ";
+
         }
+
+
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
@@ -1817,6 +1820,22 @@ namespace editorDeGrafos
             else
                 matIn = true;
             InvalidatePlus(1);
+        }
+
+        protected virtual void isoForm_Click(object sender, EventArgs e)
+        {
+            Form2 forma = new Form2();
+            forma.ShowDialog();
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }//Form.
 }//namespace.
