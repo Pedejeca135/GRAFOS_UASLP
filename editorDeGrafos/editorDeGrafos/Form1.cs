@@ -15,6 +15,7 @@ namespace editorDeGrafos
 {
     public partial class Form1 : Form
     {
+        Boolean isoForm;
 
         List<Node> nodeList;
         List<Edge> edgeList;
@@ -28,7 +29,7 @@ namespace editorDeGrafos
         public int generalRadius;
         Boolean anyNodeSelected;
         int indexCount;
-        AdjacencyList aListGraph;
+        protected AdjacencyList aListGraph;
         Boolean mousePressed;
         List<int> IDList;
 
@@ -39,12 +40,34 @@ namespace editorDeGrafos
         String nombreArchivo = "";
 
         Boolean matIn = false;
+        Form2 formaIsomorfismo;// = null;
 
         //Boolean nodeMoved = false;
 
         public Form1()
         {
             InitializeComponent();
+            commonCostructor();
+            isoForm = false;
+            fuerzaBrutaToolStripMenuItem.Visible = false;
+            traspuestaToolStripMenuItem.Visible = false;
+            intercambioToolStripMenuItem.Visible = false;
+            IsomtextBox.Visible = false;
+        }
+
+        public Form1(int equis)
+        {
+            InitializeComponent();
+            commonCostructor();
+            isoForm = true;
+            fuerzaBrutaToolStripMenuItem.Visible = true;
+            traspuestaToolStripMenuItem.Visible = true;
+            intercambioToolStripMenuItem.Visible = true;
+            IsomtextBox.Visible = true;
+        }
+
+        private void commonCostructor()
+        {
             generalRadius = 30; //Here you decide the size of the nodes
             nodeList = new List<Node>();
             edgeList = new List<Edge>();
@@ -64,7 +87,6 @@ namespace editorDeGrafos
             terminal.Text = "Node selected : ";
 
         }
-
 
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
@@ -213,6 +235,13 @@ namespace editorDeGrafos
         * |||||||||||||||||||||||||||||||||||||||||||||||||||||   EVENTS   |||||||||||||||||||||||||||||||||||||||||||||||||||
         * 
         * ***********************************************************************************************************************/
+       
+        public void closeIsoFormClicked(object sender, EventArgs e)
+        {
+            InvalidatePlus();
+        }
+        
+        
         private void Move_Click(object sender, EventArgs e)
         {
             keyA_OR_MoveClick();
@@ -418,6 +447,12 @@ namespace editorDeGrafos
             statusTB.Text += System.Environment.NewLine;
             statusTB.Text += "Bipartita : " + aListGraph.Bip();
             statusTB.Text += System.Environment.NewLine;
+
+            if((formaIsomorfismo == null || (formaIsomorfismo != null && formaIsomorfismo.Visible == false)) && isoForm == false)
+            {
+                IsomtextBox.Visible = false;
+            }
+            
 
         }
 
@@ -1210,7 +1245,7 @@ namespace editorDeGrafos
                 get { return input + output; }
             }
         }//DirectedGrade.
-
+        
         public class NodeRef
         {
             int weight;
@@ -1805,8 +1840,26 @@ namespace editorDeGrafos
                     return false;
                 }
             }
-           
-    }//AdjacencyList.      
+
+            public Boolean Isom_Fuerza_Bruta(AdjacencyList other)
+            {
+                Boolean res = false;
+                return res;
+            }
+
+
+            public Boolean Isom_Traspuesta(AdjacencyList other)
+            {
+                Boolean res = false;
+                return res;
+            }
+
+            public Boolean Isom_Inter(AdjacencyList other)
+            {
+                Boolean res = false;
+                return res;
+            }
+      }//AdjacencyList(END).      
 
         private void terminal_TextChanged(object sender, EventArgs e)
         {
@@ -1824,8 +1877,18 @@ namespace editorDeGrafos
 
         protected virtual void isoForm_Click(object sender, EventArgs e)
         {
-            Form2 forma = new Form2();
-            forma.ShowDialog();
+            if(formaIsomorfismo == null || formaIsomorfismo.Visible == false)
+            {
+                formaIsomorfismo = new Form2(this);
+                formaIsomorfismo.Show();
+            }
+            
+            fuerzaBrutaToolStripMenuItem.Visible = true;
+            traspuestaToolStripMenuItem.Visible = true;
+            intercambioToolStripMenuItem.Visible = true;
+            IsomtextBox.Visible = true;
+            
+            //formaIsomorfismo.Show();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -1836,6 +1899,35 @@ namespace editorDeGrafos
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        protected virtual void fuerzaBrutaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(formaIsomorfismo != null && formaIsomorfismo.Visible)
+            {
+                this.aListGraph.Isom_Fuerza_Bruta(formaIsomorfismo.aListGraph);
+            }
+        }
+
+        protected virtual void traspuestaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
+            {
+                this.aListGraph.Isom_Traspuesta(formaIsomorfismo.aListGraph);
+            }
+        }
+
+        protected virtual void intercambioToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
+            {
+                this.aListGraph.Isom_Inter(formaIsomorfismo.aListGraph);
+            }
         }
     }//Form.
 }//namespace.

@@ -48,6 +48,7 @@
             this.fuerzaBrutaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.traspuestaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.intercambioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.IsomtextBox = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -166,6 +167,7 @@
             this.menuStrip1.Size = new System.Drawing.Size(408, 24);
             this.menuStrip1.TabIndex = 4;
             this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
             // 
             // moveToolStripMenuItem
             // 
@@ -211,24 +213,40 @@
             this.fuerzaBrutaToolStripMenuItem.Name = "fuerzaBrutaToolStripMenuItem";
             this.fuerzaBrutaToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.fuerzaBrutaToolStripMenuItem.Text = "Fuerza Bruta";
+            this.fuerzaBrutaToolStripMenuItem.Click += new System.EventHandler(this.fuerzaBrutaToolStripMenuItem_Click);
             // 
             // traspuestaToolStripMenuItem
             // 
             this.traspuestaToolStripMenuItem.Name = "traspuestaToolStripMenuItem";
             this.traspuestaToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.traspuestaToolStripMenuItem.Text = "Traspuesta";
+            this.traspuestaToolStripMenuItem.Click += new System.EventHandler(this.traspuestaToolStripMenuItem_Click);
             // 
             // intercambioToolStripMenuItem
             // 
             this.intercambioToolStripMenuItem.Name = "intercambioToolStripMenuItem";
             this.intercambioToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.intercambioToolStripMenuItem.Text = "Intercambio(Manual)";
+            this.intercambioToolStripMenuItem.Click += new System.EventHandler(this.intercambioToolStripMenuItem_Click);
+            // 
+            // IsomtextBox
+            // 
+            this.IsomtextBox.AccessibleRole = System.Windows.Forms.AccessibleRole.Text;
+            this.IsomtextBox.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.IsomtextBox.Location = new System.Drawing.Point(1135, 12);
+            this.IsomtextBox.Multiline = true;
+            this.IsomtextBox.Name = "IsomtextBox";
+            this.IsomtextBox.ReadOnly = true;
+            this.IsomtextBox.Size = new System.Drawing.Size(223, 122);
+            this.IsomtextBox.TabIndex = 6;
+            this.IsomtextBox.TabStop = false;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1370, 749);
+            this.Controls.Add(this.IsomtextBox);
             this.Controls.Add(this.statusTB);
             this.Controls.Add(this.matrixTB);
             this.Controls.Add(this.terminal);
@@ -273,6 +291,7 @@
         private System.Windows.Forms.ToolStripMenuItem fuerzaBrutaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem traspuestaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem intercambioToolStripMenuItem;
+        private System.Windows.Forms.TextBox IsomtextBox;
     }
 }
 
