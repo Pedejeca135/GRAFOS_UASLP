@@ -29,7 +29,7 @@ namespace editorDeGrafos
         public int generalRadius;
         Boolean anyNodeSelected;
         int indexCount;
-        protected AdjacencyList aListGraph;
+        public AdjacencyList aListGraph;
         Boolean mousePressed;
         List<int> IDList;
 
@@ -102,12 +102,12 @@ namespace editorDeGrafos
                     //selected = selectedJustFor;
                     eliminate();
                 }
-                if(allMoRe)
+                if (allMoRe)
                 {
                     //selected = selectedJustFor;
                     if (e.Button == System.Windows.Forms.MouseButtons.Right)
-                    {                                       
-                        eliminate();                        
+                    {
+                        eliminate();
                     }
                     else
                     {
@@ -179,7 +179,7 @@ namespace editorDeGrafos
                                         aListGraph.addDirectedEdge(selected, oneNode, weight);
                                     }
                                 }
-                                InvalidatePlus();
+                                InvalidatePlus(1);
                             }
                             else // select for the first time.                            
                             {
@@ -194,7 +194,7 @@ namespace editorDeGrafos
                     }
                     else // want to make and add a new node 
                     {
-                        create(new Coordenate(e.X, e.Y));                       
+                        create(new Coordenate(e.X, e.Y));
                     }
 
                 }//left mouse button presed.           
@@ -204,7 +204,7 @@ namespace editorDeGrafos
                     {
                         if (selected == findNodeClicked(new Coordenate(e.X, e.Y)))
                         {
-                            if (selected.Status > 1)                               
+                            if (selected.Status > 1)
                             {
                                 if (selected.Status == 2)//make a own link
                                 {
@@ -215,18 +215,18 @@ namespace editorDeGrafos
                                         aListGraph.addDirectedEdge(selected, selected, weight);
                                         cicleEdgeList.Add(new Edge(selected));
                                     }
-                                    InvalidatePlus();
+                                    InvalidatePlus(1);
                                 }
                                 else//eliminate the node
                                 {
-                                        eliminate();
+                                    eliminate();
                                 }
                             }
-                        }                        
-                    }                   
+                        }
+                    }
                 }
             }
-            InvalidatePlus(1);
+            InvalidatePlus();
         }//Form_MouseDown().
 
 
@@ -235,13 +235,13 @@ namespace editorDeGrafos
         * |||||||||||||||||||||||||||||||||||||||||||||||||||||   EVENTS   |||||||||||||||||||||||||||||||||||||||||||||||||||
         * 
         * ***********************************************************************************************************************/
-       
+
         public void closeIsoFormClicked(object sender, EventArgs e)
         {
             InvalidatePlus();
         }
-        
-        
+
+
         private void Move_Click(object sender, EventArgs e)
         {
             keyA_OR_MoveClick();
@@ -264,7 +264,7 @@ namespace editorDeGrafos
 
         private void Load_Click(object sender, EventArgs e)
         {
-            
+
             if (justSaved == false)
             {
                 SaveChangesWindow gdc = new SaveChangesWindow();
@@ -275,7 +275,7 @@ namespace editorDeGrafos
                     {
                         saveFile();
                     }
-                   loadCommonActions();                   
+                    loadCommonActions();
                 }
             }
             else
@@ -308,7 +308,7 @@ namespace editorDeGrafos
             }
             else
             {
-                InvalidatePlus(1);
+                InvalidatePlus();
                 justSaved = true;
             }
         }
@@ -351,20 +351,20 @@ namespace editorDeGrafos
             {
                 selected.Position.X = e.X;
                 selected.Position.Y = e.Y;
-                InvalidatePlus();
+                InvalidatePlus(1);
             }
             if (mousePressed == true && allMoving == true && selectedJustFor != null)
             {
                 selectedJustFor.Position.X = e.X;
                 selectedJustFor.Position.Y = e.Y;
-                InvalidatePlus();
+                InvalidatePlus(1);
             }
-            if(mousePressed == true && e.Button == MouseButtons.Left && allMoRe == true && selectedJustFor != null)
+            if (mousePressed == true && e.Button == MouseButtons.Left && allMoRe == true && selectedJustFor != null)
             {
                 selectedJustFor.Position.X = e.X;
-                selectedJustFor.Position.Y = e.Y;             
-                InvalidatePlus();
-                
+                selectedJustFor.Position.Y = e.Y;
+                InvalidatePlus(1);
+
             }
             //nodeMoved = true;
         }
@@ -391,24 +391,23 @@ namespace editorDeGrafos
                 keyX_OR_RemoveClick();
             }
             InvalidatePlus();
-        }      
+        }
 
         public void InvalidatePlus()
-        {
-            justSaved = false;// all that requires invalidate also should change the jusSaved state.
+        {           
             commonInvalidateActions();
             Invalidate();
         }
 
         public void InvalidatePlus(int code)
         {
+            justSaved = false;// all that requires invalidate also should change the jusSaved state.           
             commonInvalidateActions();
             Invalidate();
-        }
+        }       
 
         public void commonInvalidateActions()
         {
-
             matrixTB.Text = aListGraph.ToString(matIn);
 
             if (selected != null)
@@ -426,7 +425,6 @@ namespace editorDeGrafos
                }
                 else
                 {
-
                     terminal.Text += "Grado(Nodo): " + aListGraph.GradeOfNode(selected);
                 }
             }
@@ -451,9 +449,7 @@ namespace editorDeGrafos
             if((formaIsomorfismo == null || (formaIsomorfismo != null && formaIsomorfismo.Visible == false)) && isoForm == false)
             {
                 IsomtextBox.Visible = false;
-            }
-            
-
+            }           
         }
 
         /*****************************
@@ -546,8 +542,7 @@ namespace editorDeGrafos
         }
 
         public void saveFile()
-        {
-            
+        {            
             TextWriter sw = null;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Title = "Save text Files";
@@ -791,7 +786,7 @@ namespace editorDeGrafos
                     allMoving = (!allMoving);
                 }
             }
-            InvalidatePlus();
+            InvalidatePlus(1);
         }
 
 
@@ -822,7 +817,7 @@ namespace editorDeGrafos
                 }
             }
             deselect();
-            InvalidatePlus();
+            InvalidatePlus(1);
         }
 
         public void keyF_OR_MoRe()
@@ -852,7 +847,7 @@ namespace editorDeGrafos
                 }
             }
             deselect();
-            InvalidatePlus();
+            InvalidatePlus(1);
         }      
 
         public Node findNodeClicked(Coordenate cor)
@@ -900,7 +895,7 @@ namespace editorDeGrafos
                 anyNodeSelected = false;
                 indexCount--;
             }
-            InvalidatePlus();
+            InvalidatePlus(1);
         }
         
         public void create(Coordenate cor)
@@ -918,7 +913,7 @@ namespace editorDeGrafos
             indexCount++;
             nodeList.Add(newNode);
             aListGraph.addNode(newNode);
-            InvalidatePlus();
+            InvalidatePlus(1);
         }
 
         public int uniqueID()
@@ -994,6 +989,12 @@ namespace editorDeGrafos
             }
             cicleEdgeList = newEdges;
         }
+        public void changeIsomtextBox(String str)
+        {
+            IsomtextBox.Text = "Isomorfismo : ";
+            IsomtextBox.Text += System.Environment.NewLine;
+            IsomtextBox.Text += str;
+        }
 
         /*************************************************************************************************************************
          * 
@@ -1043,13 +1044,9 @@ namespace editorDeGrafos
                 uniqueID = identifier;
             }
 
-
-            
-
             /*******************************************************
              *               Geters and seters(Begin)              *
              *******************************************************/
-
             public Coordenate Position
             {
                 get { return this.position; }
@@ -1318,15 +1315,7 @@ namespace editorDeGrafos
             {
                 get { return this.graph; }
             }
-            /*
-            public <List<NodeRef>> Vertex()
-            {
-                for(int i = 0 ; i< this.)
-                    {
-                    }
-             
-            }
-            */
+
             public void addNode(Node nodo)
             {
                 List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.           
@@ -1452,7 +1441,6 @@ namespace editorDeGrafos
                             resString += "\t" + 1;
                             else
                             resString += "\t" + 0;
-
                         }
                     }
                     resString += System.Environment.NewLine;
@@ -1483,7 +1471,6 @@ namespace editorDeGrafos
                 }
                 return res;
             }
-
 
             public int GradeOfNode(Node nodo)
             {
@@ -1624,18 +1611,13 @@ namespace editorDeGrafos
                 return false;
             }
 
-
-
-
             public Boolean Cicled()
             {
                 if (this.Directed())
                     return this.directedCicled();
                 else
                     return this.UndirectedCicled();
-            }
-
-           
+            }         
 
 
             //Determine if a graph is cicled with BFS algorithm.
@@ -1902,7 +1884,7 @@ namespace editorDeGrafos
                 matIn = false;
             else
                 matIn = true;
-            InvalidatePlus(1);
+            InvalidatePlus();
         }
 
         protected virtual void isoForm_Click(object sender, EventArgs e)
@@ -1936,11 +1918,12 @@ namespace editorDeGrafos
 
         }
 
+        //ISOMORFISMO:
         protected virtual void fuerzaBrutaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if(formaIsomorfismo != null && formaIsomorfismo.Visible)
             {
-                IsomtextBox.Text = this.aListGraph.Isom_Fuerza_Bruta(formaIsomorfismo.aListGraph).ToString();
+                changeIsomtextBox(this.aListGraph.Isom_Fuerza_Bruta(formaIsomorfismo.aListGraph).ToString());
             }
         }
 
@@ -1948,7 +1931,7 @@ namespace editorDeGrafos
         {
             if (formaIsomorfismo != null && formaIsomorfismo.Visible)
             {
-                IsomtextBox.Text = this.aListGraph.Isom_Traspuesta(formaIsomorfismo.aListGraph).ToString();
+                changeIsomtextBox(this.aListGraph.Isom_Traspuesta(formaIsomorfismo.aListGraph).ToString());
             }
         }
 
@@ -1956,7 +1939,7 @@ namespace editorDeGrafos
         {
             if (formaIsomorfismo != null && formaIsomorfismo.Visible)
             {
-                IsomtextBox.Text = this.aListGraph.Isom_Inter(formaIsomorfismo.aListGraph).ToString();
+                changeIsomtextBox(this.aListGraph.Isom_Inter(formaIsomorfismo.aListGraph).ToString());
             }
         }
     }//Form.

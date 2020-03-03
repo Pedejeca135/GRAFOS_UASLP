@@ -33,7 +33,7 @@ namespace editorDeGrafos
         {
             if(this.aListGraph != null)
             {
-                this.aListGraph.Isom_Fuerza_Bruta(base.aListGraph);
+                changeIsomtextBox( this.aListGraph.Isom_Fuerza_Bruta(f1.aListGraph).ToString());
             }
         }
 
@@ -41,7 +41,7 @@ namespace editorDeGrafos
         {
             if (this.aListGraph != null)
             {
-                this.aListGraph.Isom_Traspuesta(base.aListGraph);
+                changeIsomtextBox(this.aListGraph.Isom_Traspuesta(f1.aListGraph).ToString());
             }
         }
 
@@ -49,7 +49,7 @@ namespace editorDeGrafos
         {
             if (this.aListGraph != null)
             {
-                this.aListGraph.Isom_Inter(base.aListGraph);
+                changeIsomtextBox(this.aListGraph.Isom_Inter(f1.aListGraph).ToString());
             }
         }
 
