@@ -1841,24 +1841,54 @@ namespace editorDeGrafos
                 }
             }
 
+            //first algorithm of isimorphism. Implemented by me.
             public Boolean Isom_Fuerza_Bruta(AdjacencyList other)
             {
                 Boolean res = false;
+                if(heuristicIsom(other))
+                {
+                    return true;
+                }
                 return res;
             }
 
-
+            //algorithm of
             public Boolean Isom_Traspuesta(AdjacencyList other)
             {
                 Boolean res = false;
+                if (heuristicIsom(other))
+                {
+                    return true;
+                }
                 return res;
             }
 
+            //
             public Boolean Isom_Inter(AdjacencyList other)
             {
                 Boolean res = false;
+                if (heuristicIsom(other))
+                {
+                    return true;
+                }
                 return res;
             }
+
+            private Boolean heuristicIsom(AdjacencyList other)
+            {               
+                if(this.GRAPH.Count() == other.GRAPH.Count())
+                {                       
+                    if (this.Grade() == other.Grade())
+                        if (this.Directed() == other.Directed())
+                            if (this.Complete() == other.Complete())
+                                if (this.Pseudo() == other.Pseudo())
+                                    if (this.Cicled() == other.Cicled())
+                                        if (this.Bip() == other.Bip())
+                                            return true;
+                }
+                return false;
+            }
+
       }//AdjacencyList(END).      
 
         private void terminal_TextChanged(object sender, EventArgs e)
@@ -1910,7 +1940,7 @@ namespace editorDeGrafos
         {
             if(formaIsomorfismo != null && formaIsomorfismo.Visible)
             {
-                this.aListGraph.Isom_Fuerza_Bruta(formaIsomorfismo.aListGraph);
+                IsomtextBox.Text = this.aListGraph.Isom_Fuerza_Bruta(formaIsomorfismo.aListGraph).ToString();
             }
         }
 
@@ -1918,7 +1948,7 @@ namespace editorDeGrafos
         {
             if (formaIsomorfismo != null && formaIsomorfismo.Visible)
             {
-                this.aListGraph.Isom_Traspuesta(formaIsomorfismo.aListGraph);
+                IsomtextBox.Text = this.aListGraph.Isom_Traspuesta(formaIsomorfismo.aListGraph).ToString();
             }
         }
 
@@ -1926,7 +1956,7 @@ namespace editorDeGrafos
         {
             if (formaIsomorfismo != null && formaIsomorfismo.Visible)
             {
-                this.aListGraph.Isom_Inter(formaIsomorfismo.aListGraph);
+                IsomtextBox.Text = this.aListGraph.Isom_Inter(formaIsomorfismo.aListGraph).ToString();
             }
         }
     }//Form.
