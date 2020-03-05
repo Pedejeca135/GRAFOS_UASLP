@@ -1833,13 +1833,17 @@ namespace editorDeGrafos
                 }
                 return res;
             }
-
+             
             //algorithm of
             public Boolean Isom_Traspuesta(AdjacencyList other)
             {
                 Boolean res = false;
                 if (heuristicIsom(other))
                 {
+
+
+
+
                     return true; 
                 }
                 return res;
