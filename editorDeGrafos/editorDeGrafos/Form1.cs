@@ -1840,7 +1840,7 @@ namespace editorDeGrafos
                 Boolean res = false;
                 if (heuristicIsom(other))
                 {
-                    return true;
+                    return true; 
                 }
                 return res;
             }
