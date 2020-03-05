@@ -51,7 +51,7 @@ namespace editorDeGrafos
             return res;
         }
 
-        public int[,] Transpose ()
+        public int[,] TransposeFree ()
         {
             int[,] res = new int[this.MATRIX.GetLength(1), this.MATRIX.GetLength(0)];
 
@@ -60,7 +60,20 @@ namespace editorDeGrafos
                 {
                     res[i, j] = this.matrix[j, i];
                 }
+            return res;
+        }
 
+        public Matrix TransposeMatrix()
+        {
+            Matrix res;
+            int[,] pseudoRes = new int[this.MATRIX.GetLength(1), this.MATRIX.GetLength(0)];
+
+            for (int j = 0; j < this.MATRIX.GetLength(0); j++)
+                for (int i = 0; i < this.MATRIX.GetLength(1); i++)
+                {
+                    pseudoRes[i, j] = this.matrix[j, i];
+                }
+            res = new Matrix(pseudoRes);
             return res;
         }
 
