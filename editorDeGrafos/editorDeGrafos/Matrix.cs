@@ -8,14 +8,14 @@ namespace editorDeGrafos
 {
     public class Matrix
     {
-        int [,] matrix;
+        int[,] matrix;
 
         public Matrix(int row, int col)
         {
             this.matrix = new int[row, col];
         }
 
-        public Matrix(int [,] matrix)
+        public Matrix(int[,] matrix)
         {
             this.matrix = matrix;
         }
@@ -23,18 +23,18 @@ namespace editorDeGrafos
         public Matrix MatrixProduct(Matrix other)
         {
             Matrix res;
-            res = new Matrix( product(this.MATRIX, other.MATRIX) );
+            res = new Matrix(product(this.MATRIX, other.MATRIX));
             return res;
         }
 
-        public int[,] MatrixProductFree( int [,] other)
+        public int[,] MatrixProductFree(int[,] other)
         {
             int[,] res;
             res = product(this.MATRIX, other);
             return res;
         }
 
-        private int[,] product(int[,] g , int[,] h )
+        private int[,] product(int[,] g, int[,] h)
         {
             int[,] res = null;
             int commonLength = g.GetLength(1);
@@ -45,18 +45,18 @@ namespace editorDeGrafos
                     for (int i = 0; i < h.GetLength(1); i++)
                         for (int k = 0; k < commonLength; k++)
                         {
-                            res[j,i] += g[j, k] * h[k, i];
+                            res[j, i] += g[j, k] * h[k, i];
                         }
             }
             return res;
         }
 
-        public int[,] TransposeFree ()
+        public int[,] TransposeFree()
         {
             int[,] res = new int[this.MATRIX.GetLength(1), this.MATRIX.GetLength(0)];
 
-            for(int j = 0; j< this.MATRIX.GetLength(0);j++ )
-                for(int i = 0; i < this.MATRIX.GetLength(1); i++ )
+            for (int j = 0; j < this.MATRIX.GetLength(0); j++)
+                for (int i = 0; i < this.MATRIX.GetLength(1); i++)
                 {
                     res[i, j] = this.matrix[j, i];
                 }
@@ -75,6 +75,23 @@ namespace editorDeGrafos
                 }
             res = new Matrix(pseudoRes);
             return res;
+        }
+
+        public Boolean Equals(Matrix other)
+        {
+            if (this.MATRIX.GetLength(0) == other.MATRIX.GetLength(0) && this.MATRIX.GetLength(1) == other.MATRIX.GetLength(1))
+            {
+                for (int j = 0; j < this.MATRIX.GetLength(0); j++)
+                    for (int i = 0; i < this.MATRIX.GetLength(1); i++)
+                    { 
+                        if(this.MATRIX[j,i] != other.MATRIX[j,i])                       
+                        {
+                            return false;
+                        }
+                    }
+                return true;
+            }
+            return false;
         }
 
 
