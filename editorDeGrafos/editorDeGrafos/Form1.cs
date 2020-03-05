@@ -1829,6 +1829,7 @@ namespace editorDeGrafos
                 Boolean res = false;
                 if(heuristicIsom(other))
                 {
+                   
                     return true;
                 }
                 return res;
@@ -1838,13 +1839,18 @@ namespace editorDeGrafos
             public Boolean Isom_Traspuesta(AdjacencyList other)
             {
                 Boolean res = false;
+
+                Boolean soldOutPermutations = true;
                 if (heuristicIsom(other))
                 {
-
-
-
-
-                    return true; 
+                    while(soldOutPermutations)
+                    {
+                       /* if ()
+                        {
+                            return true;
+                        }*/
+                    }
+                   
                 }
                 return res;
             }
