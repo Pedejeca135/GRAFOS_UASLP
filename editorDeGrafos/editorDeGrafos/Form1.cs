@@ -1673,8 +1673,6 @@ namespace editorDeGrafos
                 }
                 //move vertex from gray set to black set when done exploring.
                 moveVertex(currentIndex, grayS, blackS);
-
-
                 return false;
             }
 
@@ -1701,9 +1699,7 @@ namespace editorDeGrafos
             }
 
         public Boolean Bipartita2( int origin, HashSet<int> visited, HashSet<int> originColorSet , HashSet<int> destinationColorSet, HashSet<int> whiteSet)
-        {
-
-            
+        {            
             foreach(NodeRef nodeR in graph[origin])
             {
                     if (nodeR.W > -1)
@@ -1812,7 +1808,6 @@ namespace editorDeGrafos
 
                         }
                     }
-
                     // If we reach here, then all adjacent vertices 
                     // can be colored with alternate color 
                     return true;
@@ -1826,13 +1821,117 @@ namespace editorDeGrafos
             //first algorithm of isimorphism. Implemented by me.
             public Boolean Isom_Fuerza_Bruta(AdjacencyList other)
             {
-                Boolean res = false;
+                //Boolean res = false;              
                 if(heuristicIsom(other))
                 {
-                   
-                    return true;
+                    List<int> sameGrade = new List<int>();
+                    for (int i = 0; i < other.GRAPH.Count(); i++)//
+                    {
+                       if ( other.GradeOfNode(other.GRAPH[i][i].NODO) == this.GradeOfNode(this.GRAPH[0][0].NODO))
+                       {
+                         sameGrade.Add(other.GRAPH[i][i].NODO.Index);
+                       }                           
+                    }                  
+
+                    int rootThis = 0;//never change.
+                    int rootOther = 0;//change always.
+
+                    while (sameGrade.Count() > 0)
+                    {
+                        rootOther = sameGrade.ElementAt(0);
+                        sameGrade.RemoveAt(0);
+
+                        HashSet<int> whiteSet = new HashSet<int>();
+                        //HashSet<int> graySet = new HashSet<int>();
+                        HashSet<int> blackSet = new HashSet<int>();
+
+                        HashSet<int> whiteSet_Other = new HashSet<int>();
+                        //HashSet<int> graySet = new HashSet<int>();
+                        HashSet<int> blackSet_Other = new HashSet<int>();
+
+                        for (int i = 0; i < other.GRAPH.Count(); i++)//
+                        {
+                            whiteSet.Add(i);
+                            whiteSet_Other.Add(i);
+                        }
+
+                        moveVertex(rootThis, whiteSet, blackSet);
+                        moveVertex(rootOther, whiteSet_Other, blackSet_Other);
+                        
+                        while (whiteSet.Count() > 0 && whiteSet_Other.Count() > 0)//BFS for the roots calculated.
+                        {
+                            // int current = whiteSet.First();
+                            int current = whiteSet.Min();
+                            int current_O = whiteSet_Other.Min();
+                            if (coupleBFS_Iso_FB(rootThis,rootOther, whiteSet, blackSet, whiteSet_Other, blackSet_Other,other))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+
+                }//END of the heuristic.
+                return false;
+            }
+
+            private Boolean coupleBFS_Iso_FB(int currentIndexThis, int currentIndexOther, HashSet<int> whiteS, HashSet<int> blackS, HashSet<int> whiteS_O, HashSet<int> blackS_O, AdjacencyList other)//fuerza Bruta
+            {
+                //move current to gray set from white set and then explore it.
+                if (this.GradeOfNode( this.GRAPH[currentIndexThis][currentIndexThis].NODO)  !=  other.GradeOfNode(other.GRAPH[currentIndexOther][currentIndexOther].NODO))
+                {
+                    return false;
                 }
-                return res;
+                moveVertex(currentIndexThis, whiteS, blackS);
+                moveVertex(currentIndexOther, whiteS_O, blackS_O);
+                foreach (NodeRef nodeR in graph[currentIndexThis])
+                {
+                    HashSet<int> candidates = new HashSet<int>();
+
+                    foreach(NodeRef nodeR_O in other.GRAPH[currentIndexOther])
+                    {
+                        if (nodeR_O.W > -1)
+                        {
+                            if (other.GradeOfNode(nodeR_O.NODO) == this.GradeOfNode(nodeR.NODO))
+                            {
+                                if (!blackS_O.Contains(nodeR_O.NODO.Index))//si el nodo no est marcado como visitado.
+                                {
+                                    candidates.Add(nodeR_O.NODO.Index);
+                                }
+                            }
+                        }
+                    }
+
+                    if (nodeR.W > -1)
+                    {
+                        while (candidates.Count() > 0)
+                        {
+                            //if in black set means already explored so continue.
+                            if (blackS.Contains(nodeR.NODO.Index))
+                            {
+                                continue;
+                            }
+                            if (coupleBFS_Iso_FB(currentIndexThis, currentIndexOther, whiteS, blackS, whiteS_O, blackS_O, other))
+                            {
+                                if (whiteS.Count() < 1 && whiteS_O.Count() < 1)
+                                {
+                                    return true;
+                                }
+                            }
+                            else
+                            {
+                                if (whiteS.Count() < 1 || whiteS_O.Count() < 1)
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+
+                }
+                //move vertex from gray set to black set when done exploring.
+                //moveVertex(currentIndex, grayS, blackS);
+                return false;
             }
              
             //algorithm of
@@ -1881,7 +1980,32 @@ namespace editorDeGrafos
                 return false;
             }
 
-      }//AdjacencyList(END).      
+            public List<int> neighborList(List<NodeRef> row)
+            {
+                List<int> res = null;          
+                for(int i = 0; i< row.Count(); i++)
+                { 
+                    if(row[i].W > -1)
+                    {
+                        res.Add(row[i].NODO.Index);
+                    }
+                }
+                return res;
+            }
+
+            public List<NodeRef> neighborListRef(List<NodeRef> row)
+            {
+                List<NodeRef> res = new List<NodeRef>();
+                for (int i = 0; i < row.Count(); i++)
+                {
+                    if (row[i].W > -1)
+                    {
+                        res.Add(row[i]);
+                    }
+                }
+                return res;
+            }
+        }//AdjacencyList(END).      
 
         private void terminal_TextChanged(object sender, EventArgs e)
         {
@@ -1952,5 +2076,7 @@ namespace editorDeGrafos
                 changeIsomtextBox(this.aListGraph.Isom_Inter(formaIsomorfismo.aListGraph).ToString());
             }
         }
+
+        
     }//Form.
 }//namespace.
