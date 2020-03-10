@@ -1291,6 +1291,121 @@ namespace editorDeGrafos
 
         }//NodeRef.
 
+        public class SpecificGradeSets
+        {
+           public int grade;
+           public List<int> thisIndices;
+           public List<int> otherIndices;
+
+            public SpecificGradeSets(int grade)
+            {
+                this.grade = grade;
+            }
+            
+            public void addThis(int index)
+            {
+                thisIndices.Add(index);
+            }
+
+            public void addOther(int index)
+            {
+                otherIndices.Add(index);
+            }
+
+            public int numberOf_O()
+            {
+                return thisIndices.Count();
+            }
+            public int numberOf_T()
+            {
+                return otherIndices.Count();
+            }
+
+            public Boolean validation()
+            {
+                if(numberOf_O() == numberOf_T())
+                {
+                    return true;
+                }
+                    return false;
+            }
+        }
+        public class permutationSetStruct
+        {
+            List<int> gradeInts;
+            List<SpecificGradeSets> grades;
+            public permutationSetStruct()
+            {
+                gradeInts = new List<int>();
+                grades = new List<SpecificGradeSets>();
+            }
+
+            public void addGrade(int grade)
+            {
+                if(!gradeInts.Contains(grade))
+                {
+                    gradeInts.Add(grade);
+                    grades.Add(new SpecificGradeSets(grade));
+                }
+            }
+
+            public void addIndex(int grade, int index, int this_other)
+            {
+                int indexInSet;
+                if (!gradeInts.Contains(grade))
+                {
+                    addGrade(grade);
+                }
+                indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
+                if (this_other <= 0)
+                {
+                    grades[indexInSet].addThis(index);
+                }
+                else 
+                {
+                    grades[indexInSet].addOther(index);
+                }
+            }
+
+            public void addIndex_T (int grade, int index)
+            {
+                int indexInSet;
+                if (!gradeInts.Contains(grade))
+                {
+                    addGrade(grade);
+                }
+                indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
+              
+                    grades[indexInSet].addThis(index);
+
+            }
+
+            public void addIndex_O (int grade, int index)
+            {
+                int indexInSet;
+                if (!gradeInts.Contains(grade))
+                {
+                    addGrade(grade);
+                }
+                indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
+               
+                    grades[indexInSet].addOther(index);                
+            }
+
+            public Boolean validateSet()
+            {
+                Boolean res = true;
+                foreach(SpecificGradeSets spG in grades)
+                {
+                    if(spG.validation() == false)
+                    {
+                        return false;
+                    }
+                }
+                return res;
+            }
+
+        }
         public class AdjacencyList
         {
             List<List<NodeRef>> graph;
@@ -1942,6 +2057,7 @@ namespace editorDeGrafos
                 Boolean soldOutPermutations = true;
                 if (heuristicIsom(other))
                 {
+
                     while(soldOutPermutations)
                     {
                        /* if ()
