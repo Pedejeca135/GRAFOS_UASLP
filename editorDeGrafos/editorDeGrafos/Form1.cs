@@ -394,7 +394,7 @@ namespace editorDeGrafos
         }
 
         public void InvalidatePlus()
-        {           
+        {
             commonInvalidateActions();
             Invalidate();
         }
@@ -404,7 +404,7 @@ namespace editorDeGrafos
             justSaved = false;// all that requires invalidate also should change the jusSaved state.           
             commonInvalidateActions();
             Invalidate();
-        }       
+        }
 
         public void commonInvalidateActions()
         {
@@ -413,7 +413,7 @@ namespace editorDeGrafos
             if (selected != null)
             {
                 terminal.Text = "Node selected : " + System.Environment.NewLine + "ID = " + selected.ID + System.Environment.NewLine + "Index = " + selected.Index + "\t" + System.Environment.NewLine;
-               if (aListGraph.Directed() == true)
+                if (aListGraph.Directed() == true)
                 {
                     DirectedGrade dG;
                     dG = aListGraph.GradeOfDirectedNode(selected);
@@ -421,8 +421,8 @@ namespace editorDeGrafos
                     terminal.Text += System.Environment.NewLine;
                     terminal.Text += "  GradoEntrada ( [<-] ): " + dG.Input;
                     terminal.Text += System.Environment.NewLine;
-                    terminal.Text += "  GradoSalida    ( [->] ): " + dG.Output;                 
-               }
+                    terminal.Text += "  GradoSalida    ( [->] ): " + dG.Output;
+                }
                 else
                 {
                     terminal.Text += "Grado(Nodo): " + aListGraph.GradeOfNode(selected);
@@ -435,21 +435,21 @@ namespace editorDeGrafos
             statusTB.Text = "Nombre :" + nombreArchivo + System.Environment.NewLine;
             statusTB.Text += "Grado(Grafo) : " + aListGraph.Grade();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Dirigido : " + aListGraph.Directed();            
+            statusTB.Text += "Dirigido : " + aListGraph.Directed();
             statusTB.Text += System.Environment.NewLine;
             statusTB.Text += "Completo : " + aListGraph.Complete();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Pseudo: "+ aListGraph.Pseudo();
+            statusTB.Text += "Pseudo: " + aListGraph.Pseudo();
             statusTB.Text += System.Environment.NewLine;
             statusTB.Text += "Cíclico : " + aListGraph.Cicled();
             statusTB.Text += System.Environment.NewLine;
             statusTB.Text += "Bipartita : " + aListGraph.Bip();
             statusTB.Text += System.Environment.NewLine;
 
-            if((formaIsomorfismo == null || (formaIsomorfismo != null && formaIsomorfismo.Visible == false)) && isoForm == false)
+            if ((formaIsomorfismo == null || (formaIsomorfismo != null && formaIsomorfismo.Visible == false)) && isoForm == false)
             {
                 IsomtextBox.Visible = false;
-            }           
+            }
         }
 
         /*****************************
@@ -465,7 +465,7 @@ namespace editorDeGrafos
             Rectangle rectangle;
 
             Pen penDirect = new Pen(Color.DimGray, 8);
-            penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor; 
+            penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor;
             penDirect.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
 
 
@@ -476,8 +476,8 @@ namespace editorDeGrafos
             foreach (Edge edge in cicleEdgeList)//cicled edge.
             {
                 Point StartPoint = new Point(edge.A.X, edge.A.Y);
-                Point unoP = new Point(edge.A.X - generalRadius*4 , edge.A.Y - generalRadius*4);
-                Point dosP = new Point(edge.A.X - generalRadius*4 , edge.A.Y + generalRadius*4);
+                Point unoP = new Point(edge.A.X - generalRadius * 4, edge.A.Y - generalRadius * 4);
+                Point dosP = new Point(edge.A.X - generalRadius * 4, edge.A.Y + generalRadius * 4);
                 //graphics.DrawBezier(pen, StartPoint,unoP,dosP,StartPoint);
                 GraphicsPath gPath = new GraphicsPath();
                 gPath.AddBezier(StartPoint, unoP, dosP, StartPoint);
@@ -488,9 +488,9 @@ namespace editorDeGrafos
             Double ye_Y;
             foreach (Edge edge in diEdgeList)//directed edges.
             {
-                Double rate = edge.Distancia/generalRadius;
-                equis_X = (edge.A.X + rate * edge.B.X)/(1+rate);
-                ye_Y = (edge.A.Y + rate * edge.B.Y)/(1 + rate);
+                Double rate = edge.Distancia / generalRadius;
+                equis_X = (edge.A.X + rate * edge.B.X) / (1 + rate);
+                ye_Y = (edge.A.Y + rate * edge.B.Y) / (1 + rate);
                 //graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
                 graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, (float)equis_X, (float)ye_Y);
                 //int difFromCenterToPin = (int)Math.Pow((generalRadius / 2.0), 0.5);
@@ -542,7 +542,7 @@ namespace editorDeGrafos
         }
 
         public void saveFile()
-        {            
+        {
             TextWriter sw = null;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Title = "Save text Files";
@@ -560,43 +560,43 @@ namespace editorDeGrafos
             int index;
             int uniqueID;
             */
-                foreach (Node node in nodeList)//all about the node
+            foreach (Node node in nodeList)//all about the node
+            {
+                sw.WriteLine(node.ID + "," + node.Index + "," + node.Position.X + "," + node.Position.Y + "," + node.Radius);
+            }
+            sw.WriteLine("Matrix");
+            foreach (List<NodeRef> row in aListGraph.GRAPH)
+            {
+                foreach (NodeRef nodeR in row)
                 {
-                    sw.WriteLine(node.ID + "," + node.Index + "," + node.Position.X + "," + node.Position.Y + "," + node.Radius);
+                    sw.Write(nodeR.W + ",");
                 }
-                sw.WriteLine("Matrix");
-                foreach (List<NodeRef> row in aListGraph.GRAPH)
-                {
-                    foreach (NodeRef nodeR in row)
-                    {
-                        sw.Write(nodeR.W+",");
-                    }
-                    sw.WriteLine();
-                }
-                sw.WriteLine("Edges");
-                foreach (Edge edge in edgeList)
-                {
-                    sw.WriteLine(edge.Client.Index+","+ edge.Server.Index);
-                }
-                sw.WriteLine("D_Edges");
-                foreach (Edge edge in diEdgeList)
-                {
-                    sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
-                }
-                sw.WriteLine("C_Edges");
-                foreach (Edge edge in cicleEdgeList)
-                {
-                    sw.WriteLine(edge.Client.Index);
-                }
-                sw.Close();
-                justSaved = true;
-            
+                sw.WriteLine();
+            }
+            sw.WriteLine("Edges");
+            foreach (Edge edge in edgeList)
+            {
+                sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
+            }
+            sw.WriteLine("D_Edges");
+            foreach (Edge edge in diEdgeList)
+            {
+                sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
+            }
+            sw.WriteLine("C_Edges");
+            foreach (Edge edge in cicleEdgeList)
+            {
+                sw.WriteLine(edge.Client.Index);
+            }
+            sw.Close();
+            justSaved = true;
+
         }
 
         public int openFile()
         {
             int statusRes = 0;
-            
+
             StreamReader sr = null;
             OpenFileDialog openFileDialog = new OpenFileDialog();
 
@@ -607,7 +607,7 @@ namespace editorDeGrafos
                 char[] Delimiters = new char[] { ',' };
                 string[] Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
 
-                while (sr != null && !sr.EndOfStream && Input[0] != "Matrix" )
+                while (sr != null && !sr.EndOfStream && Input[0] != "Matrix")
                 {
                     int idON;
                     int indexON;
@@ -615,34 +615,34 @@ namespace editorDeGrafos
                     int y;
                     int radiusON;
 
-                   
-                        int.TryParse(Input[0], out idON);
-                        int.TryParse(Input[1], out indexON);
-                        int.TryParse(Input[2], out x);
-                        int.TryParse(Input[3], out y);
-                        int.TryParse(Input[4], out radiusON);
 
-                        Coordenate cor = new Coordenate(x, y);
-                        Node node = new Node(cor, radiusON, indexON, idON);
-                        aListGraph.addNode(node);
-                        nodeList.Add(node);
-                        Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);                    
+                    int.TryParse(Input[0], out idON);
+                    int.TryParse(Input[1], out indexON);
+                    int.TryParse(Input[2], out x);
+                    int.TryParse(Input[3], out y);
+                    int.TryParse(Input[4], out radiusON);
+
+                    Coordenate cor = new Coordenate(x, y);
+                    Node node = new Node(cor, radiusON, indexON, idON);
+                    aListGraph.addNode(node);
+                    nodeList.Add(node);
+                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
-                if(Input[0] == "Matrix")
+                if (Input[0] == "Matrix")
                 {
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
 
                 int i = 0;
-                while (sr != null && !sr.EndOfStream && Input[0] != "Edges" )
+                while (sr != null && !sr.EndOfStream && Input[0] != "Edges")
                 {
                     int Peso;
 
-                    for (int j = 0; j < Input.Length ; j++)
+                    for (int j = 0; j < Input.Length; j++)
                     {
                         int.TryParse(Input[j], out Peso);
                         aListGraph.GRAPH[i][j].W = Peso;
-                    }                    
+                    }
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                     i++;
                 }
@@ -650,7 +650,7 @@ namespace editorDeGrafos
                 {
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
-                while (sr != null && !sr.EndOfStream && Input[0] != "D_Edges"  )
+                while (sr != null && !sr.EndOfStream && Input[0] != "D_Edges")
                 {
                     Node server = new Node();
                     Node client = new Node();
@@ -662,14 +662,14 @@ namespace editorDeGrafos
 
                     for (int j = 0; j < aListGraph.GRAPH.Count; j++)
                     {
-                            if (aListGraph.GRAPH[j][j].NODO.Index == nodo_C)
-                            {
-                                client = aListGraph.GRAPH[j][j].NODO;
-                            }
-                            if(aListGraph.GRAPH[j][j].NODO.Index == nodo_S)
-                            {
-                                server = aListGraph.GRAPH[j][j].NODO;
-                            }
+                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_C)
+                        {
+                            client = aListGraph.GRAPH[j][j].NODO;
+                        }
+                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_S)
+                        {
+                            server = aListGraph.GRAPH[j][j].NODO;
+                        }
                     }
 
                     Edge edge = new Edge(server, client);
@@ -710,7 +710,7 @@ namespace editorDeGrafos
                 {
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
-                while (sr != null && !sr.EndOfStream )
+                while (sr != null && !sr.EndOfStream)
                 {
                     Node server = new Node();
 
@@ -848,7 +848,7 @@ namespace editorDeGrafos
             }
             deselect();
             InvalidatePlus(1);
-        }      
+        }
 
         public Node findNodeClicked(Coordenate cor)
         {
@@ -897,19 +897,19 @@ namespace editorDeGrafos
             }
             InvalidatePlus(1);
         }
-        
+
         public void create(Coordenate cor)
         {
             Coordenate newNodePosition = new Coordenate(cor.X, cor.Y);
             Node newNode;
             if (allMoRe)
             {
-               newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID(),Color.Indigo);
+                newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID(), Color.Indigo);
             }
             else
             {
-               newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID());
-            }           
+                newNode = new Node(newNodePosition, generalRadius, indexCount, this.uniqueID());
+            }
             indexCount++;
             nodeList.Add(newNode);
             aListGraph.addNode(newNode);
@@ -922,22 +922,22 @@ namespace editorDeGrafos
             Boolean different;
             int res;
             Random random = new Random();
-        
+
             do
             {
                 different = true;
                 res = random.Next(1000, 9999);
-                foreach(int num in IDList)//ID list should be a tree so the time-complexity to compruebe the exixtence of the random number generated could decresse
+                foreach (int num in IDList)//ID list should be a tree so the time-complexity to compruebe the exixtence of the random number generated could decresse
                 {
-                    if(res == num )
+                    if (res == num)
                     {
                         different = false;
                         break;//doesn't make sense continuing serching. Basic heuristic avrd.
                     }
-                }                
+                }
             }
             while (different == false);
-            return res;            
+            return res;
         }
 
         private int AskForAWeight()
@@ -947,7 +947,7 @@ namespace editorDeGrafos
             return weight;
         }
 
-      
+
         public void eliminateNexetEdges(Node node)
         {
             List<Edge> newEdges = new List<Edge>();
@@ -1033,7 +1033,7 @@ namespace editorDeGrafos
                 color = Color.Black;
                 uniqueID = identifier;
             }
-            public Node(Coordenate position, int radius, int index, int identifier,Color color)
+            public Node(Coordenate position, int radius, int index, int identifier, Color color)
             {
                 this.position = position;
                 this.radiusLenght = radius;
@@ -1159,8 +1159,8 @@ namespace editorDeGrafos
                 get { return this.server; }
             }
 
-            public Double Distancia => Math.Pow(Math.Pow(B.X - A.X, 2.0) + Math.Pow(B.Y - A.Y, 2.0), 0.5); 
-            
+            public Double Distancia => Math.Pow(Math.Pow(B.X - A.X, 2.0) + Math.Pow(B.Y - A.Y, 2.0), 0.5);
+
         }//Edge.
 
         public class Coordenate
@@ -1186,20 +1186,20 @@ namespace editorDeGrafos
                 set { this.y = value; }
             }
 
-                public override String ToString()
+            public override String ToString()
             {
                 // return " x = " + this.X + " y = " + this.Y;
                 return this.X + "," + this.Y;
             }
-        
+
 
         }//Coordenate.
 
         public class TidyPair : Coordenate
         {
-            public TidyPair(int x, int y) : base(x,y)
+            public TidyPair(int x, int y) : base(x, y)
             {
-                              
+
             }
             public override String ToString()
             {
@@ -1227,7 +1227,7 @@ namespace editorDeGrafos
                 this.input = input;
                 this.output = output;
             }
-        
+
             public int Input
             {
                 get { return this.input; }
@@ -1237,19 +1237,19 @@ namespace editorDeGrafos
                 get { return this.output; }
             }
 
-           public int Total
+            public int Total
             {
                 get { return input + output; }
             }
         }//DirectedGrade.
-        
+
         public class NodeRef
         {
             int weight;
             Node nodo;
             TidyPair tidy;
             Boolean activeNode;
-            
+
 
             public NodeRef(int weight, Node nodo, TidyPair tidyPair)
             {
@@ -1259,7 +1259,7 @@ namespace editorDeGrafos
                 activeNode = false;
             }
 
-            public NodeRef(int weight, Node nodo, TidyPair tidyPair,Boolean active)
+            public NodeRef(int weight, Node nodo, TidyPair tidyPair, Boolean active)
             {
                 this.tidy = tidyPair;
                 this.nodo = nodo;
@@ -1293,9 +1293,9 @@ namespace editorDeGrafos
 
         public class SpecificGradeSets
         {
-           public int grade;
-           public List<int> thisIndices;
-           public List<int> otherIndices;
+            public int grade;
+            public List<int> thisIndices;
+            public List<int> otherIndices;
 
             public SpecificGradeSets(int grade)
             {
@@ -1303,7 +1303,7 @@ namespace editorDeGrafos
                 thisIndices = new List<int>();
                 otherIndices = new List<int>();
             }
-            
+
             public void addThis(int index)
             {
                 thisIndices.Add(index);
@@ -1325,11 +1325,11 @@ namespace editorDeGrafos
 
             public Boolean validation()
             {
-                if(numberOf_O() == numberOf_T())
+                if (numberOf_O() == numberOf_T())
                 {
                     return true;
                 }
-                    return false;
+                return false;
             }
         }//END.SpecificGradeSets
 
@@ -1346,7 +1346,7 @@ namespace editorDeGrafos
 
             public void addGrade(int grade)
             {
-                if(!gradeInts.Contains(grade))
+                if (!gradeInts.Contains(grade))
                 {
                     gradeInts.Add(grade);
                     grades.Add(new SpecificGradeSets(grade));
@@ -1365,13 +1365,13 @@ namespace editorDeGrafos
                 {
                     grades[indexInSet].addThis(index);
                 }
-                else 
+                else
                 {
                     grades[indexInSet].addOther(index);
                 }
             }
 
-            public void addIndex_T (int grade, int index)
+            public void addIndex_T(int grade, int index)
             {
                 int indexInSet;
                 if (!gradeInts.Contains(grade))
@@ -1379,11 +1379,11 @@ namespace editorDeGrafos
                     addGrade(grade);
                 }
                 indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
-              
-                    grades[indexInSet].addThis(index);
+
+                grades[indexInSet].addThis(index);
             }
 
-            public void addIndex_O (int grade, int index)
+            public void addIndex_O(int grade, int index)
             {
                 int indexInSet;
                 if (!gradeInts.Contains(grade))
@@ -1391,16 +1391,16 @@ namespace editorDeGrafos
                     addGrade(grade);
                 }
                 indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
-               
-                    grades[indexInSet].addOther(index);                
+
+                grades[indexInSet].addOther(index);
             }
 
             public Boolean validateSet()
             {
                 Boolean res = true;
-                foreach(SpecificGradeSets spG in grades)
+                foreach (SpecificGradeSets spG in grades)
                 {
-                    if(spG.validation() == false)
+                    if (spG.validation() == false)
                     {
                         return false;
                     }
@@ -1408,9 +1408,40 @@ namespace editorDeGrafos
                 return res;
             }
 
+            public List<SpecificGradeSets> GRADES
+            {
+                get { return this.grades; }
+            }
+
         }//END. permutationSetStruct.
 
-        public class AdjacencyList
+        public class PermutationPair
+        {
+            public int thisInt;
+            public int otherInt;
+            
+        }
+
+        public class PermutationPairList
+        {
+            List<PermutationPair> permutationList;
+            public PermutationPairList(int tamOfGraphs)
+            {
+                permutationList = new List<PermutationPair>();
+            }
+        }
+
+        public class ListOfPerLists
+        {
+            int numOfPermutationPosibilities;
+            public ListOfPerLists(int tamOfGraphs, permutationSetStruct permutSetStruct)
+            {
+                permutSetStruct.GRADES.Count();
+            }
+        }
+
+
+            public class AdjacencyList
         {
             List<List<NodeRef>> graph;
 
@@ -1982,11 +2013,14 @@ namespace editorDeGrafos
 
                     if(gradePairs.validateSet())
                     {
+                        
                         return true;                             
                     }
                 }
                 return res;
             }
+
+           
 
             /********************************************************************************************
             * 
