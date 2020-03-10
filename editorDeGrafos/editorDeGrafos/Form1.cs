@@ -1300,6 +1300,8 @@ namespace editorDeGrafos
             public SpecificGradeSets(int grade)
             {
                 this.grade = grade;
+                thisIndices = new List<int>();
+                otherIndices = new List<int>();
             }
             
             public void addThis(int index)
@@ -1329,11 +1331,13 @@ namespace editorDeGrafos
                 }
                     return false;
             }
-        }
+        }//END.SpecificGradeSets
+
         public class permutationSetStruct
         {
             List<int> gradeInts;
             List<SpecificGradeSets> grades;
+
             public permutationSetStruct()
             {
                 gradeInts = new List<int>();
@@ -1377,7 +1381,6 @@ namespace editorDeGrafos
                 indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
               
                     grades[indexInSet].addThis(index);
-
             }
 
             public void addIndex_O (int grade, int index)
@@ -1405,7 +1408,8 @@ namespace editorDeGrafos
                 return res;
             }
 
-        }
+        }//END. permutationSetStruct.
+
         public class AdjacencyList
         {
             List<List<NodeRef>> graph;
@@ -1414,7 +1418,6 @@ namespace editorDeGrafos
             {
                 graph = new List<List<NodeRef>>();
             }
-
 
             public int NumberOfLists
             {
@@ -1933,150 +1936,77 @@ namespace editorDeGrafos
                 }
             }
 
-            //first algorithm of isimorphism. Implemented by me.
+            /********************************************************************************************
+            * 
+            * 
+            *      ISOMORPHISM : First algorithm of isimorphism. Implemented by me... ñ_ñ 
+            * 
+            * 
+            * *******************************************************************************************/
+
             public Boolean Isom_Fuerza_Bruta(AdjacencyList other)
             {
                 //Boolean res = false;              
                 if(heuristicIsom(other))
                 {
-                    List<int> sameGrade = new List<int>();
-                    for (int i = 0; i < other.GRAPH.Count(); i++)//
+                    permutationSetStruct gradePairs;
+                    gradePairs = heuristicIsom_SEC_FASE(other);
+
+                    if (gradePairs.validateSet())
                     {
-                       if ( other.GradeOfNode(other.GRAPH[i][i].NODO) == this.GradeOfNode(this.GRAPH[0][0].NODO))
-                       {
-                         sameGrade.Add(other.GRAPH[i][i].NODO.Index);
-                       }                           
-                    }                  
 
-                    int rootThis = 0;//never change.
-                    int rootOther = 0;//change always.
+                      
 
-                    while (sameGrade.Count() > 0)
-                    {
-                        rootOther = sameGrade.ElementAt(0);
-                        sameGrade.RemoveAt(0);
-
-                        HashSet<int> whiteSet = new HashSet<int>();
-                        //HashSet<int> graySet = new HashSet<int>();
-                        HashSet<int> blackSet = new HashSet<int>();
-
-                        HashSet<int> whiteSet_Other = new HashSet<int>();
-                        //HashSet<int> graySet = new HashSet<int>();
-                        HashSet<int> blackSet_Other = new HashSet<int>();
-
-                        for (int i = 0; i < other.GRAPH.Count(); i++)//
-                        {
-                            whiteSet.Add(i);
-                            whiteSet_Other.Add(i);
-                        }
-
-                        moveVertex(rootThis, whiteSet, blackSet);
-                        moveVertex(rootOther, whiteSet_Other, blackSet_Other);
-                        
-                        while (whiteSet.Count() > 0 && whiteSet_Other.Count() > 0)//BFS for the roots calculated.
-                        {
-                            // int current = whiteSet.First();
-                            int current = whiteSet.Min();
-                            int current_O = whiteSet_Other.Min();
-                            if (coupleBFS_Iso_FB(rootThis,rootOther, whiteSet, blackSet, whiteSet_Other, blackSet_Other,other))
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-
+                    }//grade pairs validations.
                 }//END of the heuristic.
                 return false;
             }
 
-            private Boolean coupleBFS_Iso_FB(int currentIndexThis, int currentIndexOther, HashSet<int> whiteS, HashSet<int> blackS, HashSet<int> whiteS_O, HashSet<int> blackS_O, AdjacencyList other)//fuerza Bruta
-            {
-                //move current to gray set from white set and then explore it.
-                if (this.GradeOfNode( this.GRAPH[currentIndexThis][currentIndexThis].NODO)  !=  other.GradeOfNode(other.GRAPH[currentIndexOther][currentIndexOther].NODO))
-                {
-                    return false;
-                }
-                moveVertex(currentIndexThis, whiteS, blackS);
-                moveVertex(currentIndexOther, whiteS_O, blackS_O);
-                foreach (NodeRef nodeR in graph[currentIndexThis])
-                {
-                    HashSet<int> candidates = new HashSet<int>();
-
-                    foreach(NodeRef nodeR_O in other.GRAPH[currentIndexOther])
-                    {
-                        if (nodeR_O.W > -1)
-                        {
-                            if (other.GradeOfNode(nodeR_O.NODO) == this.GradeOfNode(nodeR.NODO))
-                            {
-                                if (!blackS_O.Contains(nodeR_O.NODO.Index))//si el nodo no est marcado como visitado.
-                                {
-                                    candidates.Add(nodeR_O.NODO.Index);
-                                }
-                            }
-                        }
-                    }
-
-                    if (nodeR.W > -1)
-                    {
-                        while (candidates.Count() > 0)
-                        {
-                            //if in black set means already explored so continue.
-                            if (blackS.Contains(nodeR.NODO.Index))
-                            {
-                                continue;
-                            }
-                            if (coupleBFS_Iso_FB(currentIndexThis, currentIndexOther, whiteS, blackS, whiteS_O, blackS_O, other))
-                            {
-                                if (whiteS.Count() < 1 && whiteS_O.Count() < 1)
-                                {
-                                    return true;
-                                }
-                            }
-                            else
-                            {
-                                if (whiteS.Count() < 1 || whiteS_O.Count() < 1)
-                                {
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-
-                }
-                //move vertex from gray set to black set when done exploring.
-                //moveVertex(currentIndex, grayS, blackS);
-                return false;
-            }
-             
-            //algorithm of
+         
+            /********************************************************************************************
+             * 
+             * 
+             *      ISOMORPHISM :algorithm of tranpose matrix.
+             * 
+             * 
+             * *******************************************************************************************/
             public Boolean Isom_Traspuesta(AdjacencyList other)
             {
-                Boolean res = false;
+                Boolean res = false;              
 
                 Boolean soldOutPermutations = true;
                 if (heuristicIsom(other))
                 {
+                    permutationSetStruct gradePairs;
+                    gradePairs = heuristicIsom_SEC_FASE(other);
 
-                    while(soldOutPermutations)
+                    if(gradePairs.validateSet())
                     {
-                       /* if ()
-                        {
-                            return true;
-                        }*/
+                        return true;                             
                     }
-                   
                 }
                 return res;
             }
 
-            //
+            /********************************************************************************************
+            * 
+            * 
+            *      ISOMORPHISM : In the manual.
+            * 
+            * 
+            * *******************************************************************************************/
             public Boolean Isom_Inter(AdjacencyList other)
             {
                 Boolean res = false;
                 if (heuristicIsom(other))
                 {
-                    return true;
+                    permutationSetStruct gradePairs;
+                    gradePairs = heuristicIsom_SEC_FASE(other);
+
+                    if (gradePairs.validateSet())
+                    {
+                        return true;                   
+                    }
                 }
                 return res;
             }
@@ -2094,6 +2024,23 @@ namespace editorDeGrafos
                                             return true;
                 }
                 return false;
+            }
+
+            private permutationSetStruct heuristicIsom_SEC_FASE(AdjacencyList other)
+            {
+                permutationSetStruct res = new permutationSetStruct();
+                int grade_T;
+                int grade_O;
+
+                for (int i = 0; i < other.GRAPH.Count(); i++)
+                {
+                    grade_T = this.GradeOfNode(this.GRAPH[i][i].NODO);
+                    res.addIndex_T(grade_T, this.GRAPH[i][i].NODO.Index);
+
+                    grade_O = other.GradeOfNode(other.GRAPH[i][i].NODO);
+                    res.addIndex_O(grade_O, other.GRAPH[i][i].NODO.Index);
+                }
+                return res;
             }
 
             public List<int> neighborList(List<NodeRef> row)
