@@ -1331,14 +1331,32 @@ namespace editorDeGrafos
                 }
                 return false;
             }
+
+            public Boolean matchPair(int T, int O)
+            {
+                if (thisIndices.Contains(T) && otherIndices.Contains(O))
+                    return true;
+                else
+                    return false;
+            }
+
+            public List<int> ThisIndicesList
+            {
+                get { return thisIndices; }
+            }
+            public List<int> OtherIndicesList
+            {
+                get { return otherIndices; }
+            }
+
         }//END.SpecificGradeSets
 
-        public class permutationSetStruct
+        public class PermutationSetStruct
         {
             List<int> gradeInts;
             List<SpecificGradeSets> grades;
 
-            public permutationSetStruct()
+            public PermutationSetStruct()
             {
                 gradeInts = new List<int>();
                 grades = new List<SpecificGradeSets>();
@@ -1351,6 +1369,16 @@ namespace editorDeGrafos
                     gradeInts.Add(grade);
                     grades.Add(new SpecificGradeSets(grade));
                 }
+            }
+            public Boolean matchPairGrades(int T, int O)
+            {
+                Boolean res = false;
+                foreach( SpecificGradeSets sgs in grades )
+                {
+                    if (sgs.matchPair(T, O))
+                        return true;
+                }
+                return res;
             }
 
             public void addIndex(int grade, int index, int this_other)
@@ -1413,32 +1441,183 @@ namespace editorDeGrafos
                 get { return this.grades; }
             }
 
+            /*
+            public PermutationPairList makeArrayPermute(int tamOfGraphs)
+            {
+                
+                if(tamOfGraphs == 1)
+                {
+                    if (this.grades[0].matchPair(0, 0))
+                    {
+                        auxPerPair = new PermutationPair(0, 0);
+                        res.Add(auxPerPair);
+                    }
+                    return res;
+                }
+                else { 
+                        
+                    }
+
+                List<int> thisArray = new List<int>();
+                List<int> otherArray = new List<int>();
+
+                for(int i = 0; i < tamOfGraphs; i++)
+                {
+                    otherArray.Add(i);
+                }
+
+                return res;
+            }
+            */
+
+            public PermutationPairList P_PairList;
+            public PermutationPair auxPerPair;
+            public void makeArrayPermute(int tamOfGraphs)
+            {
+                
+
+            }
+
+            public void storePermutation(int[] a)
+            {
+                P_PairList = new PermutationPairList();
+
+                for (int i = 0; i < a.Length; i++)
+                {                    
+                    if(matchPairGrades(i,a[i]))
+                    {
+                        auxPerPair = new PermutationPair(i, a[i]);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                    P_PairList.Add(auxPerPair);
+                }
+            }
+
+            public void heapPermutation(int[] a, int size, int n)
+            {                
+                // if size becomes 1 then prints the obtained 
+                // permutation 
+                if (size == 1)
+                {
+                    storePermutation(a);//store and validate the permutation made.
+                }
+
+                for (int i = 0; i < size; i++)
+                {
+                    heapPermutation(a, size - 1, n);
+
+                    // if size is odd, swap first and last 
+                    // element 
+                    if (size % 2 == 1)
+                    {
+                        int temp = a[0];
+                        a[0] = a[size - 1];
+                        a[size - 1] = temp;
+                    }
+
+                    // If size is even, swap ith and last 
+                    // element 
+                    else
+                    {
+                        int temp = a[i];
+                        a[i] = a[size - 1];
+                        a[size - 1] = temp;
+                    }
+                }
+            }
+
         }//END. permutationSetStruct.
 
-        public class PermutationPair
+        public class PermutationPair//...........................................................
         {
             public int thisInt;
             public int otherInt;
-            
+            public PermutationPair(int T, int O)
+            {
+                thisInt = T;
+                otherInt = O;
+            }
         }
-
-        public class PermutationPairList
+        public class PermutationPairList//.......................................................
         {
+            /*
+             * this is the way to do permutations.
+             * (12345)
+             *        |----------------------> very important.
+             * (54321)
+             * the above numbers are an example of permutation. we can have n! permutation if the graphs have n nodes.
+             * the way we do it here make this less than n! permutations, due to the clasifications by grade
+             * comparing each graph.
+             * 
+             * */
             List<PermutationPair> permutationList;
-            public PermutationPairList(int tamOfGraphs)
+            PermutationSetStruct workingPairs;
+
+            public PermutationPairList()
             {
                 permutationList = new List<PermutationPair>();
             }
-        }
-
-        public class ListOfPerLists
-        {
-            int numOfPermutationPosibilities;
-            public ListOfPerLists(int tamOfGraphs, permutationSetStruct permutSetStruct)
+            public void Add(PermutationPair pp)
             {
-                permutSetStruct.GRADES.Count();
+                permutationList.Add(pp);
             }
-        }
+            public Matrix toMatrixOfPermutation()
+            {
+                Matrix res = null;
+                int[,] toDoMatrix;
+
+                return res;
+            }
+        }    
+        public class ListOfPerPairLists//............................................................
+        {
+            int numOfPermutationPosibilities = 0;
+            public ListOfPerPairLists(int tamOfGraphs, PermutationSetStruct permutSetStruct)
+            {
+                numOfPermutationPosibilities = calculatePer(permutSetStruct);                
+            }
+        
+            public int calculatePer(PermutationSetStruct permutSetStruct)
+            {
+                int res = 1;
+
+                for (int i = 0; i < permutSetStruct.GRADES.Count(); i++)
+                {
+                    int nP = permutSetStruct.GRADES[i].OtherIndicesList.Count();
+                    if (nP < 3)
+                    {
+                        nP = nP * nP;
+                    }
+                    else
+                    {
+                        nP = factorial(nP);
+                    }
+                    res *= nP;
+                }
+                return res;
+            }
+
+        //factorial method
+            public int factorial(int integer)
+            {
+                int res = 1;
+                for (int i = 1; i <= integer; i++)
+                {
+                        res += res * i;
+                }
+                return res;
+            }
+    }
+      
+            
+           
+               
+
+        
+          
 
 
             public class AdjacencyList
@@ -1980,7 +2159,7 @@ namespace editorDeGrafos
                 //Boolean res = false;              
                 if(heuristicIsom(other))
                 {
-                    permutationSetStruct gradePairs;
+                    PermutationSetStruct gradePairs;
                     gradePairs = heuristicIsom_SEC_FASE(other);
 
                     if (gradePairs.validateSet())
@@ -2008,7 +2187,7 @@ namespace editorDeGrafos
                 Boolean soldOutPermutations = true;
                 if (heuristicIsom(other))
                 {
-                    permutationSetStruct gradePairs;
+                    PermutationSetStruct gradePairs;
                     gradePairs = heuristicIsom_SEC_FASE(other);
 
                     if(gradePairs.validateSet())
@@ -2034,7 +2213,7 @@ namespace editorDeGrafos
                 Boolean res = false;
                 if (heuristicIsom(other))
                 {
-                    permutationSetStruct gradePairs;
+                    PermutationSetStruct gradePairs;
                     gradePairs = heuristicIsom_SEC_FASE(other);
 
                     if (gradePairs.validateSet())
@@ -2060,9 +2239,9 @@ namespace editorDeGrafos
                 return false;
             }
 
-            private permutationSetStruct heuristicIsom_SEC_FASE(AdjacencyList other)
+            private PermutationSetStruct heuristicIsom_SEC_FASE(AdjacencyList other)
             {
-                permutationSetStruct res = new permutationSetStruct();
+                PermutationSetStruct res = new PermutationSetStruct();
                 int grade_T;
                 int grade_O;
 
