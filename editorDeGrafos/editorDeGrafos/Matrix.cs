@@ -10,6 +10,11 @@ namespace editorDeGrafos
     {
         int[,] matrix;
 
+        public Matrix()
+        {
+            this.matrix = new int[1, 1];
+        }
+
         public Matrix(int row, int col)
         {
             this.matrix = new int[row, col];

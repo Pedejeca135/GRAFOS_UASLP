@@ -1529,7 +1529,7 @@ namespace editorDeGrafos
                 }
             }
 
-        }//END. permutationSetStruct.
+        }//END. PermutationSetStruct.
 
         public class PermutationPair//...........................................................
         {
@@ -1553,7 +1553,7 @@ namespace editorDeGrafos
              * comparing each graph.
              * 
              * */
-            List<PermutationPair> permutationList;
+            List<PermutationPair> permutationList = null;
             PermutationSetStruct workingPairs;
 
             public PermutationPairList()
@@ -1564,11 +1564,20 @@ namespace editorDeGrafos
             {
                 permutationList.Add(pp);
             }
-            public Matrix toMatrixOfPermutation()
+            public Matrix toMatrixOfPermutation()//to convert the permutation into a matrix of permutations.
             {
                 Matrix res = null;
-                int[,] toDoMatrix;
+                if(permutationList.Count > 0)
+                {
+                    int n = permutationList.Count();
+                    int[,] toDoMatrix = new int[n, n];
 
+                    for(int i = 0; i < n; i++)
+                    {
+                        toDoMatrix[permutationList[i].otherInt, permutationList[i].thisInt] = 1;
+                    }
+                    res = new Matrix(toDoMatrix);
+                }
                 return res;
             }
         }    
@@ -1577,7 +1586,8 @@ namespace editorDeGrafos
             int numOfPermutationPosibilities = 0;
             public ListOfPerPairLists(int tamOfGraphs, PermutationSetStruct permutSetStruct)
             {
-                numOfPermutationPosibilities = calculatePer(permutSetStruct);                
+                numOfPermutationPosibilities = calculatePer(permutSetStruct);
+                
             }
         
             public int calculatePer(PermutationSetStruct permutSetStruct)
@@ -2133,7 +2143,6 @@ namespace editorDeGrafos
                             {
                                 return false;
                             }
-
                         }
                     }
                     // If we reach here, then all adjacent vertices 
@@ -2191,15 +2200,38 @@ namespace editorDeGrafos
                     gradePairs = heuristicIsom_SEC_FASE(other);
 
                     if(gradePairs.validateSet())
-                    {
-                        
-                        return true;                             
+                    {                        
+                        return Isom_Traspuesta_Algorithm(other);                             
                     }
                 }
                 return res;
             }
+            public Boolean Isom_Traspuesta_Algorithm(AdjacencyList other)//Algorithm
+            {
+                Boolean res = false;
+                int limitOfPermutations = 40000;
+                Matrix thisMatrix = this.toMatrix();
+                Matrix otherMatrix = other.toMatrix();
 
-           
+                Matrix permutationMatrix = new Matrix();
+                Matrix permutationMatrixTrans = new Matrix();
+
+                Matrix resMatrixOperation = new Matrix();
+
+                do
+                {
+                    resMatrixOperation = permutationMatrix.MatrixProduct(otherMatrix);
+                    resMatrixOperation = resMatrixOperation.MatrixProduct(permutationMatrixTrans);
+                    if (thisMatrix.Equals(resMatrixOperation))
+                    {
+                        return res;
+                    }
+                    limitOfPermutations--;
+                } while (limitOfPermutations > 0);
+                
+                return false;
+            }
+
 
             /********************************************************************************************
             * 
@@ -2279,6 +2311,23 @@ namespace editorDeGrafos
                         res.Add(row[i]);
                     }
                 }
+                return res;
+            }
+
+            public Matrix toMatrix()
+            {
+                Matrix res;
+                int[,] toDoMatrix = new int[graph.Count(), graph.Count()];
+
+                for (int j = 0; j < graph.Count(); j++)
+                    for (int i = 0; i < graph.Count(); i++)                   
+                    {
+                        if (graph[j][i].W > -1)
+                            toDoMatrix[j,i] = 1;
+                        else
+                            toDoMatrix[j, i] = 0;
+                    }       
+                res = new Matrix(toDoMatrix);
                 return res;
             }
         }//AdjacencyList(END).      
