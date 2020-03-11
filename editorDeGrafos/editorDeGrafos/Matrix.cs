@@ -82,6 +82,28 @@ namespace editorDeGrafos
             return res;
         }
 
+        public Matrix interchangeRC(ref Matrix m, int tam, int index1, int index2)
+        {
+            Matrix res = m ;
+            for(int j = 0; j < tam ; j++)
+            {
+                swapInt(ref res.MATRIX[j,index1] , ref res.MATRIX[j,index2]);
+            }
+            for (int j = 0; j < tam; j++)
+            {
+                swapInt(ref res.MATRIX[index1 , j], ref res.MATRIX[index2 , j]);
+            }
+            res = new Matrix(res.MATRIX);
+            return res;
+        }
+        private void swapInt(ref int one, ref int two)
+        {
+            int aux;
+            aux = one;
+            one = two;
+            two = aux;
+        }
+
         public Boolean Equals(Matrix other)
         {
             if (this.MATRIX.GetLength(0) == other.MATRIX.GetLength(0) && this.MATRIX.GetLength(1) == other.MATRIX.GetLength(1))

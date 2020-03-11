@@ -1954,19 +1954,20 @@ namespace editorDeGrafos
                     listOfPermutations.RemoveAt(0);
 
                     band = true;
-                    for (int j = 0; j < permutationArray.Length; j++)                       
+                    int j;
+                    for (j = 0; j < permutationArray.Length; j++)                       
                     {                       
                         for (int i = 0; i < permutationArray.Length; i++)
                         {
                             if (otherMatrix.MATRIX[j, i] != thisMatrix.MATRIX[permutationArray[j], permutationArray[i]])
                             {
                                 band = false;
-                                break;
+                                continue;
                             }
                         }
                         if (!band)
                         {
-                            break;
+                            continue;
                         }
                     }
                     limitOfPermutations--;
@@ -2003,7 +2004,7 @@ namespace editorDeGrafos
                         {
                             if (gradePairs.validateSet())
                             {
-                                return Isom_Inter_Algorithm();
+                                return Isom_Inter_Algorithm(other);
                             }
                         }
                     }
@@ -2011,8 +2012,117 @@ namespace editorDeGrafos
                 return false;
             }
 
-            public Boolean Isom_Inter_Algorithm()
+            public Boolean Isom_Inter_Algorithm(AdjacencyList other)
             {
+                Matrix thisMatrix = this.toMatrix();
+                Matrix otherMatrix = other.toMatrix();
+
+                List<int> colIndexOne;
+                List<int> sumEachRow = new List<int>();
+                int sumCol = 0;
+
+                List<int> colIndex_Two = new List<int>();
+                int sumaCol_Two = 0;
+                List<int> sumEachRow_Two = new List<int>();
+
+                int sumaRen;
+
+                    for (int iteratorInt = 0; iteratorInt < this.GRAPH.Count() -1; iteratorInt++ )
+                    {
+                        colIndexOne = new List<int>();
+                        sumCol = 0;
+                        sumEachRow = new List<int>();
+
+                        for (int j = 0; j < this.GRAPH.Count(); j++)
+                        {
+                                if (thisMatrix.MATRIX[j, iteratorInt] == 1)
+                                {
+                                    colIndexOne.Add(j);
+                                    sumCol++;
+                                    sumEachRow.Add(0);
+                                }
+                        }
+
+                         int inte = 0;
+                       foreach(int index in colIndexOne)
+                        {
+                            for (int j = 0; j < this.GRAPH.Count(); j++)
+                            {
+                                sumEachRow[inte] +=  thisMatrix.MATRIX[index, j];
+                            }
+                            inte++;
+                        }
+
+                    //EN EL SEGUNDO GRAFO:
+                    int iteratorColSec = iteratorInt +1;
+                    
+                        for (int i = iteratorColSec; i < other.GRAPH.Count(); i++)
+                        {
+                            colIndex_Two = new List<int>();
+                            sumaCol_Two = 0;
+                            sumEachRow_Two = new List<int>();
+
+                            for (int j = 0; j < other.GRAPH.Count(); j++)
+                            {
+                                if (otherMatrix.MATRIX[j, iteratorColSec] == 1)
+                                {
+                                    colIndex_Two.Add(j);
+                                    sumaCol_Two++;
+                                    sumEachRow_Two.Add(0);
+                                }
+                            }
+
+                            inte = 0;
+                            foreach (int index in colIndex_Two)
+                            {
+                                for (int j = 0; j < this.GRAPH.Count(); j++)
+                                {
+                                    if(index < this.GRAPH.Count() && inte < sumEachRow.Count() )
+                                    sumEachRow[inte] += thisMatrix.MATRIX[index, j];
+                                }
+                                inte++;
+                            }
+
+                            if(sumaCol_Two == sumCol && colIndexOne.Count() == colIndex_Two.Count())
+                            {
+                                sumEachRow.Sort();
+                                sumEachRow_Two.Sort();
+                                if(sumEachRow.Count() == sumEachRow_Two.Count())
+                                {
+                                        int k ;
+                                        for (k = 0; k < colIndexOne.Count(); k++)
+                                        {
+                                            if(sumEachRow[k] != sumEachRow_Two[k])
+                                            {
+                                                continue;
+                                            }
+                                        }
+                                        if(k < colIndexOne.Count())
+                                        { 
+                                            continue; 
+                                        }
+
+                                    otherMatrix.interchangeRC(ref otherMatrix,otherMatrix.MATRIX.GetLength(0),iteratorInt,i);
+                                    if(otherMatrix.Equals(thisMatrix))
+                                    {
+                                        return true;
+                                    }                                    
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                                   
+                            }
+                            else
+                            {
+                                continue; 
+                            }
+                        }
+                }
+                
+                
+
                 return false;
             }
 
