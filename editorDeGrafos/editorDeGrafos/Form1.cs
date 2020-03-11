@@ -1816,6 +1816,86 @@ namespace editorDeGrafos
                     return false;
                 }
             }
+         /******************************************************************************************************************
+          * 
+          * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
+          * 
+          *                         ----- START OF ALGORITHM OF ISOMORFISM -----
+          *                                    
+          * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
+          * 
+          ********************************************************************************************************************/    
+
+
+            /********************************************************************************************
+             * 
+             * 
+             *      ISOMORPHISM :algorithm of tranpose matrix.
+             * 
+             * 
+             * *******************************************************************************************/
+            public Boolean Isom_Traspuesta(AdjacencyList other)
+            {
+                //Boolean res = false;              
+
+                if (heuristicIsom(other))
+                {
+                    PermutationSetStruct gradePairs;
+                    gradePairs = heuristicIsom_SEC_FASE(other);
+
+                    if (other.GRAPH.Count() < 1 && this.GRAPH.Count() < 1)//
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (this.GRAPH.Equals(other.GRAPH))//si los grafos son iguales retorna true.
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            if (gradePairs.validateSet())
+                            {
+                                return Isom_Traspuesta_Algorithm(other, gradePairs);
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+            public Boolean Isom_Traspuesta_Algorithm(AdjacencyList other, PermutationSetStruct gradePairs)//Algorithm
+            {
+                int limitOfPermutations = 40000;
+                Matrix thisMatrix = this.toMatrix();
+                Matrix otherMatrix = other.toMatrix();
+
+                Matrix permutationMatrix = new Matrix();
+                Matrix permutationMatrixTrans = new Matrix();
+
+                Matrix resMatrixOperation = new Matrix();
+                ListOfPerPairLists listOfPerPairLists = new ListOfPerPairLists(gradePairs);
+                PermutationPairList aux;
+
+                while (limitOfPermutations > 0 && listOfPerPairLists.PER_ALFA_LIST.Count() > 0)
+                {
+                    //get the next permutation:
+                    aux = listOfPerPairLists.PER_ALFA_LIST.ElementAt(0);
+                    listOfPerPairLists.PER_ALFA_LIST.RemoveAt(0);
+
+                    aux.toMatrixOfPermutationB(ref permutationMatrix, ref permutationMatrixTrans);//make the permutation matrix and the transpose.
+
+                    resMatrixOperation = permutationMatrix.MatrixProduct(otherMatrix);
+                    resMatrixOperation = resMatrixOperation.MatrixProduct(permutationMatrixTrans);
+
+                    if (thisMatrix.Equals(resMatrixOperation))
+                    {
+                        return true;
+                    }
+                    limitOfPermutations--;
+                }
+                return false;
+            }
 
             /********************************************************************************************
             * 
@@ -1857,20 +1937,53 @@ namespace editorDeGrafos
 
             public Boolean Isom_Fuerza_Bruta_Algorithm(AdjacencyList other, PermutationSetStruct gradePairs)
             {
-                return false;
+
+                int limitOfPermutations = 40000;
+                Matrix thisMatrix = this.toMatrix();
+                Matrix otherMatrix = other.toMatrix();
+
+                bool band = false;
+
+                List<int[]> listOfPermutations = gradePairs.makeAllPermutationsPure();
+                int[] permutationArray;
+
+                while (limitOfPermutations > 0 && listOfPermutations.Count() > 0 && !band)
+                {
+                    //get the next permutation:
+                    permutationArray = listOfPermutations.ElementAt(0);
+                    listOfPermutations.RemoveAt(0);
+
+                    band = true;
+                    for (int j = 0; j < permutationArray.Length; j++)                       
+                    {                       
+                        for (int i = 0; i < permutationArray.Length; i++)
+                        {
+                            if (otherMatrix.MATRIX[j, i] != thisMatrix.MATRIX[permutationArray[j], permutationArray[i]])
+                            {
+                                band = false;
+                                break;
+                            }
+                        }
+                        if (!band)
+                        {
+                            break;
+                        }
+                    }
+                    limitOfPermutations--;
+                }//END(while).     
+
+                return band;
             }
 
             /********************************************************************************************
-             * 
-             * 
-             *      ISOMORPHISM :algorithm of tranpose matrix.
-             * 
-             * 
-             * *******************************************************************************************/
-            public Boolean Isom_Traspuesta(AdjacencyList other)
+            * 
+            * 
+            *      ISOMORPHISM : In the manual.
+            * 
+            * 
+            * *******************************************************************************************/
+            public Boolean Isom_Inter(AdjacencyList other)
             {
-                Boolean res = false;              
-
                 if (heuristicIsom(other))
                 {
                     PermutationSetStruct gradePairs;
@@ -1882,7 +1995,7 @@ namespace editorDeGrafos
                     }
                     else
                     {
-                        if(this.GRAPH.Equals(other.GRAPH))//si los grafos son iguales retorna true.
+                        if (this.GRAPH.Equals(other.GRAPH))//si los grafos son iguales retorna true.
                         {
                             return true;
                         }
@@ -1890,71 +2003,28 @@ namespace editorDeGrafos
                         {
                             if (gradePairs.validateSet())
                             {
-                                return Isom_Traspuesta_Algorithm(other, gradePairs);
+                                return Isom_Inter_Algorithm();
                             }
                         }
-                        
                     }
-                }
-                return res;
-            }
-            public Boolean Isom_Traspuesta_Algorithm(AdjacencyList other,PermutationSetStruct gradePairs)//Algorithm
-            {               
-                int limitOfPermutations = 40000;
-                Matrix thisMatrix = this.toMatrix();
-                Matrix otherMatrix = other.toMatrix();
-
-                Matrix permutationMatrix = new Matrix();
-                Matrix permutationMatrixTrans = new Matrix();
-
-                Matrix resMatrixOperation = new Matrix();
-                ListOfPerPairLists listOfPerPairLists = new ListOfPerPairLists(gradePairs);
-                PermutationPairList aux;
-
-                while (limitOfPermutations > 0 && listOfPerPairLists.PER_ALFA_LIST.Count() > 0) 
-                {
-                    //get the next permutation:
-                    aux = listOfPerPairLists.PER_ALFA_LIST.ElementAt(0);
-                    listOfPerPairLists.PER_ALFA_LIST.RemoveAt(0);
-
-                    aux.toMatrixOfPermutationB(ref permutationMatrix,ref permutationMatrixTrans);//make the permutation matrix and the transpose.
-
-                    resMatrixOperation = permutationMatrix.MatrixProduct(otherMatrix);
-                    resMatrixOperation = resMatrixOperation.MatrixProduct(permutationMatrixTrans);
-
-                    if (thisMatrix.Equals(resMatrixOperation))
-                    {
-                        return true;
-                    }
-                    limitOfPermutations--;
-                }                
+                }//END of the heuristic.
                 return false;
             }
 
-
-            /********************************************************************************************
-            * 
-            * 
-            *      ISOMORPHISM : In the manual.
-            * 
-            * 
-            * *******************************************************************************************/
-            public Boolean Isom_Inter(AdjacencyList other)
+            public Boolean Isom_Inter_Algorithm()
             {
-                Boolean res = false;
-                if (heuristicIsom(other))
-                {
-                    PermutationSetStruct gradePairs;
-                    gradePairs = heuristicIsom_SEC_FASE(other);
-
-                    if (gradePairs.validateSet())
-                    {
-                        return true;                   
-                    }
-                }
-                return res;
+                return false;
             }
 
+            /******************************************************************************************************************
+            * 
+            * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
+            * 
+            *                              ----- END OF ALGORITHM OF ISOMORFISM -----
+            *                                    
+            * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
+            * 
+            ********************************************************************************************************************/
             private Boolean heuristicIsom(AdjacencyList other)
             {               
                 if(this.GRAPH.Count() == other.GRAPH.Count())
@@ -2294,6 +2364,62 @@ namespace editorDeGrafos
                         }
                     }
                 }
+
+
+            //permutations but like an array.
+            public List<int []> makeAllPermutationsPure()
+            {
+                List<int[]> res = new List<int[]>();
+                heapPermutationPure(innerAray, innerAray.Length,ref res);
+                return res;
+            }
+
+            public void storePermutationPure(int[] a, ref List<int[]> res)//store only if all the permutations match.
+            {
+                for (int i = 0; i < a.Length; i++)
+                {
+                    if (!matchPairGrades(i, a[i]))
+                    {
+                        return;
+                    }                    
+                }
+                res.Add(a);
+            }
+
+            public void heapPermutationPure(int[] a, int size, ref List<int[]> res)
+            {
+                // if size becomes 1 then prints the obtained 
+                // permutation 
+                if (size == 1)
+                {
+                    storePermutationPure(a, ref res);//store and validate the permutation made.
+                }
+
+                for (int i = 0; i < size; i++)
+                {
+                    heapPermutationPure(a, size - 1, ref res);
+
+                    // if size is odd, swap first and last 
+                    // element 
+                    if (size % 2 == 1)
+                    {
+                        int temp = a[0];
+                        a[0] = a[size - 1];
+                        a[size - 1] = temp;
+                    }
+
+                    // If size is even, swap ith and last 
+                    // element 
+                    else
+                    {
+                        int temp = a[i];
+                        a[i] = a[size - 1];
+                        a[size - 1] = temp;
+                    }
+                }
+            }
+
+
 
         }//END. PermutationSetStruct.
 
