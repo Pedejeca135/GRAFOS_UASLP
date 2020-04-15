@@ -22,6 +22,28 @@ namespace editorDeGrafos
         List<Edge> diEdgeList;
         List<Edge> cicleEdgeList;
 
+        //for paths and cicles:
+        List<Edge> eulerPathEdges;
+        List<Node> eulerPathNodes;
+        Boolean eulerBoolDo = false;
+        List<Edge> pathToAnimate;
+
+        Boolean nodePathsReady = false;
+        Node initialNodePath = null;
+        Node finalNodePath = null;
+        Timer timerColor = new System.Windows.Forms.Timer();
+        int timerColorOption = 0;
+        int tmpCount = 0;
+
+        //Boolean iniBoolClick_H_E = false;
+        //Boolean finBoolClick_H_E = false;
+
+        List<Edge> hamiltonPathEdges;
+        List<Node> hamiltonPathNodes;
+        Boolean hamiltonBoolDo = false;
+
+
+
         Node selectedNode;
         Node selected = null;
         Node selectedJustFor = null;
@@ -92,7 +114,74 @@ namespace editorDeGrafos
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
             mousePressed = true;
-            if (allMoving || allDeleting || allMoRe)
+            if((eulerBoolDo || hamiltonBoolDo) && aListGraph.GRAPH.Count() > 1)
+            {
+               
+                if(initialNodePath == null || finalNodePath == null)//if any node does not exist.
+                {
+                    if (initialNodePath == null)
+                    {
+                        //one node clicked.//check all the node list.
+                        initialNodePath = findNodeClicked(new Coordenate(e.X, e.Y));
+                        if(initialNodePath != null)
+                        {
+                            initialNodePath.COLOR = Color.Blue;//change the color of the initial node
+                        }
+                        
+
+                        if (aListGraph.GRAPH.Count() == 1)
+                        {
+                            finalNodePath = initialNodePath;
+                        }
+                    }
+                    else
+                    {
+                        finalNodePath = findNodeClicked(new Coordenate(e.X, e.Y));
+                        if (finalNodePath != null)
+                        {
+                            finalNodePath.COLOR = Color.Red;//change the color of the final node
+                        }
+                        
+
+                        nodePathsReady  = true;
+
+                        if (eulerBoolDo)//le toca a euler.
+                        {
+                            eulerBoolDo = false;
+                            if (initialNodePath == finalNodePath)//cycle
+                            {
+                                finalNodePath.COLOR = Color.Beige;//
+                                cycleOfEuler();
+                            }
+                            else//path
+                            {
+                                pathOfEuler();
+                            }
+                           
+
+                        }
+                        else//le toca a hamilton.
+                        {
+                            hamiltonBoolDo = false;
+                            if (initialNodePath == finalNodePath)//cycle
+                            {
+                                finalNodePath.COLOR = Color.Beige;//
+                                cycleOfHamilton();
+                            }
+                            else//path
+                            {
+                                pathOfHamilton();
+                            }
+                            
+                        }
+
+                        initialNodePath = null;
+                        finalNodePath = null;
+                    }                  
+
+                }
+            }
+            else if (allMoving || allDeleting || allMoRe)
             {
                 selectedJustFor = findNodeClicked(new Coordenate(e.X, e.Y));
                 selected = selectedJustFor;
@@ -463,6 +552,7 @@ namespace editorDeGrafos
             Pen pen = new Pen(Color.Black, 5);
             Brush brush = new SolidBrush(BackColor);
             Rectangle rectangle;
+            Pen pen2;
 
             Pen penDirect = new Pen(Color.DimGray, 8);
             penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor;
@@ -471,7 +561,8 @@ namespace editorDeGrafos
 
             foreach (Edge edge in edgeList)//undirected edges.
             {
-                graphics.DrawLine(pen, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
+                pen2 = new Pen(edge.COLOR, 5);
+                graphics.DrawLine(pen2, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
             }
             foreach (Edge edge in cicleEdgeList)//cicled edge.
             {
@@ -996,6 +1087,384 @@ namespace editorDeGrafos
             IsomtextBox.Text += str;
         }
 
+        /*******************************************
+         * 
+         * 
+         *  ////////////////   paths and cycles.(caminos y circuitos).
+         *      
+         * 
+         * **********************************************/
+
+        AdjacencyList aux;
+        List<Edge> cutEdges;
+
+        List<Node> estimadedIniFinNodes;
+
+        List<Node> pathToPrint;
+
+
+        
+
+        public void cycleOfEuler()//next to the event.
+        {
+            if(!cycleOfEulerBool() )
+            {
+              //deploy a OK form to finish.
+
+            }
+            else//a trabajar
+            {
+                // do the animation of the path or cycle
+                pathToAnimate = cycleOfEuler_Algorithm();
+                if(pathToAnimate == null)
+                {
+                    //deploy a OK form to finish.
+                }
+                else
+                {
+                    tmpCount = 0;
+                    Form3 f3 = new Form3();
+                    f3.ShowDialog();
+                    /*if (gdc.Operation == 1 || gdc.Operation == 2)
+                    {
+                        if (gdc.Operation == 1)
+                        {
+                            saveFile();
+                        }
+                        loadCommonActions();
+                    }
+                    */
+                    timerColor.Start();
+                }
+               
+            }                        
+        }
+
+        void DFSEulerCycle(Node workingNode/*int v, bool visited[]*/)
+        {
+            // Mark the current node as visited
+            pathToPrint.Add(workingNode);
+            workingNode.Visitado = true;
+
+            List<Node> dejaAlFinal = new List<Node>();
+
+
+            // Recur for all the vertices adjacent to this vertex
+            foreach (Node node in aListGraph.neighborListNode(workingNode))
+            {
+                if (node.Visitado == false)
+                {
+                    foreach (Edge edge in edgeList)
+                    {
+                        if (edge.isThis(workingNode, node))
+                        {
+                            if(cutEdges.Contains(edge))
+                            {
+                                dejaAlFinal.Add(node);
+                            }
+                            else
+                            {
+                                if (node != finalNodePath)
+                                {
+                                    pathToAnimate.Add(edge);
+                                    DFSEulerCycle(node);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
+
+            foreach (Node node in dejaAlFinal)
+            {
+                if (node.Visitado == false)
+                {
+                    foreach (Edge edge in edgeList)
+                    {
+                        if (edge.isThis(workingNode, node))
+                        {
+                            pathToAnimate.Add(edge);
+
+                        }
+                    }
+                    DFSEulerCycle(node);
+                }
+            }
+            if(finalNodePath.Visitado == false  && aListGraph.neighborListNode(workingNode).Contains(finalNodePath))
+            {
+                foreach (Edge edge in edgeList)
+                {
+                    if (edge.isThis(workingNode, finalNodePath))
+                    {
+                        pathToAnimate.Add(edge);
+
+                    }
+                }
+                pathToPrint.Add(finalNodePath);
+                finalNodePath.Visitado = true;
+            }
+        }
+
+        public List<Edge> cycleOfEuler_Algorithm()//algoritmos
+        {
+            List<Edge> res = new List<Edge>();
+            List<Edge> edgeListInside = new List<Edge>();
+            edgeListInside = edgeList;
+            pathToPrint = new List<Node>();
+            pathToAnimate = new List<Edge>();
+
+            cutEdges = new List<Edge>();
+
+            foreach(Edge edge in edgeListInside)
+            {
+                if(isABridgeBool(edge))
+                {
+                    cutEdges.Add(edge);
+                }
+            }
+
+            // Mark all the vertices as not visited 
+            aListGraph.markAllLikeNotVisited();
+
+            // Start DFS traversal from a vertex with non-zero degree 
+
+            DFSEulerCycle(initialNodePath);
+
+            
+          
+
+            return res;
+
+        }
+
+        public void pathOfEuler()//next to the event
+        {
+            if (!pathOfEulerBool())
+            {
+                //deploy a OK form to finish.
+            }
+            else//a trabajar
+            {
+                pathToAnimate = pathOfEuler_Algorithm();
+                timerColor.Start();
+            }
+        }
+        public List<Edge> pathOfEuler_Algorithm()//algorithm
+        {
+            List<Edge> res = null;
+            return res;
+
+        }
+
+        //-------------------------------- Hamilton--------------------
+        public void cycleOfHamilton()
+        {
+            if (!cycleOfHamiltonBool())
+            {
+                //deploy a OK form to finish.
+            }
+            else//a trabajar
+            {
+                pathToAnimate = cycleOfHamilton_Algorithm();
+                timerColor.Start();
+            }
+        }
+        public List<Edge> cycleOfHamilton_Algorithm()
+        {
+            List<Edge> res = null;
+            return res;
+
+        }
+
+        public void pathOfHamilton()
+        {
+            if (!pathOfHamiltonBool())
+            {
+                //deploy a OK form to finish.
+            }
+            else//a trabajar
+            {
+                pathToAnimate = pathOfHamilton_Algorithm();
+                timerColor.Start();
+            }
+        }
+
+        public List<Edge> pathOfHamilton_Algorithm()
+        {
+            List<Edge> res = null;
+            return res;
+
+        }
+
+        /**************************************
+         * 
+         * 
+         * Bool to comproove .
+         * 
+         * **********************************/
+        void DFSUtilAllConected(Node workingNode/*int v, bool visited[]*/)
+        {
+            // Mark the current node as visited
+            workingNode.Visitado = true;
+
+
+            // Recur for all the vertices adjacent to this vertex
+             foreach (Node node in aListGraph.neighborListNode(workingNode))
+            {
+                if (node.Visitado == false)
+                {
+                    DFSUtilAllConected(node);
+                }
+            }
+        }
+        void DFSUtilAllConectedBridge(Node workingNode,Edge posibleBridge/*int v, bool visited[]*/)
+        {
+            // Mark the current node as visited
+            workingNode.Visitado = true;
+
+
+            // Recur for all the vertices adjacent to this vertex
+            foreach (Node node in aListGraph.neighborListNode(workingNode))
+            {
+                if(workingNode == posibleBridge.Client && node == posibleBridge.Server)
+                {
+
+                }
+                else if (node.Visitado == false)
+                {
+                    DFSUtilAllConectedBridge(node,posibleBridge);
+                }
+            }
+        }
+
+        public Boolean allConected()
+        {
+            // Mark all the vertices as not visited 
+            aListGraph.markAllLikeNotVisited();
+
+            // Start DFS traversal from a vertex with non-zero degree 
+            DFSUtilAllConected(aux.LIST_NODES[0]);
+
+            // Check if all non-zero degree vertices are visited 
+
+            foreach (Node node in aux.LIST_NODES)
+            {
+                if(node.Visitado == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public Boolean isABridgeBool(Edge posibleBridge)
+        {
+            // Mark all the vertices as not visited 
+            aListGraph.markAllLikeNotVisited();
+
+            // Start DFS traversal from a vertex with non-zero degree 
+            DFSUtilAllConectedBridge(aux.LIST_NODES[0],posibleBridge);
+
+            // Check if all non-zero degree vertices are visited 
+            foreach (Node node in aux.LIST_NODES)
+            {
+                if (node.Visitado == false)
+                {
+                    return true;
+                }
+            }
+
+            return false;//if all vertices was visited evenif the edge was cutted.
+        }
+
+
+        public Boolean cycleOfEulerBool()//to determine if the graph has a Eulerian cycle.
+        {
+            // An undirected graph has Eulerian cycle if following two conditions are true.
+            //….a) All vertices with non-zero degree are connected.We don’t care about 
+            //vertices with zero degree because they don’t belong to Eulerian Cycle or Path(we only consider all edges).
+            //….b) All vertices have even degree.
+            bool res = true;
+            aux = new AdjacencyList();
+
+            foreach (Node node in nodeList)
+            {
+                int degreeByN = aListGraph.neighborListNode(node).Count();
+               
+                if (degreeByN > 0)//atleast one neightboor
+                {
+                    if (degreeByN % 2 != 0)// one node have not an even number of neirhtbors
+                    {
+                        return false;
+                    }
+                    aux.addNode(node);                    
+                }
+            }
+
+            if(aux.LIST_NODES.Count() > 0)
+            {
+                if(!allConected())// if not all are connected
+                {
+                    return false;
+                }
+            }
+            return res;
+        }
+
+        public Boolean pathOfEulerBool()
+        {
+            bool res = true;
+            aux = new AdjacencyList();
+            estimadedIniFinNodes = new List<Node>();
+            int oddDegreeCont = 0;
+
+            foreach (Node node in nodeList)
+            {
+                int degreeByN = aListGraph.neighborListNode(node).Count();
+
+                if (degreeByN > 0)//atleast one neightboor
+                {
+                    if (degreeByN % 2 != 0)// the node have not an even number of neightbors
+                    {
+                        oddDegreeCont++;
+                        estimadedIniFinNodes.Add(node);
+                    }
+                    aux.addNode(node);
+                }
+            }           
+
+            if (aux.LIST_NODES.Count() > 0)
+            {
+                if (oddDegreeCont != 2 && oddDegreeCont != 0)               
+                {
+                    return false;
+                }
+
+                if (!allConected())// if not all are connected
+                {
+                    return false;
+                }
+            }
+            return res;
+        }
+
+        public Boolean cycleOfHamiltonBool()
+        {
+          
+            bool res = false;
+
+            return res;
+        }
+        public Boolean pathOfHamiltonBool()
+        {
+            bool res = false;
+
+            return res;
+        }
+
+
         /*************************************************************************************************************************
          * 
          * |||||||||||||||||||||||||||||||||||||||||||||||||||||   CLASSES   |||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -1012,6 +1481,9 @@ namespace editorDeGrafos
             int selected;
             int index;
             int uniqueID;
+
+            Boolean visitado = false;
+
 
             public Node() //default constructor of the class Node
             {
@@ -1088,6 +1560,12 @@ namespace editorDeGrafos
                 get { return this.uniqueID; }
                 set { this.uniqueID = value; }
             }
+
+            public Boolean Visitado
+            {
+                get {return this.visitado; }
+                set { this.visitado = value; }
+            }
             /*******************************************************
              *                Geters and seters(End)               *
              *******************************************************/
@@ -1108,6 +1586,8 @@ namespace editorDeGrafos
             Node client = null;
             Node server = null;
             Boolean directed;
+            Color color = Color.Black;
+            
 
             //Coordenate a;
             //Coordenate b;
@@ -1138,6 +1618,13 @@ namespace editorDeGrafos
                 directed = false;
             }
 
+            public Color COLOR
+            {
+                get { return this.color; }
+                set { this.color = value; }
+            }
+
+
             public Coordenate A
             {
                 get { return this.client.Position; }
@@ -1160,6 +1647,24 @@ namespace editorDeGrafos
             }
 
             public Double Distancia => Math.Pow(Math.Pow(B.X - A.X, 2.0) + Math.Pow(B.Y - A.Y, 2.0), 0.5);
+
+            public Boolean isThis(Node client, Node server)
+            {
+                if(client == this.client && server == this.server)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            public Boolean isThis(int client, int server)
+            {
+                if( this.client.Index == client && this.server.Index== server)
+                {
+                    return true;
+                }
+                return false;
+            }
 
         }//Edge.
 
@@ -1291,14 +1796,18 @@ namespace editorDeGrafos
 
         }//NodeRef.
 
-        
-            public class AdjacencyList
+
+        public class AdjacencyList
         {
             List<List<NodeRef>> graph;
+            List<Node> listOfNodes_IG;
+
+
 
             public AdjacencyList()
             {
                 graph = new List<List<NodeRef>>();
+                listOfNodes_IG = new List<Node>();
             }
 
             public int NumberOfLists
@@ -1316,9 +1825,16 @@ namespace editorDeGrafos
                 get { return this.graph; }
             }
 
+            public List<Node> LIST_NODES
+            {
+                get { return this.listOfNodes_IG; }
+            }
+
+
             public void addNode(Node nodo)
             {
                 List<NodeRef> newNodeRefList = new List<NodeRef>();//the new list for the new node conections.           
+                listOfNodes_IG.Add(nodo);
 
                 if (graph.Count() == 0)//ther's no elements
                 {
@@ -1357,6 +1873,7 @@ namespace editorDeGrafos
             public void removeNode(Node nodo)//almost the same process as addNode() but vice versa.
             {
                 int nodeIndexToEiminate = nodo.Index;
+                listOfNodes_IG.Remove(nodo);
 
                 foreach (List<NodeRef> row in graph)
                 {
@@ -1437,10 +1954,10 @@ namespace editorDeGrafos
                         }
                         else
                         {
-                            if(nodoR.W > -1)
-                            resString += "\t" + 1;
+                            if (nodoR.W > -1)
+                                resString += "\t" + 1;
                             else
-                            resString += "\t" + 0;
+                                resString += "\t" + 0;
                         }
                     }
                     resString += System.Environment.NewLine;
@@ -1586,10 +2103,10 @@ namespace editorDeGrafos
                 return false;
             }
 
-            public Boolean dfsU( int vertex, HashSet<int> visited, int parent)
+            public Boolean dfsU(int vertex, HashSet<int> visited, int parent)
             {
                 visited.Add(vertex);
-                foreach(NodeRef nodeR in graph[vertex])
+                foreach (NodeRef nodeR in graph[vertex])
                 {
                     if (nodeR.W > -1)
                     {
@@ -1617,7 +2134,7 @@ namespace editorDeGrafos
                     return this.directedCicled();
                 else
                     return this.UndirectedCicled();
-            }         
+            }
 
 
             //Determine if a graph is cicled with BFS algorithm.
@@ -1637,8 +2154,8 @@ namespace editorDeGrafos
 
                 while (whiteSet.Count() > 0)
                 {
-                   // int current = whiteSet.First();
-                   int current = whiteSet.Min();
+                    // int current = whiteSet.First();
+                    int current = whiteSet.Min();
                     if (dfs(current, whiteSet, graySet, blackSet))
                     {
                         return true;
@@ -1689,40 +2206,40 @@ namespace editorDeGrafos
                 HashSet<int> redSet = new HashSet<int>();
                 HashSet<int> visited = new HashSet<int>();
 
-                for(int i = 0; i < graph.Count(); i++)
+                for (int i = 0; i < graph.Count(); i++)
                 {
                     whiteSet.Add(i);
                 }
                 moveVertex(0, whiteSet, blueSet);
                 visited.Add(0);
-                return Bipartita2(0,visited,blueSet,redSet,whiteSet);
+                return Bipartita2(0, visited, blueSet, redSet, whiteSet);
             }
 
-        public Boolean Bipartita2( int origin, HashSet<int> visited, HashSet<int> originColorSet , HashSet<int> destinationColorSet, HashSet<int> whiteSet)
-        {            
-            foreach(NodeRef nodeR in graph[origin])
+            public Boolean Bipartita2(int origin, HashSet<int> visited, HashSet<int> originColorSet, HashSet<int> destinationColorSet, HashSet<int> whiteSet)
             {
+                foreach (NodeRef nodeR in graph[origin])
+                {
                     if (nodeR.W > -1)
                     {
-                       if(!visited.Contains(nodeR.NODO.Index))
+                        if (!visited.Contains(nodeR.NODO.Index))
                         {
                             // mark present vertic as visited 
                             visited.Add(nodeR.NODO.Index);
 
                             // mark its color opposite to its parent 
-                            this.moveVertex(nodeR.NODO.Index,whiteSet,destinationColorSet);
+                            this.moveVertex(nodeR.NODO.Index, whiteSet, destinationColorSet);
 
                             // if the subtree rooted at vertex v is not bipartite 
-                            if (Bipartita2(nodeR.NODO.Index,  visited,destinationColorSet, originColorSet, whiteSet))
+                            if (Bipartita2(nodeR.NODO.Index, visited, destinationColorSet, originColorSet, whiteSet))
                                 return false;
                         }
-                        else 
-                        if (originColorSet.Contains(nodeR.NODO.Index) && originColorSet.Contains(origin))
+                        else
+                         if (originColorSet.Contains(nodeR.NODO.Index) && originColorSet.Contains(origin))
                             return false;
                     }
+                }
+                return true;
             }
-            return true;
-        }
             public Boolean Bip()
             {
                 if (graph.Count() > 0)
@@ -1816,15 +2333,15 @@ namespace editorDeGrafos
                     return false;
                 }
             }
-         /******************************************************************************************************************
-          * 
-          * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
-          * 
-          *                         ----- START OF ALGORITHM OF ISOMORFISM -----
-          *                                    
-          * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
-          * 
-          ********************************************************************************************************************/    
+            /******************************************************************************************************************
+             * 
+             * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
+             * 
+             *                         ----- START OF ALGORITHM OF ISOMORFISM -----
+             *                                    
+             * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
+             * 
+             ********************************************************************************************************************/
 
 
             /********************************************************************************************
@@ -1908,7 +2425,7 @@ namespace editorDeGrafos
             public Boolean Isom_Fuerza_Bruta(AdjacencyList other)
             {
                 //Boolean res = false;              
-                if(heuristicIsom(other))
+                if (heuristicIsom(other))
                 {
                     PermutationSetStruct gradePairs;
                     gradePairs = heuristicIsom_SEC_FASE(other);
@@ -1955,8 +2472,8 @@ namespace editorDeGrafos
 
                     band = true;
                     int j;
-                    for (j = 0; j < permutationArray.Length; j++)                       
-                    {                       
+                    for (j = 0; j < permutationArray.Length; j++)
+                    {
                         for (int i = 0; i < permutationArray.Length; i++)
                         {
                             if (otherMatrix.MATRIX[j, i] != thisMatrix.MATRIX[permutationArray[j], permutationArray[i]])
@@ -2027,101 +2544,101 @@ namespace editorDeGrafos
 
                 int sumaRen;
 
-                    for (int iteratorInt = 0; iteratorInt < this.GRAPH.Count() -1; iteratorInt++ )
-                    {
-                        colIndexOne = new List<int>();
-                        sumCol = 0;
-                        sumEachRow = new List<int>();
+                for (int iteratorInt = 0; iteratorInt < this.GRAPH.Count() - 1; iteratorInt++)
+                {
+                    colIndexOne = new List<int>();
+                    sumCol = 0;
+                    sumEachRow = new List<int>();
 
+                    for (int j = 0; j < this.GRAPH.Count(); j++)
+                    {
+                        if (thisMatrix.MATRIX[j, iteratorInt] == 1)
+                        {
+                            colIndexOne.Add(j);
+                            sumCol++;
+                            sumEachRow.Add(0);
+                        }
+                    }
+
+                    int inte = 0;
+                    foreach (int index in colIndexOne)
+                    {
                         for (int j = 0; j < this.GRAPH.Count(); j++)
                         {
-                                if (thisMatrix.MATRIX[j, iteratorInt] == 1)
-                                {
-                                    colIndexOne.Add(j);
-                                    sumCol++;
-                                    sumEachRow.Add(0);
-                                }
+                            sumEachRow[inte] += thisMatrix.MATRIX[index, j];
+                        }
+                        inte++;
+                    }
+
+                    //EN EL SEGUNDO GRAFO:
+                    int iteratorColSec = iteratorInt + 1;
+
+                    for (int i = iteratorColSec; i < other.GRAPH.Count(); i++)
+                    {
+                        colIndex_Two = new List<int>();
+                        sumaCol_Two = 0;
+                        sumEachRow_Two = new List<int>();
+
+                        for (int j = 0; j < other.GRAPH.Count(); j++)
+                        {
+                            if (otherMatrix.MATRIX[j, iteratorColSec] == 1)
+                            {
+                                colIndex_Two.Add(j);
+                                sumaCol_Two++;
+                                sumEachRow_Two.Add(0);
+                            }
                         }
 
-                         int inte = 0;
-                       foreach(int index in colIndexOne)
+                        inte = 0;
+                        foreach (int index in colIndex_Two)
                         {
                             for (int j = 0; j < this.GRAPH.Count(); j++)
                             {
-                                sumEachRow[inte] +=  thisMatrix.MATRIX[index, j];
+                                if (index < this.GRAPH.Count() && inte < sumEachRow.Count())
+                                    sumEachRow[inte] += thisMatrix.MATRIX[index, j];
                             }
                             inte++;
                         }
 
-                    //EN EL SEGUNDO GRAFO:
-                    int iteratorColSec = iteratorInt +1;
-                    
-                        for (int i = iteratorColSec; i < other.GRAPH.Count(); i++)
+                        if (sumaCol_Two == sumCol && colIndexOne.Count() == colIndex_Two.Count())
                         {
-                            colIndex_Two = new List<int>();
-                            sumaCol_Two = 0;
-                            sumEachRow_Two = new List<int>();
-
-                            for (int j = 0; j < other.GRAPH.Count(); j++)
+                            sumEachRow.Sort();
+                            sumEachRow_Two.Sort();
+                            if (sumEachRow.Count() == sumEachRow_Two.Count())
                             {
-                                if (otherMatrix.MATRIX[j, iteratorColSec] == 1)
+                                int k;
+                                for (k = 0; k < colIndexOne.Count(); k++)
                                 {
-                                    colIndex_Two.Add(j);
-                                    sumaCol_Two++;
-                                    sumEachRow_Two.Add(0);
-                                }
-                            }
-
-                            inte = 0;
-                            foreach (int index in colIndex_Two)
-                            {
-                                for (int j = 0; j < this.GRAPH.Count(); j++)
-                                {
-                                    if(index < this.GRAPH.Count() && inte < sumEachRow.Count() )
-                                    sumEachRow[inte] += thisMatrix.MATRIX[index, j];
-                                }
-                                inte++;
-                            }
-
-                            if(sumaCol_Two == sumCol && colIndexOne.Count() == colIndex_Two.Count())
-                            {
-                                sumEachRow.Sort();
-                                sumEachRow_Two.Sort();
-                                if(sumEachRow.Count() == sumEachRow_Two.Count())
-                                {
-                                        int k ;
-                                        for (k = 0; k < colIndexOne.Count(); k++)
-                                        {
-                                            if(sumEachRow[k] != sumEachRow_Two[k])
-                                            {
-                                                continue;
-                                            }
-                                        }
-                                        if(k < colIndexOne.Count())
-                                        { 
-                                            continue; 
-                                        }
-
-                                    otherMatrix.interchangeRC(ref otherMatrix,otherMatrix.MATRIX.GetLength(0),iteratorInt,i);
-                                    if(otherMatrix.Equals(thisMatrix))
+                                    if (sumEachRow[k] != sumEachRow_Two[k])
                                     {
-                                        return true;
-                                    }                                    
+                                        continue;
+                                    }
                                 }
-                                else
+                                if (k < colIndexOne.Count())
                                 {
                                     continue;
                                 }
-                                   
+
+                                otherMatrix.interchangeRC(ref otherMatrix, otherMatrix.MATRIX.GetLength(0), iteratorInt, i);
+                                if (otherMatrix.Equals(thisMatrix))
+                                {
+                                    return true;
+                                }
                             }
                             else
                             {
-                                continue; 
+                                continue;
                             }
+
                         }
+                        else
+                        {
+                            continue;
+                        }
+                    }
                 }
-                
-                
+
+
 
                 return false;
             }
@@ -2136,9 +2653,9 @@ namespace editorDeGrafos
             * 
             ********************************************************************************************************************/
             private Boolean heuristicIsom(AdjacencyList other)
-            {               
-                if(this.GRAPH.Count() == other.GRAPH.Count())
-                {                       
+            {
+                if (this.GRAPH.Count() == other.GRAPH.Count())
+                {
                     if (this.Grade() == other.Grade())
                         if (this.Directed() == other.Directed())
                             if (this.Complete() == other.Complete())
@@ -2169,10 +2686,10 @@ namespace editorDeGrafos
 
             public List<int> neighborList(List<NodeRef> row)
             {
-                List<int> res = null;          
-                for(int i = 0; i< row.Count(); i++)
-                { 
-                    if(row[i].W > -1)
+                List<int> res = null;
+                for (int i = 0; i < row.Count(); i++)
+                {
+                    if (row[i].W > -1)
                     {
                         res.Add(row[i].NODO.Index);
                     }
@@ -2193,22 +2710,84 @@ namespace editorDeGrafos
                 return res;
             }
 
+            public List<Node> neighborListNode(Node workingNode)
+            {
+                List<Node> res = new List<Node>();
+                for (int i = 0; i < graph[workingNode.Index].Count(); i++)
+                {
+                    if (graph[workingNode.Index][i].W > -1)
+                    {
+                        res.Add(graph[workingNode.Index][i].NODO);
+
+                    }
+                }
+                return res;
+
+            }
+
+            public void markAllLikeVisited()
+            {
+                for (int j = 0; j < graph.Count(); j++)
+                    for (int i = 0; i < graph.Count(); i++)
+                    {
+                        graph[j][i].NODO.Visitado = true;
+                    }
+            }
+
+            public void markAllLikeNotVisited()
+            {
+                for (int j = 0; j < graph.Count(); j++)
+                    for (int i = 0; i < graph.Count(); i++)
+                    {
+                        graph[j][i].NODO.Visitado = false;
+                    }
+            }
+
+            public void markAsVisited_T_F(int index, Boolean mark)
+            {                   
+                graph[index][index].NODO.Visitado = mark;                    
+            }
+
+
             public Matrix toMatrix()
             {
                 Matrix res;
                 int[,] toDoMatrix = new int[graph.Count(), graph.Count()];
 
                 for (int j = 0; j < graph.Count(); j++)
-                    for (int i = 0; i < graph.Count(); i++)                   
+                    for (int i = 0; i < graph.Count(); i++)
                     {
                         if (graph[j][i].W > -1)
-                            toDoMatrix[j,i] = 1;
+                            toDoMatrix[j, i] = 1;
                         else
                             toDoMatrix[j, i] = 0;
-                    }       
+                    }
                 res = new Matrix(toDoMatrix);
                 return res;
             }
+
+            /******************************************************************************************************************
+            * 
+            * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
+            * 
+            *                         ----- START OF PATHS AND CIRCUITS -----
+            *                                    
+            * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
+            * 
+            ********************************************************************************************************************/
+           
+
+            /******************************************************************************************************************
+           * 
+           * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
+           * 
+           *                              ----- END OF PATHS AND CIRCUITS -----
+           *                                    
+           * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
+           * 
+           ********************************************************************************************************************/
+
+
         }//AdjacencyList(END).      
 
 
@@ -2619,14 +3198,6 @@ namespace editorDeGrafos
             }
         }
 
-
-
-
-
-
-
-
-
         private void terminal_TextChanged(object sender, EventArgs e)
         {
 
@@ -2662,10 +3233,62 @@ namespace editorDeGrafos
 
         }
 
+        
+
+        Boolean switcher = false;
+        public void GraphTimerColor(object sender, EventArgs e)
+        {
+            if (pathToPrint != null && tmpCount >= pathToPrint.Count())
+            {
+                timerColor.Stop();
+            }
+            else
+            {
+                if (pathToPrint != null ) 
+                {
+                    if (switcher == false)
+                    {
+                        pathToPrint[tmpCount].COLOR = Color.Aquamarine;
+                        switcher = !switcher;
+                    }
+                    else
+                    {
+                        int serverIndex = tmpCount +1;
+                        if(serverIndex == pathToPrint.Count())
+                        {
+                            serverIndex = 0;
+                        }
+                        
+                        foreach(Edge edge in edgeList)
+                        {
+                            if(edge.isThis(pathToPrint[tmpCount],pathToPrint[serverIndex]))
+                            {
+                                edge.COLOR = Color.Red;
+                            }
+                        }
+                        switcher = !switcher;
+                        tmpCount++;
+                    }
+
+                }
+                else
+                {
+                    timerColor.Stop();
+                }
+                
+            }
+            Invalidate();
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            timerColor = new System.Windows.Forms.Timer();
+            timerColor.Interval = 500;
+            timerColor.Tick += new EventHandler(GraphTimerColor);
+            tmpCount = 0;
         }
+
+        
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
@@ -2697,6 +3320,25 @@ namespace editorDeGrafos
             }
         }
 
-        
+        private void eulerToolStripMenuItem_Click(object sender, EventArgs e)//make happend 
+        {
+            eulerBoolDo = true;
+            hamiltonBoolDo = false;
+            nodePathsReady = false;   
+            
+        }
+
+        private void hamiltonToolStripMenuItem_Click(object sender, EventArgs e)//make happend
+        {
+            eulerBoolDo = false;
+            hamiltonBoolDo = true;
+            nodePathsReady = false;
+
+        }
+
+        private void caminosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }//Form.
 }//namespace.

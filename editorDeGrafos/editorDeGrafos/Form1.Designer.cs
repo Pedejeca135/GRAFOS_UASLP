@@ -48,6 +48,9 @@
             this.fuerzaBrutaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.traspuestaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.intercambioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.caminosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.eulerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.hamiltonToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.IsomtextBox = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -161,10 +164,11 @@
             this.removeXRToolStripMenuItem,
             this.moreToolStripMenuItem,
             this.matrizIncidenciaToolStripMenuItem,
-            this.isomToolStripMenuItem});
+            this.isomToolStripMenuItem,
+            this.caminosToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(116, 1);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(408, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(594, 24);
             this.menuStrip1.TabIndex = 4;
             this.menuStrip1.Text = "menuStrip1";
             this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
@@ -228,6 +232,30 @@
             this.intercambioToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.intercambioToolStripMenuItem.Text = "Intercambio(Manual)";
             this.intercambioToolStripMenuItem.Click += new System.EventHandler(this.intercambioToolStripMenuItem_Click);
+            // 
+            // caminosToolStripMenuItem
+            // 
+            this.caminosToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.eulerToolStripMenuItem,
+            this.hamiltonToolStripMenuItem});
+            this.caminosToolStripMenuItem.Name = "caminosToolStripMenuItem";
+            this.caminosToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
+            this.caminosToolStripMenuItem.Text = "Caminos";
+            this.caminosToolStripMenuItem.Click += new System.EventHandler(this.caminosToolStripMenuItem_Click);
+            // 
+            // eulerToolStripMenuItem
+            // 
+            this.eulerToolStripMenuItem.Name = "eulerToolStripMenuItem";
+            this.eulerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.eulerToolStripMenuItem.Text = "Euler";
+            this.eulerToolStripMenuItem.Click += new System.EventHandler(this.eulerToolStripMenuItem_Click);
+            // 
+            // hamiltonToolStripMenuItem
+            // 
+            this.hamiltonToolStripMenuItem.Name = "hamiltonToolStripMenuItem";
+            this.hamiltonToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.hamiltonToolStripMenuItem.Text = "Hamilton";
+            this.hamiltonToolStripMenuItem.Click += new System.EventHandler(this.hamiltonToolStripMenuItem_Click);
             // 
             // IsomtextBox
             // 
@@ -294,6 +322,9 @@
         private System.Windows.Forms.ToolStripMenuItem traspuestaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem intercambioToolStripMenuItem;
         private System.Windows.Forms.TextBox IsomtextBox;
+        private System.Windows.Forms.ToolStripMenuItem caminosToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem eulerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem hamiltonToolStripMenuItem;
     }
 }
 
