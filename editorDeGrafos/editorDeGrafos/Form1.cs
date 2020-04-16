@@ -114,20 +114,20 @@ namespace editorDeGrafos
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
             mousePressed = true;
-            if((eulerBoolDo || hamiltonBoolDo) && aListGraph.GRAPH.Count() > 1)
+            if ((eulerBoolDo || hamiltonBoolDo) && aListGraph.GRAPH.Count() > 1)
             {
-               
-                if(initialNodePath == null || finalNodePath == null)//if any node does not exist.
+
+                if (initialNodePath == null || finalNodePath == null)//if any node does not exist.
                 {
                     if (initialNodePath == null)
                     {
                         //one node clicked.//check all the node list.
                         initialNodePath = findNodeClicked(new Coordenate(e.X, e.Y));
-                        if(initialNodePath != null)
+                        if (initialNodePath != null)
                         {
                             initialNodePath.COLOR = Color.Blue;//change the color of the initial node
                         }
-                        
+
 
                         if (aListGraph.GRAPH.Count() == 1)
                         {
@@ -141,9 +141,9 @@ namespace editorDeGrafos
                         {
                             finalNodePath.COLOR = Color.Red;//change the color of the final node
                         }
-                        
 
-                        nodePathsReady  = true;
+
+                        nodePathsReady = true;
 
                         if (eulerBoolDo)//le toca a euler.
                         {
@@ -157,7 +157,7 @@ namespace editorDeGrafos
                             {
                                 pathOfEuler();
                             }
-                           
+
 
                         }
                         else//le toca a hamilton.
@@ -172,12 +172,12 @@ namespace editorDeGrafos
                             {
                                 pathOfHamilton();
                             }
-                            
+
                         }
 
                         initialNodePath = null;
                         finalNodePath = null;
-                    }                  
+                    }
 
                 }
             }
@@ -623,6 +623,15 @@ namespace editorDeGrafos
          * 
          * ***********************************************************************************************************************/
 
+
+        private void marAllEdgesAsNotVisited(List<Edge> listEdge)
+        {
+            foreach (Edge edge in listEdge)
+            {
+                edge.visitada = false;
+                edge.COLOR = Color.Black;
+            }
+        }
         public int AFWeight(String type)
         {
             int res = 0;
@@ -1103,27 +1112,34 @@ namespace editorDeGrafos
         List<Node> pathToPrint;
 
 
-        
+
 
         public void cycleOfEuler()//next to the event.
         {
-            if(!cycleOfEulerBool() )
+            if (!cycleOfEulerBool())
             {
-              //deploy a OK form to finish.
+                //deploy a OK form to finish.
 
             }
             else//a trabajar
             {
                 // do the animation of the path or cycle
                 pathToAnimate = cycleOfEuler_Algorithm();
-                if(pathToAnimate == null)
+                if (pathToAnimate == null)
                 {
                     //deploy a OK form to finish.
                 }
                 else
                 {
+                    String forma3Mensaje = "";
+
+                    foreach (Node node in pathToPrint)
+                    {
+                        forma3Mensaje = forma3Mensaje + node.Index + "->";
+                    }
                     tmpCount = 0;
-                    Form3 f3 = new Form3();
+                    Form3 f3 = new Form3(forma3Mensaje);
+                    timerColor.Start();
                     f3.ShowDialog();
                     /*if (gdc.Operation == 1 || gdc.Operation == 2)
                     {
@@ -1134,10 +1150,10 @@ namespace editorDeGrafos
                         loadCommonActions();
                     }
                     */
-                    timerColor.Start();
+
                 }
-               
-            }                        
+
+            }
         }
 
         void DFSEulerCycle(Node workingNode/*int v, bool visited[]*/)
@@ -1158,7 +1174,7 @@ namespace editorDeGrafos
                     {
                         if (edge.isThis(workingNode, node))
                         {
-                            if(cutEdges.Contains(edge))
+                            if (cutEdges.Contains(edge))
                             {
                                 dejaAlFinal.Add(node);
                             }
@@ -1170,7 +1186,7 @@ namespace editorDeGrafos
                                     DFSEulerCycle(node);
                                 }
                             }
-                            
+
                         }
                     }
                 }
@@ -1191,7 +1207,7 @@ namespace editorDeGrafos
                     DFSEulerCycle(node);
                 }
             }
-            if(finalNodePath.Visitado == false  && aListGraph.neighborListNode(workingNode).Contains(finalNodePath))
+            if (finalNodePath.Visitado == false && aListGraph.neighborListNode(workingNode).Contains(finalNodePath))
             {
                 foreach (Edge edge in edgeList)
                 {
@@ -1216,9 +1232,9 @@ namespace editorDeGrafos
 
             cutEdges = new List<Edge>();
 
-            foreach(Edge edge in edgeListInside)
+            foreach (Edge edge in edgeListInside)
             {
-                if(isABridgeBool(edge))
+                if (isABridgeBool(edge))
                 {
                     cutEdges.Add(edge);
                 }
@@ -1231,8 +1247,8 @@ namespace editorDeGrafos
 
             DFSEulerCycle(initialNodePath);
 
-            
-          
+
+
 
             return res;
 
@@ -1310,7 +1326,7 @@ namespace editorDeGrafos
 
 
             // Recur for all the vertices adjacent to this vertex
-             foreach (Node node in aListGraph.neighborListNode(workingNode))
+            foreach (Node node in aListGraph.neighborListNode(workingNode))
             {
                 if (node.Visitado == false)
                 {
@@ -1318,7 +1334,7 @@ namespace editorDeGrafos
                 }
             }
         }
-        void DFSUtilAllConectedBridge(Node workingNode,Edge posibleBridge/*int v, bool visited[]*/)
+        void DFSUtilAllConectedBridge(Node workingNode, Edge posibleBridge/*int v, bool visited[]*/)
         {
             // Mark the current node as visited
             workingNode.Visitado = true;
@@ -1327,13 +1343,13 @@ namespace editorDeGrafos
             // Recur for all the vertices adjacent to this vertex
             foreach (Node node in aListGraph.neighborListNode(workingNode))
             {
-                if(workingNode == posibleBridge.Client && node == posibleBridge.Server)
+                if (workingNode == posibleBridge.Client && node == posibleBridge.Server)
                 {
 
                 }
                 else if (node.Visitado == false)
                 {
-                    DFSUtilAllConectedBridge(node,posibleBridge);
+                    DFSUtilAllConectedBridge(node, posibleBridge);
                 }
             }
         }
@@ -1350,7 +1366,7 @@ namespace editorDeGrafos
 
             foreach (Node node in aux.LIST_NODES)
             {
-                if(node.Visitado == false)
+                if (node.Visitado == false)
                 {
                     return false;
                 }
@@ -1365,7 +1381,7 @@ namespace editorDeGrafos
             aListGraph.markAllLikeNotVisited();
 
             // Start DFS traversal from a vertex with non-zero degree 
-            DFSUtilAllConectedBridge(aux.LIST_NODES[0],posibleBridge);
+            DFSUtilAllConectedBridge(aux.LIST_NODES[0], posibleBridge);
 
             // Check if all non-zero degree vertices are visited 
             foreach (Node node in aux.LIST_NODES)
@@ -1392,20 +1408,20 @@ namespace editorDeGrafos
             foreach (Node node in nodeList)
             {
                 int degreeByN = aListGraph.neighborListNode(node).Count();
-               
+
                 if (degreeByN > 0)//atleast one neightboor
                 {
                     if (degreeByN % 2 != 0)// one node have not an even number of neirhtbors
                     {
                         return false;
                     }
-                    aux.addNode(node);                    
+                    aux.addNode(node);
                 }
             }
 
-            if(aux.LIST_NODES.Count() > 0)
+            if (aux.LIST_NODES.Count() > 0)
             {
-                if(!allConected())// if not all are connected
+                if (!allConected())// if not all are connected
                 {
                     return false;
                 }
@@ -1433,11 +1449,11 @@ namespace editorDeGrafos
                     }
                     aux.addNode(node);
                 }
-            }           
+            }
 
             if (aux.LIST_NODES.Count() > 0)
             {
-                if (oddDegreeCont != 2 && oddDegreeCont != 0)               
+                if (oddDegreeCont != 2 && oddDegreeCont != 0)
                 {
                     return false;
                 }
@@ -1452,7 +1468,7 @@ namespace editorDeGrafos
 
         public Boolean cycleOfHamiltonBool()
         {
-          
+
             bool res = false;
 
             return res;
@@ -1563,7 +1579,7 @@ namespace editorDeGrafos
 
             public Boolean Visitado
             {
-                get {return this.visitado; }
+                get { return this.visitado; }
                 set { this.visitado = value; }
             }
             /*******************************************************
@@ -1587,7 +1603,8 @@ namespace editorDeGrafos
             Node server = null;
             Boolean directed;
             Color color = Color.Black;
-            
+            Boolean visited = false;
+
 
             //Coordenate a;
             //Coordenate b;
@@ -1616,6 +1633,12 @@ namespace editorDeGrafos
                 this.client = unique;
                 this.server = unique;
                 directed = false;
+            }
+
+            public Boolean visitada
+            {
+                get { return this.visited; }
+                set { this.visited = value; }
             }
 
             public Color COLOR
@@ -1650,7 +1673,7 @@ namespace editorDeGrafos
 
             public Boolean isThis(Node client, Node server)
             {
-                if(client == this.client && server == this.server)
+                if (client == this.client && server == this.server)
                 {
                     return true;
                 }
@@ -1659,7 +1682,7 @@ namespace editorDeGrafos
 
             public Boolean isThis(int client, int server)
             {
-                if( this.client.Index == client && this.server.Index== server)
+                if (this.client.Index == client && this.server.Index == server)
                 {
                     return true;
                 }
@@ -2740,12 +2763,13 @@ namespace editorDeGrafos
                     for (int i = 0; i < graph.Count(); i++)
                     {
                         graph[j][i].NODO.Visitado = false;
+                        graph[j][i].NODO.COLOR = Color.Black;
                     }
             }
 
             public void markAsVisited_T_F(int index, Boolean mark)
-            {                   
-                graph[index][index].NODO.Visitado = mark;                    
+            {
+                graph[index][index].NODO.Visitado = mark;
             }
 
 
@@ -2775,7 +2799,7 @@ namespace editorDeGrafos
             * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
             * 
             ********************************************************************************************************************/
-           
+
 
             /******************************************************************************************************************
            * 
@@ -2853,213 +2877,213 @@ namespace editorDeGrafos
 
         public class PermutationSetStruct
         {
-                    List<int> gradeInts;
-                    List<SpecificGradeSets> grades;
-                    int tamOfGraph = 1;
+            List<int> gradeInts;
+            List<SpecificGradeSets> grades;
+            int tamOfGraph = 1;
 
-                    int[] innerAray; 
+            int[] innerAray;
 
-                    public PermutationSetStruct()
-                    {
-                        gradeInts = new List<int>();
-                        grades = new List<SpecificGradeSets>();
-                        innerAray = makeInnerArray(1);
-                    }
-                    public PermutationSetStruct(int tamOfGraph)
-                    {
-                        gradeInts = new List<int>();
-                        grades = new List<SpecificGradeSets>();
-                        this.tamOfGraph = tamOfGraph;
-                        innerAray = makeInnerArray(tamOfGraph);
-                    }
-                    private int [] makeInnerArray(int tam)
-                    {
-                        int[] res = new int[tam];
-                        for(int i = 0; i < tam; i++)
-                        {
-                            res[i] = i;
-                        }
-                        return res;
-                    }
-
-                    public void addGrade(int grade)
-                    {
-                        if (!gradeInts.Contains(grade))
-                        {
-                            gradeInts.Add(grade);
-                            grades.Add(new SpecificGradeSets(grade));
-                        }
-                    }
-                    public Boolean matchPairGrades(int T, int O)
-                    {
-                        Boolean res = false;
-                        foreach (SpecificGradeSets sgs in grades)
-                        {
-                            if (sgs.matchPair(T, O))
-                                return true;
-                        }
-                        return res;
-                    }
-
-                    public void addIndex(int grade, int index, int this_other)
-                    {
-                        int indexInSet;
-                        if (!gradeInts.Contains(grade))
-                        {
-                            addGrade(grade);
-                        }
-                        indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
-                        if (this_other <= 0)
-                        {
-                            grades[indexInSet].addThis(index);
-                        }
-                        else
-                        {
-                            grades[indexInSet].addOther(index);
-                        }
-                    }
-
-                    public void addIndex_T(int grade, int index)
-                    {
-                        int indexInSet;
-                        if (!gradeInts.Contains(grade))
-                        {
-                            addGrade(grade);
-                        }
-                        indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
-
-                        grades[indexInSet].addThis(index);
-                    }
-
-                    public void addIndex_O(int grade, int index)
-                    {
-                        int indexInSet;
-                        if (!gradeInts.Contains(grade))
-                        {
-                            addGrade(grade);
-                        }
-                        indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
-
-                        grades[indexInSet].addOther(index);
-                    }
-
-                    public Boolean validateSet()
-                    {
-                        Boolean res = true;
-                        foreach (SpecificGradeSets spG in grades)
-                        {
-                            if (spG.validation() == false)
-                            {
-                                return false;
-                            }
-                        }
-                        return res;
-                    }
-
-                    public List<SpecificGradeSets> GRADES
-                    {
-                        get { return this.grades; }
-                    }
-
-                    public int calculatePer()
-                    {
-                        int res = 1;
-
-                        for (int i = 0; i < GRADES.Count(); i++)
-                        {
-                            int nP = GRADES[i].OtherIndicesList.Count();
-                            if (nP < 3)
-                            {
-                                nP = nP * nP;
-                            }
-                            else
-                            {
-                                nP = factorial(nP);
-                            }
-                            res *= nP;
-                        }
-                        return res;
-                    }
-
-                    //factorial method
-                    public int factorial(int integer)
-                    {
-                        int res = 1;
-                        for (int i = 1; i <= integer; i++)
-                        {
-                            res += res * i;
-                        }
-                        return res;
-                    }                
-
-                public List<PermutationPairList> LP_PairList;
-                public PermutationPairList P_PairList;
-                public PermutationPair auxPerPair;
-
-                public List<PermutationPairList> makeAllPermutations()
+            public PermutationSetStruct()
+            {
+                gradeInts = new List<int>();
+                grades = new List<SpecificGradeSets>();
+                innerAray = makeInnerArray(1);
+            }
+            public PermutationSetStruct(int tamOfGraph)
+            {
+                gradeInts = new List<int>();
+                grades = new List<SpecificGradeSets>();
+                this.tamOfGraph = tamOfGraph;
+                innerAray = makeInnerArray(tamOfGraph);
+            }
+            private int[] makeInnerArray(int tam)
+            {
+                int[] res = new int[tam];
+                for (int i = 0; i < tam; i++)
                 {
-                    LP_PairList = new List<PermutationPairList>();
-                    heapPermutation(innerAray,innerAray.Length);
-                    return LP_PairList;
+                    res[i] = i;
                 }
+                return res;
+            }
 
-                public void storePermutation(int[] a)//store only if all the permutations match.
+            public void addGrade(int grade)
+            {
+                if (!gradeInts.Contains(grade))
                 {
-                    P_PairList = new PermutationPairList();
-                    for (int i = 0; i < a.Length; i++)
-                    {
-                        if (matchPairGrades(i, a[i]))
-                        {
-                            auxPerPair = new PermutationPair(i, a[i]);
-                            P_PairList.Add(auxPerPair);
-                        }
-                        else
-                        {
-                            return;
-                        }    
-                    }
-                    LP_PairList.Add(P_PairList);
+                    gradeInts.Add(grade);
+                    grades.Add(new SpecificGradeSets(grade));
                 }
-
-                public void heapPermutation(int[] a, int size)
+            }
+            public Boolean matchPairGrades(int T, int O)
+            {
+                Boolean res = false;
+                foreach (SpecificGradeSets sgs in grades)
                 {
-                    // if size becomes 1 then prints the obtained 
-                    // permutation 
-                    if (size == 1)
+                    if (sgs.matchPair(T, O))
+                        return true;
+                }
+                return res;
+            }
+
+            public void addIndex(int grade, int index, int this_other)
+            {
+                int indexInSet;
+                if (!gradeInts.Contains(grade))
+                {
+                    addGrade(grade);
+                }
+                indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
+                if (this_other <= 0)
+                {
+                    grades[indexInSet].addThis(index);
+                }
+                else
+                {
+                    grades[indexInSet].addOther(index);
+                }
+            }
+
+            public void addIndex_T(int grade, int index)
+            {
+                int indexInSet;
+                if (!gradeInts.Contains(grade))
+                {
+                    addGrade(grade);
+                }
+                indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
+
+                grades[indexInSet].addThis(index);
+            }
+
+            public void addIndex_O(int grade, int index)
+            {
+                int indexInSet;
+                if (!gradeInts.Contains(grade))
+                {
+                    addGrade(grade);
+                }
+                indexInSet = gradeInts.IndexOf(grade);//the index of the grade whereyou want to add
+
+                grades[indexInSet].addOther(index);
+            }
+
+            public Boolean validateSet()
+            {
+                Boolean res = true;
+                foreach (SpecificGradeSets spG in grades)
+                {
+                    if (spG.validation() == false)
                     {
-                        storePermutation(a);//store and validate the permutation made.
-                    }
-
-                    for (int i = 0; i < size; i++)
-                    {
-                        heapPermutation(a, size - 1);
-
-                        // if size is odd, swap first and last 
-                        // element 
-                        if (size % 2 == 1)
-                        {
-                            int temp = a[0];
-                            a[0] = a[size - 1];
-                            a[size - 1] = temp;
-                        }
-
-                        // If size is even, swap ith and last 
-                        // element 
-                        else
-                        {
-                            int temp = a[i];
-                            a[i] = a[size - 1];
-                            a[size - 1] = temp;
-                        }
+                        return false;
                     }
                 }
+                return res;
+            }
+
+            public List<SpecificGradeSets> GRADES
+            {
+                get { return this.grades; }
+            }
+
+            public int calculatePer()
+            {
+                int res = 1;
+
+                for (int i = 0; i < GRADES.Count(); i++)
+                {
+                    int nP = GRADES[i].OtherIndicesList.Count();
+                    if (nP < 3)
+                    {
+                        nP = nP * nP;
+                    }
+                    else
+                    {
+                        nP = factorial(nP);
+                    }
+                    res *= nP;
+                }
+                return res;
+            }
+
+            //factorial method
+            public int factorial(int integer)
+            {
+                int res = 1;
+                for (int i = 1; i <= integer; i++)
+                {
+                    res += res * i;
+                }
+                return res;
+            }
+
+            public List<PermutationPairList> LP_PairList;
+            public PermutationPairList P_PairList;
+            public PermutationPair auxPerPair;
+
+            public List<PermutationPairList> makeAllPermutations()
+            {
+                LP_PairList = new List<PermutationPairList>();
+                heapPermutation(innerAray, innerAray.Length);
+                return LP_PairList;
+            }
+
+            public void storePermutation(int[] a)//store only if all the permutations match.
+            {
+                P_PairList = new PermutationPairList();
+                for (int i = 0; i < a.Length; i++)
+                {
+                    if (matchPairGrades(i, a[i]))
+                    {
+                        auxPerPair = new PermutationPair(i, a[i]);
+                        P_PairList.Add(auxPerPair);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                LP_PairList.Add(P_PairList);
+            }
+
+            public void heapPermutation(int[] a, int size)
+            {
+                // if size becomes 1 then prints the obtained 
+                // permutation 
+                if (size == 1)
+                {
+                    storePermutation(a);//store and validate the permutation made.
+                }
+
+                for (int i = 0; i < size; i++)
+                {
+                    heapPermutation(a, size - 1);
+
+                    // if size is odd, swap first and last 
+                    // element 
+                    if (size % 2 == 1)
+                    {
+                        int temp = a[0];
+                        a[0] = a[size - 1];
+                        a[size - 1] = temp;
+                    }
+
+                    // If size is even, swap ith and last 
+                    // element 
+                    else
+                    {
+                        int temp = a[i];
+                        a[i] = a[size - 1];
+                        a[size - 1] = temp;
+                    }
+                }
+            }
 
 
             //permutations but like an array.
-            public List<int []> makeAllPermutationsPure()
+            public List<int[]> makeAllPermutationsPure()
             {
                 List<int[]> res = new List<int[]>();
-                heapPermutationPure(innerAray, innerAray.Length,ref res);
+                heapPermutationPure(innerAray, innerAray.Length, ref res);
                 return res;
             }
 
@@ -3070,7 +3094,7 @@ namespace editorDeGrafos
                     if (!matchPairGrades(i, a[i]))
                     {
                         return;
-                    }                    
+                    }
                 }
                 res.Add(a);
             }
@@ -3124,61 +3148,61 @@ namespace editorDeGrafos
         }
         public class PermutationPairList//.......................................................
         {
-                /*
-                 * this is the way to do permutations.
-                 * (12345)
-                 *        |----------------------> very important.
-                 * (54321)
-                 * the above numbers are an example of permutation. we can have n! permutation if the graphs have n nodes.
-                 * the way we do it here make this less than n! permutations, due to the clasifications by grade,
-                 * comparing each graph.
-                 * 
-                 * */
-                List<PermutationPair> permutationList = null;
-                //PermutationSetStruct workingPairs;
+            /*
+             * this is the way to do permutations.
+             * (12345)
+             *        |----------------------> very important.
+             * (54321)
+             * the above numbers are an example of permutation. we can have n! permutation if the graphs have n nodes.
+             * the way we do it here make this less than n! permutations, due to the clasifications by grade,
+             * comparing each graph.
+             * 
+             * */
+            List<PermutationPair> permutationList = null;
+            //PermutationSetStruct workingPairs;
 
-                public PermutationPairList()
+            public PermutationPairList()
+            {
+                permutationList = new List<PermutationPair>();
+            }
+            public void Add(PermutationPair pp)
+            {
+                permutationList.Add(pp);
+            }
+            public Matrix toMatrixOfPermutation()//to convert the permutation into a matrix of permutations.
+            {
+                Matrix res = null;
+                if (permutationList.Count > 0)
                 {
-                    permutationList = new List<PermutationPair>();
-                }
-                public void Add(PermutationPair pp)
-                {
-                    permutationList.Add(pp);
-                }
-                public Matrix toMatrixOfPermutation()//to convert the permutation into a matrix of permutations.
-                {
-                    Matrix res = null;
-                    if (permutationList.Count > 0)
+                    int n = permutationList.Count();
+                    int[,] toDoMatrix = new int[n, n];
+
+                    for (int i = 0; i < n; i++)
                     {
-                        int n = permutationList.Count();
-                        int[,] toDoMatrix = new int[n, n];
-
-                        for (int i = 0; i < n; i++)
-                        {
-                            toDoMatrix[permutationList[i].otherInt, permutationList[i].thisInt] = 1;
-                        }
-                        res = new Matrix(toDoMatrix);
+                        toDoMatrix[permutationList[i].otherInt, permutationList[i].thisInt] = 1;
                     }
-                    return res;
+                    res = new Matrix(toDoMatrix);
                 }
+                return res;
+            }
 
-                public void toMatrixOfPermutationB(ref Matrix mNormal, ref Matrix mTrans)//to convert the permutation into a matrix of permutations.
-                {               
-                    if (permutationList.Count > 0)
+            public void toMatrixOfPermutationB(ref Matrix mNormal, ref Matrix mTrans)//to convert the permutation into a matrix of permutations.
+            {
+                if (permutationList.Count > 0)
+                {
+                    int n = permutationList.Count();
+                    int[,] toDoMatrix = new int[n, n];
+                    int[,] toDoMatrixTrans = new int[n, n];
+
+                    for (int i = 0; i < n; i++)
                     {
-                        int n = permutationList.Count();
-                        int[,] toDoMatrix = new int[n, n];
-                        int[,] toDoMatrixTrans = new int[n, n];
-
-                        for (int i = 0; i < n; i++)
-                        {
-                            toDoMatrix[permutationList[i].otherInt, permutationList[i].thisInt] = 1;
-                            toDoMatrixTrans[permutationList[i].thisInt , permutationList[i].otherInt] = 1;
-                        }
-                        mNormal = new Matrix(toDoMatrix);
-                        mTrans = new Matrix(toDoMatrixTrans);
+                        toDoMatrix[permutationList[i].otherInt, permutationList[i].thisInt] = 1;
+                        toDoMatrixTrans[permutationList[i].thisInt, permutationList[i].otherInt] = 1;
                     }
+                    mNormal = new Matrix(toDoMatrix);
+                    mTrans = new Matrix(toDoMatrixTrans);
                 }
+            }
         }
 
         public class ListOfPerPairLists//............................................................
@@ -3186,12 +3210,12 @@ namespace editorDeGrafos
             int numOfPermutationPosibilities = 0;
             List<PermutationPairList> listOfPermutationAlfa;
 
-            public ListOfPerPairLists( PermutationSetStruct permutSetStruct)
+            public ListOfPerPairLists(PermutationSetStruct permutSetStruct)
             {
                 numOfPermutationPosibilities = permutSetStruct.calculatePer();
                 listOfPermutationAlfa = permutSetStruct.makeAllPermutations();
             }
-            
+
             public List<PermutationPairList> PER_ALFA_LIST
             {
                 get { return listOfPermutationAlfa; }
@@ -3214,17 +3238,17 @@ namespace editorDeGrafos
 
         protected virtual void isoForm_Click(object sender, EventArgs e)
         {
-            if(formaIsomorfismo == null || formaIsomorfismo.Visible == false)
+            if (formaIsomorfismo == null || formaIsomorfismo.Visible == false)
             {
                 formaIsomorfismo = new Form2(this);
                 formaIsomorfismo.Show();
             }
-            
+
             fuerzaBrutaToolStripMenuItem.Visible = true;
             traspuestaToolStripMenuItem.Visible = true;
             intercambioToolStripMenuItem.Visible = true;
             IsomtextBox.Visible = true;
-            
+
             //formaIsomorfismo.Show();
         }
 
@@ -3233,7 +3257,7 @@ namespace editorDeGrafos
 
         }
 
-        
+
 
         Boolean switcher = false;
         public void GraphTimerColor(object sender, EventArgs e)
@@ -3244,7 +3268,7 @@ namespace editorDeGrafos
             }
             else
             {
-                if (pathToPrint != null ) 
+                if (pathToPrint != null)
                 {
                     if (switcher == false)
                     {
@@ -3253,15 +3277,15 @@ namespace editorDeGrafos
                     }
                     else
                     {
-                        int serverIndex = tmpCount +1;
-                        if(serverIndex == pathToPrint.Count())
+                        int serverIndex = tmpCount + 1;
+                        if (serverIndex == pathToPrint.Count())
                         {
                             serverIndex = 0;
                         }
-                        
-                        foreach(Edge edge in edgeList)
+
+                        foreach (Edge edge in edgeList)
                         {
-                            if(edge.isThis(pathToPrint[tmpCount],pathToPrint[serverIndex]))
+                            if (edge.isThis(pathToPrint[tmpCount], pathToPrint[serverIndex]))
                             {
                                 edge.COLOR = Color.Red;
                             }
@@ -3275,16 +3299,83 @@ namespace editorDeGrafos
                 {
                     timerColor.Stop();
                 }
-                
+
             }
             Invalidate();
         }
 
+        Boolean switcher2 = false;
+        List<Edge> workingEdgesList;
+       // List<NeightborsTreatet>
+
+        public void GraphTimerColor2(object sender, EventArgs e)
+        {
+            aListGraph.markAllLikeNotVisited();
+            
+
+            
+            Edge[] workingEdgesArray = new Edge[edgeList.Count()];
+            edgeList.CopyTo(workingEdgesArray);
+            workingEdgesList = workingEdgesArray.ToList();
+
+            marAllEdgesAsNotVisited(workingEdgesList);
+
+            do {
+                BFSColored(initialNodePath);
+            }
+            while (allVisited(workingEdgesList) == true);
+            Invalidate();
+            timerColor.Stop();
+        }
+
+        public void BFSColored(Node node)
+        {
+            node.Visitado = true;
+            node.COLOR = Color.Red;
+
+            foreach(Node nodo in aListGraph.neighborListNode(node))
+            {
+                foreach (Edge edge in workingEdgesList)
+                {
+                    if (!edge.isThis(node, nodo))
+                    {
+                        if(edge.visitada == false)
+                        {
+                            edge.visitada = true;
+                            edge.COLOR = Color.Green;
+                            BFSColored(nodo);
+                        }
+                    }
+                }                
+                   
+            }
+            Invalidate();
+
+        }
+
+        
+
+        public Boolean allVisited(List<Edge> listEdges)
+        {
+            foreach(Edge edge in listEdges)
+            {
+                if (edge.visitada == false)
+                    return false;
+            }
+            return true;
+        }
+
+       
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            pruebas pb = new pruebas();
+            pb.ShowDialog();
+
+
             timerColor = new System.Windows.Forms.Timer();
             timerColor.Interval = 500;
-            timerColor.Tick += new EventHandler(GraphTimerColor);
+            timerColor.Tick += new EventHandler(GraphTimerColor2/*GraphTimerColor*/);
             tmpCount = 0;
         }
 

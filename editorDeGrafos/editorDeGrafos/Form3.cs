@@ -12,9 +12,21 @@ namespace editorDeGrafos
 {
     public partial class Form3 : Form
     {
-        public Form3()
+        public Form3(String message)
         {
             InitializeComponent();
+            this.label1.Text = message;
+
+        }
+
+        private void Form3_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
