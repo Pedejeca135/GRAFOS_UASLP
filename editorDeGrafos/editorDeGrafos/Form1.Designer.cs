@@ -49,6 +49,13 @@
             this.traspuestaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.intercambioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.IsomtextBox = new System.Windows.Forms.TextBox();
+            this.caminosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.eulerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.circuitoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.caminoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.hamiltonToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.circuitoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.caminoToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -161,10 +168,11 @@
             this.removeXRToolStripMenuItem,
             this.moreToolStripMenuItem,
             this.matrizIncidenciaToolStripMenuItem,
-            this.isomToolStripMenuItem});
+            this.isomToolStripMenuItem,
+            this.caminosToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(116, 1);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(408, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(592, 24);
             this.menuStrip1.TabIndex = 4;
             this.menuStrip1.Text = "menuStrip1";
             this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
@@ -241,6 +249,62 @@
             this.IsomtextBox.TabIndex = 6;
             this.IsomtextBox.TabStop = false;
             // 
+            // caminosToolStripMenuItem
+            // 
+            this.caminosToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.eulerToolStripMenuItem,
+            this.hamiltonToolStripMenuItem});
+            this.caminosToolStripMenuItem.Name = "caminosToolStripMenuItem";
+            this.caminosToolStripMenuItem.Size = new System.Drawing.Size(64, 20);
+            this.caminosToolStripMenuItem.Text = "caminos";
+            this.caminosToolStripMenuItem.Click += new System.EventHandler(this.caminosToolStripMenuItem_Click);
+            // 
+            // eulerToolStripMenuItem
+            // 
+            this.eulerToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.caminoToolStripMenuItem,
+            this.circuitoToolStripMenuItem});
+            this.eulerToolStripMenuItem.Name = "eulerToolStripMenuItem";
+            this.eulerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.eulerToolStripMenuItem.Text = "Euler";
+            // 
+            // circuitoToolStripMenuItem
+            // 
+            this.circuitoToolStripMenuItem.Name = "circuitoToolStripMenuItem";
+            this.circuitoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.circuitoToolStripMenuItem.Text = "Circuito";
+            this.circuitoToolStripMenuItem.Click += new System.EventHandler(this.circuitoToolStripMenuItem_Click);
+            // 
+            // caminoToolStripMenuItem
+            // 
+            this.caminoToolStripMenuItem.Name = "caminoToolStripMenuItem";
+            this.caminoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.caminoToolStripMenuItem.Text = "Camino";
+            this.caminoToolStripMenuItem.Click += new System.EventHandler(this.caminoToolStripMenuItem_Click);
+            // 
+            // hamiltonToolStripMenuItem
+            // 
+            this.hamiltonToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.caminoToolStripMenuItem1,
+            this.circuitoToolStripMenuItem1});
+            this.hamiltonToolStripMenuItem.Name = "hamiltonToolStripMenuItem";
+            this.hamiltonToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.hamiltonToolStripMenuItem.Text = "Hamilton";
+            // 
+            // circuitoToolStripMenuItem1
+            // 
+            this.circuitoToolStripMenuItem1.Name = "circuitoToolStripMenuItem1";
+            this.circuitoToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.circuitoToolStripMenuItem1.Text = "Circuito";
+            this.circuitoToolStripMenuItem1.Click += new System.EventHandler(this.circuitoToolStripMenuItem1_Click);
+            // 
+            // caminoToolStripMenuItem1
+            // 
+            this.caminoToolStripMenuItem1.Name = "caminoToolStripMenuItem1";
+            this.caminoToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.caminoToolStripMenuItem1.Text = "Camino";
+            this.caminoToolStripMenuItem1.Click += new System.EventHandler(this.caminoToolStripMenuItem1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -294,6 +358,13 @@
         private System.Windows.Forms.ToolStripMenuItem traspuestaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem intercambioToolStripMenuItem;
         private System.Windows.Forms.TextBox IsomtextBox;
+        private System.Windows.Forms.ToolStripMenuItem caminosToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem eulerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem caminoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem circuitoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem hamiltonToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem caminoToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem circuitoToolStripMenuItem1;
     }
 }
 
