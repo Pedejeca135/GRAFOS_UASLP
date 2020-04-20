@@ -52,6 +52,7 @@
             this.eulerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hamiltonToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.IsomtextBox = new System.Windows.Forms.TextBox();
+            this.brToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -165,10 +166,11 @@
             this.moreToolStripMenuItem,
             this.matrizIncidenciaToolStripMenuItem,
             this.isomToolStripMenuItem,
-            this.caminosToolStripMenuItem});
+            this.caminosToolStripMenuItem,
+            this.brToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(116, 1);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(594, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(624, 24);
             this.menuStrip1.TabIndex = 4;
             this.menuStrip1.Text = "menuStrip1";
             this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
@@ -269,6 +271,13 @@
             this.IsomtextBox.TabIndex = 6;
             this.IsomtextBox.TabStop = false;
             // 
+            // brToolStripMenuItem
+            // 
+            this.brToolStripMenuItem.Name = "brToolStripMenuItem";
+            this.brToolStripMenuItem.Size = new System.Drawing.Size(30, 20);
+            this.brToolStripMenuItem.Text = "br";
+            this.brToolStripMenuItem.Click += new System.EventHandler(this.brToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -325,6 +334,7 @@
         private System.Windows.Forms.ToolStripMenuItem caminosToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem eulerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hamiltonToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem brToolStripMenuItem;
     }
 }
 

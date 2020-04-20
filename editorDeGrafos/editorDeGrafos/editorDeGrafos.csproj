@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdjacencyList.cs" />
     <Compile Include="Arista.cs" />
     <Compile Include="AskForWeight.cs">
       <SubType>Form</SubType>
@@ -53,6 +54,9 @@
     <Compile Include="AskForWeight.Designer.cs">
       <DependentUpon>AskForWeight.cs</DependentUpon>
     </Compile>
+    <Compile Include="Coordenate.cs" />
+    <Compile Include="DirectedGrade.cs" />
+    <Compile Include="Edge.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -65,14 +69,19 @@
     <Compile Include="Form2.Designer.cs">
       <DependentUpon>Form2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form3.cs">
+    <Compile Include="pathsOK.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form3.Designer.cs">
-      <DependentUpon>Form3.cs</DependentUpon>
+    <Compile Include="pathsOK.Designer.cs">
+      <DependentUpon>pathsOK.cs</DependentUpon>
     </Compile>
+    <Compile Include="ListOfPerPairLists.cs" />
     <Compile Include="Matrix.cs" />
-    <Compile Include="Nodo.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="NodeRef.cs" />
+    <Compile Include="PermutationPair.cs" />
+    <Compile Include="PermutationPairList.cs" />
+    <Compile Include="PermutationSetStruct.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="pruebas.cs">
@@ -87,6 +96,8 @@
     <Compile Include="SaveChangesWindow.Designer.cs">
       <DependentUpon>SaveChangesWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="SpecificGradeSets.cs" />
+    <Compile Include="TidyPair.cs" />
     <EmbeddedResource Include="AskForWeight.resx">
       <DependentUpon>AskForWeight.cs</DependentUpon>
     </EmbeddedResource>
@@ -96,8 +107,8 @@
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form3.resx">
-      <DependentUpon>Form3.cs</DependentUpon>
+    <EmbeddedResource Include="pathsOK.resx">
+      <DependentUpon>pathsOK.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
