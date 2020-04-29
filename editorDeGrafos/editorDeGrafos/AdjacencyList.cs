@@ -1043,6 +1043,34 @@ namespace editorDeGrafos
 
         }
 
+        public List<Node> notVisitedList()
+        {
+            List<Node> res = new List<Node>();
+            foreach(Node node in listOfNodes_IG)
+            {
+                if(node.Visitado == false)
+                {
+                    res.Add(node);
+                }
+            }
+            return res;
+          }
+
+        public void restoreNotVisited(List<Node> notVisitedYet)
+        {
+            foreach(Node node in listOfNodes_IG)
+            {
+                if(notVisitedYet.Contains(node))
+                {
+                    node.Visitado = false;
+                }
+                else
+                {
+                    node.Visitado = true;
+                }
+            }
+        }
+
         public List<Node> listOfconectedNodes()//nodes that have at least one conection.
             {
             List<Node> resList = new List<Node>();

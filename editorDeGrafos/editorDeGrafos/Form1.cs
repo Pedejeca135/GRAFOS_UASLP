@@ -1561,17 +1561,75 @@ namespace editorDeGrafos
             // Mark all the vertices as not visited 
 
             // Start DFS traversal from a vertex with non-zero degree 
-
-            pathOfNodes.Add(initialNodePath);
-            aListGraph.markAllNodeAndEdgesNotVisited();
-             return DFSHamiltonCycle(initialNodePath);
-
+            //return DFSHamiltonCycle(initialNodePath);
+ 
+            aListGraph.markAllNodeAndEdgesNotVisited();//marcar todos los nodos y aristas como no visitados.
+           
+            return DFS_Any_HamiltonCycle(initialNodePath);
         }
 
+        List<Node> nodesPath = new List<Node>();
+Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
+        {
+            workingNode.Visitado= true;//marcar el nodo actual como visitado.
+            List<Node> notVisitedYet = aListGraph.notVisitedList();//nodos sin visitar para restauraciones.
+            List<Node> neightboors = aListGraph.neighborListNode(workingNode);//vecinos del nodo actual.
+
+            /*********************
+             *       Caso Base. 
+             * *********************/
+            if (notVisitedYet.Count() < 1 && neightboors.Contains(initialNodePath))//todos los nodos visitados && el nodo actual tiene de vecino al nodo inicial
+            {
+                Edge edge = aListGraph.thisEdge(workingNode, initialNodePath);
+                pathToAnimate.Add(edge);//agrega la arista( actual->inicial) al camino para animar
+                pathOfNodes.Add(initialNodePath);//se agrega por primera vez el nodoInicial(mismo que nodoFinal) al camino de nodos;
+                pathOfNodes.Add(workingNode);//agrega el nodo actual al camino de nodos 
+                return true;
+            }
+
+            //acomodar los vecinos de menor a mayor en cuestion de grado.
+            neightboors.Sort(delegate (Node x, Node y)
+            {
+                return aListGraph.neighborListNodeNoVisited(x).Count().CompareTo(aListGraph.neighborListNodeNoVisited(y).Count());
+            });
+
+
+            /*********************
+             *       Caso General. 
+             * *********************/
+            foreach (Node node in neightboors)
+            {
+                if (node.Visitado == false)
+                {
+                    if (DFS_Any_HamiltonCycle(node))//si el nodo vecino retorna un ciclo
+                    {
+
+                        // nodesPath.Add(workingNode);
+                        Edge edge = aListGraph.thisEdge(workingNode, node);
+                        pathOfNodes.Add(workingNode);
+                        pathToAnimate.Add(edge);
+                        return true;
+                    }
+                    else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
+                        aListGraph.restoreNotVisited(notVisitedYet);//restaturacion.
+                }
+
+            }
+
+            //no se encontro nigun ciclo.
+            return false;
+        }//DFS_Any_HamiltonCycle(END).
 
 
 
-        Boolean DFSHamiltonCycle(Node workingNode/*int v, bool visited[]*/)
+
+
+
+
+       
+
+
+ Boolean DFSHamiltonCycle(Node workingNode/*int v, bool visited[]*/)
         {
             // Mark the current node as visited
             // pathOfNodes.Add(workingNode);
@@ -1681,7 +1739,75 @@ namespace editorDeGrafos
                 }
             }
         }
-      
+
+
+
+        int DFS_Any_HamiltonCycleOrPath(Node workingNode)//recursive function.
+        {
+            workingNode.Visitado = true;
+            List<Node> notVisitedYet = aListGraph.notVisitedList();
+            List<Node> neightboors = aListGraph.neighborListNode(workingNode);
+            if (notVisitedYet.Count() < 1)// si todos los nodos han sido visitados
+            {
+                if (neightboors.Contains(initialNodePath) && initialNodePath == finalNodePath)// si cumple el ciclo y se busca el ciclo.
+                {
+                    Edge edge = aListGraph.thisEdge(workingNode, initialNodePath);
+                    pathToAnimate.Add(edge);
+                    pathOfNodes.Add(initialNodePath);
+                    pathOfNodes.Add(workingNode);
+                    return 2;
+                }
+                else
+                {
+                    pathOfNodes.Add(workingNode);
+                    return 1;
+                }
+
+            }
+            else if (notVisitedYet.Count() == 1 && neightboors.Contains(finalNodePath) && notVisitedYet.Contains(finalNodePath))
+            {
+                int res = DFS_Any_HamiltonCycleOrPath(finalNodePath);
+                if (res > 0)
+                {
+                    Edge edge = aListGraph.thisEdge(workingNode, finalNodePath);
+                    pathOfNodes.Add(workingNode);
+                    pathToAnimate.Add(edge);
+                    return res;
+                }
+            }
+
+
+            neightboors.Sort(delegate (Node x, Node y)
+            {
+                return aListGraph.neighborListNodeNoVisited(x).Count().CompareTo(aListGraph.neighborListNodeNoVisited(y).Count());
+            });
+
+            foreach (Node node in neightboors)
+            {
+                if (node.Visitado == false && node != finalNodePath)
+                {
+                    int res = DFS_Any_HamiltonCycleOrPath(finalNodePath);
+                    if (res > 0)
+                    {
+
+                        // nodesPath.Add(workingNode);
+                        Edge edge = aListGraph.thisEdge(workingNode, node);
+                        pathOfNodes.Add(workingNode);
+                        pathToAnimate.Add(edge);
+                        return res;
+                    }
+                    else
+                        aListGraph.restoreNotVisited(notVisitedYet);
+                }
+
+            }
+
+            return 0;
+        }//DFS_Any_HamiltonCycle(END).
+
+
+
+
         public Boolean pathOfHamiltonBool()
         {
             Boolean res = false;
@@ -1719,7 +1845,15 @@ namespace editorDeGrafos
 
             pathOfNodes.Add(initialNodePath);
             aListGraph.markAllNodeAndEdgesNotVisited();
-            return DFSHamiltonPath(initialNodePath);
+            //return DFSHamiltonPath(initialNodePath);
+            if(DFS_Any_HamiltonCycleOrPath(initialNodePath)>0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 
         }
 
@@ -2253,5 +2387,18 @@ namespace editorDeGrafos
             }
         }
 
+
+        Boolean directLinking = false;
+        Boolean undirectLinking = false;
+
+        private void directToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            directLinking = !directLinking;
+        }
+
+        private void undirectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            undirectLinking = !undirectLinking;
+        }
     }//Form.
 }//namespace.
