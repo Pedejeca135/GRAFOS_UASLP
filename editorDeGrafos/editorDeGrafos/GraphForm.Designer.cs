@@ -212,7 +212,7 @@
             this.moveAllAToolStripMenuItem.Name = "moveAllAToolStripMenuItem";
             this.moveAllAToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.moveAllAToolStripMenuItem.Text = "Move All (A)";
-            this.moveAllAToolStripMenuItem.Click += new System.EventHandler(this.moveAllAToolStripMenuItem_Click);
+            this.moveAllAToolStripMenuItem.Click += new System.EventHandler(this.MoveAll_Click);
             // 
             // removeXToolStripMenuItem
             // 
@@ -236,21 +236,21 @@
             this.linkingToolStripMenuItem.Name = "linkingToolStripMenuItem";
             this.linkingToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.linkingToolStripMenuItem.Text = "Linking";
-            this.linkingToolStripMenuItem.Click += new System.EventHandler(this.linkingToolStripMenuItem_Click);
+            this.linkingToolStripMenuItem.Click += new System.EventHandler(this.linking_Click);
             // 
             // undirectToolStripMenuItem
             // 
             this.undirectToolStripMenuItem.Name = "undirectToolStripMenuItem";
             this.undirectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.undirectToolStripMenuItem.Text = "Undirect (U)";
-            this.undirectToolStripMenuItem.Click += new System.EventHandler(this.undirectToolStripMenuItem_Click);
+            this.undirectToolStripMenuItem.Click += new System.EventHandler(this.linking_D_Click);
             // 
             // directToolStripMenuItem
             // 
             this.directToolStripMenuItem.Name = "directToolStripMenuItem";
             this.directToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.directToolStripMenuItem.Text = "Direct (D)";
-            this.directToolStripMenuItem.Click += new System.EventHandler(this.directToolStripMenuItem_Click);
+            this.directToolStripMenuItem.Click += new System.EventHandler(this.linking_U_Click);
             // 
             // viewToolStripMenuItem
             // 

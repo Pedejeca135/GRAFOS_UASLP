@@ -48,6 +48,7 @@
             this.Controls.Add(this.richTextBox1);
             this.Name = "pruebas";
             this.Text = "pruebas";
+            this.Load += new System.EventHandler(this.pruebas_Load);
             this.ResumeLayout(false);
 
         }

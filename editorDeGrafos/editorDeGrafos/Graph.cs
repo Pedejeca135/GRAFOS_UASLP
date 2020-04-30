@@ -27,6 +27,8 @@ namespace editorDeGrafos
 
         private List<Edge> cicleEdgeList_G = new List<Edge>();// all cicled Edges.
 
+        private List<int> IDList_G;//list of created IDs.
+
 
         /*******************************************************************
          * 
@@ -37,11 +39,13 @@ namespace editorDeGrafos
          * *****************************************************************/
         public Graph()
         {
+            commonCostructor();
             graph = new List<List<NodeRef>>();
         }
 
         Graph(List<List<NodeRef>> graph, List<Node> nodeList, List<Edge> edgeList)
         {
+            commonCostructor();
             this.graph = graph;
             this.nodeList_G = nodeList;
             this.edgeList_G = edgeList;
@@ -49,11 +53,18 @@ namespace editorDeGrafos
 
         Graph(List<List<NodeRef>> graph, List<Node> nodeList, List<Edge> edgeList, List<Edge> diEdgeList, List<Edge> cicleEdgeList)
         {
+            commonCostructor();
             this.graph = graph;
             this.nodeList_G = nodeList;
             this.edgeList_G = edgeList;
             this.diEdgeList_G = diEdgeList;
             this.cicleEdgeList_G = cicleEdgeList;
+        }
+
+        private void commonCostructor()// for all common variables.
+        {
+            IDList_G = new List<int>();
+            IDList_G.Add(1000);
         }
 
         /*********************************************************
@@ -104,6 +115,12 @@ namespace editorDeGrafos
             set { this.cicleEdgeList_G = value; }
         }
 
+        public List<int> ID_LIST
+        {
+            get { return this.IDList_G; }
+            set { this.IDList_G = value; }
+        }
+
         /********************************************************
          * 
          * 
@@ -112,7 +129,45 @@ namespace editorDeGrafos
          * 
          * ******************************************************/
 
-        /********************** Basics Operations **************************/
+        /********************** Basics Operations(Begin) **************************/
+        public void create(Coordenate cor, int generalRadius)
+        {
+            Coordenate newNodePosition = new Coordenate(cor.X, cor.Y);
+            Node newNode;            
+            newNode = new Node(newNodePosition, generalRadius, this.nodeList_G.Count(), this.createID());
+            this.addNode(newNode);
+        }
+
+        public void create(Coordenate cor, int generalRadius, Color color)
+        {
+            Coordenate newNodePosition = new Coordenate(cor.X, cor.Y);
+            Node newNode;            
+            newNode = new Node(newNodePosition, generalRadius, this.nodeList_G.Count(), this.createID(), color);
+            this.addNode(newNode);
+        }
+
+        private int createID()//crea un id diferente a cualquiera de la lista de nodos
+        {
+            Boolean different;
+            int res;
+            Random random = new Random();
+
+            do
+            {
+                different = true;
+                res = random.Next(1000, 9999);
+                foreach (int num in this.IDList_G)//ID list should be a tree so the time-complexity to compruebe the exixtence of the random number generated could decresse
+                {
+                    if (res == num)
+                    {
+                        different = false;
+                        break;//doesn't make sense continuing serching. Basic heuristic avrd.
+                    }
+                }
+            }
+            while (different == false);
+            return res;
+        }
 
         public void addNode(Node nodo)
         {
@@ -286,10 +341,10 @@ namespace editorDeGrafos
             cicleEdgeList_G = newEdges;
         }
 
+/********************** Basics Operations (End) **************************/
 
 
-
-        /*************************  Information  ***************************/
+        /*************************  Information (Begin)  ***************************/
         public int Grade()
         {
             int res = 0;
