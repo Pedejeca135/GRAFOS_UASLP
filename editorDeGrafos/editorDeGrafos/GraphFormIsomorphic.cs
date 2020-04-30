@@ -10,11 +10,11 @@ using System.Windows.Forms;
 
 namespace editorDeGrafos
 {
-    public partial class Form2 : Form1
+    public partial class GraphFormIsomorphic : GraphForm
     {
 
-        Form1 f1;
-        public Form2(Form1 father) : base(1)
+        GraphForm f1;
+        public GraphFormIsomorphic(GraphForm father) : base(1)
         {
             InitializeComponent();
             f1 = father;

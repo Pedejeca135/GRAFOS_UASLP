@@ -13,12 +13,12 @@ using System.Drawing.Drawing2D;
 
 namespace editorDeGrafos
 {
-    public partial class Form1 : Form
-    {   
+    public partial class GraphForm : Form
+    {
         /********************* Selected node control ***********************/
         Node selected = null;
         Node selectedJustFor = null;
-        Boolean anyNodeSelected;       
+        Boolean anyNodeSelected;
 
         /*********************  Inner flags ********************/
         Boolean mousePressed;
@@ -29,7 +29,7 @@ namespace editorDeGrafos
         public Graph graph;// -> graph of the form.
 
         /***************** windows and Forms ******************************/
-        Form2 IsomorfismForm;//-> form for isomofism comparison.
+        GraphFormIsomorphic IsomorfismForm;//-> form for isomofism comparison.
         SaveChangesWindow gdc;// -> changes window.
 
         /************************ other variables ********************/
@@ -37,7 +37,7 @@ namespace editorDeGrafos
 
 
         /****************** view Operations ****************************/
-        Boolean matIn = false;    
+        Boolean matIn = false;
 
         /****************************** operations Do ******************
          * 
@@ -80,7 +80,14 @@ namespace editorDeGrafos
         /****************** for Prim     *****************************/
         /****************** for Kruskal  *****************************/
 
-        public Form1()
+        /**********************************************************
+         * 
+         * 
+         *              GraphForm constructor
+         * 
+         * 
+         * *************************************************************************************/
+        public GraphForm()
         {
             InitializeComponent();
             commonCostructor();
@@ -91,7 +98,7 @@ namespace editorDeGrafos
             IsomtextBox.Visible = false;
         }
 
-        public Form1(int equis)
+        public GraphForm(int equis)
         {
             InitializeComponent();
             commonCostructor();
@@ -2106,7 +2113,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             }
             if (IsomorfismForm == null || IsomorfismForm.Visible == false)
             {
-                IsomorfismForm = new Form2(this);
+                IsomorfismForm = new GraphFormIsomorphic(this);
                 IsomorfismForm.Show();
             }
 
