@@ -31,25 +31,25 @@ namespace editorDeGrafos
 
         protected override void fuerzaBrutaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(this.aListGraph != null)
+            if(this.graph != null)
             {
-                changeIsomtextBox( this.aListGraph.Isom_Fuerza_Bruta(f1.aListGraph).ToString());
+                changeIsomtextBox( this.graph.Isom_Fuerza_Bruta(f1.graph).ToString());
             }
         }
 
         protected override void traspuestaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.aListGraph != null)
+            if (this.graph != null)
             {
-                changeIsomtextBox(this.aListGraph.Isom_Traspuesta(f1.aListGraph).ToString());
+                changeIsomtextBox(this.graph.Isom_Traspuesta(f1.graph).ToString());
             }
         }
 
         protected override void intercambioToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.aListGraph != null)
+            if (this.graph != null)
             {
-                changeIsomtextBox(this.aListGraph.Isom_Inter(f1.aListGraph).ToString());
+                changeIsomtextBox(this.graph.Isom_Inter(f1.graph).ToString());
             }
         }
 

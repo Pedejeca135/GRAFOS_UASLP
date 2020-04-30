@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdjacencyList.cs" />
+    <Compile Include="Graph.cs" />
     <Compile Include="Arista.cs" />
     <Compile Include="AskForWeight.cs">
       <SubType>Form</SubType>

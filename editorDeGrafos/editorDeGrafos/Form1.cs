@@ -17,14 +17,9 @@ namespace editorDeGrafos
     {
         Boolean isoForm;
 
-        List<Node> nodeList;
-        List<Edge> edgeList;
-        List<Edge> diEdgeList;
         List<Edge> cicleEdgeList;
 
         //for paths and cicles:
-        List<Edge> eulerPathEdges;
-        List<Node> eulerPathNodes;
         Boolean eulerBoolDo = false;
         List<Edge> pathToAnimate;
 
@@ -35,14 +30,8 @@ namespace editorDeGrafos
         int timerColorOption = 0;
         int tmpCount = 0;
 
-        //Boolean iniBoolClick_H_E = false;
-        //Boolean finBoolClick_H_E = false;
-
-        List<Edge> hamiltonPathEdges;
-        List<Node> hamiltonPathNodes;
+     
         Boolean hamiltonBoolDo = false;
-
-
 
         Node selectedNode;
         Node selected = null;
@@ -51,15 +40,41 @@ namespace editorDeGrafos
         public int generalRadius;
         Boolean anyNodeSelected;
         int indexCount;
-        public AdjacencyList aListGraph;
+        public Graph graph;
         Boolean mousePressed;
         List<int> IDList;
 
-        Boolean allMoving = false;
-        Boolean allDeleting = false;
-        Boolean allMoRe = false;
-        Boolean justSaved = true;
-        String nombreArchivo = "";
+        Boolean justSaved = true;// -> storage saveStateAuxiliar.
+
+
+        /****************************** operations Do ******************
+         * 
+         * sample: Button_key_type. 
+         * 
+         * ************************************************************/
+        Boolean Move_M_Do = false;
+        Boolean MoveAll_A_Do = false;
+        Boolean Remove_R_Do = false;
+        Boolean MoRe_F_Do = false;
+        Boolean Link_D_Do = false;
+        Boolean Link_U_Do = false;
+
+        /******************************** ALGORITMOS EVENTS  **********************************************/
+        //Dos...............................
+        Boolean Isomorfismo_FB_Do = false;
+        Boolean Isomorfismo_TS_Do = false;
+        Boolean Isomorfismo_IN_Do = false;
+        Boolean caminos_Euler_Do = false;
+        Boolean caminos_Hamilton_Do = false;
+        Boolean dijkstra_Do = false;
+        Boolean floyd_Do = false;
+        Boolean warshall_Do = false;
+        Boolean prim_Do = false;
+        Boolean kruskal_Do = false;
+        //Dos--------------------------------
+
+
+        String fileName = "";//   -> fileName
 
         Boolean matIn = false;
         Form2 formaIsomorfismo;// = null;
@@ -91,40 +106,37 @@ namespace editorDeGrafos
 
         private void commonCostructor()
         {
-            generalRadius = 30; //Here you decide the size of the nodes
-            nodeList = new List<Node>();
-            edgeList = new List<Edge>();
-            diEdgeList = new List<Edge>();
-            cicleEdgeList = new List<Edge>();
+            generalRadius = 30; 
 
             selectedNode = new Node();
             anyNodeSelected = false;
             indexCount = 0;
             mousePressed = false;
-            aListGraph = new AdjacencyList();
+            graph = new Graph();
             IDList = new List<int>();
             IDList.Add(1000);
 
 
-            statusTB.Text = "Nombre :" + nombreArchivo;
+            statusTB.Text = "Nombre :" + fileName;
             terminal.Text = "Node selected : ";
 
         }
 
+        /************* tha mouse , tha f()#/&g boss*****************/
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
 
             if (f3.Operation == 1)
             {
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
                 f3.Operation = 0;
              }
 
             
             mousePressed = true;
-            if ((eulerBoolDo || hamiltonBoolDo) && aListGraph.GRAPH.Count() > 1)
+            if ((eulerBoolDo || hamiltonBoolDo) && graph.GRAPH.Count() > 1)
             {
 
                 if (initialNodePath == null || finalNodePath == null)//if any node does not exist.
@@ -140,7 +152,7 @@ namespace editorDeGrafos
                         }
 
 
-                        if (aListGraph.GRAPH.Count() == 1)
+                        if (graph.GRAPH.Count() == 1)
                         {
                             finalNodePath = initialNodePath;
                         }
@@ -192,17 +204,17 @@ namespace editorDeGrafos
 
                 }
             }
-            else if (allMoving || allDeleting || allMoRe)
+            else if (Move_M_Do || Remove_R_Do || MoRe_F_Do)
             {
                 selectedJustFor = findNodeClicked(new Coordenate(e.X, e.Y));
                 selected = selectedJustFor;
 
-                if (allDeleting)
+                if (Remove_R_Do)
                 {
                     //selected = selectedJustFor;
                     eliminate();
                 }
-                if (allMoRe)
+                if (MoRe_F_Do)
                 {
                     //selected = selectedJustFor;
                     if (e.Button == System.Windows.Forms.MouseButtons.Right)
@@ -266,8 +278,8 @@ namespace editorDeGrafos
                                     if (weight >= 0)
                                     {
                                         Edge edge = new Edge(selected, oneNode);
-                                        edgeList.Add(edge);
-                                        aListGraph.addUndirectedEdge(edge, weight);
+                                        
+                                        graph.addUndirectedEdge(edge, weight);
                                         justSaved = false;
                                     }
                                 }
@@ -278,8 +290,8 @@ namespace editorDeGrafos
                                     //int weight = 0;
                                     if (weight >= 0)
                                     {
-                                        diEdgeList.Add(new Edge(selected, oneNode, true));
-                                        aListGraph.addDirectedEdge(selected, oneNode, weight);
+                                        graph.DIEDGE_LIST.Add(new Edge(selected, oneNode, true));
+                                        graph.addDirectedEdge(selected, oneNode, weight);
                                     }
                                 }
                                 InvalidatePlus(1);
@@ -315,7 +327,7 @@ namespace editorDeGrafos
                                     //int weight = 0;
                                     if (weight >= 0)
                                     {
-                                        aListGraph.addDirectedEdge(selected, selected, weight);
+                                        graph.addDirectedEdge(selected, selected, weight);
                                         cicleEdgeList.Add(new Edge(selected));
                                     }
                                     InvalidatePlus(1);
@@ -338,6 +350,10 @@ namespace editorDeGrafos
         * |||||||||||||||||||||||||||||||||||||||||||||||||||||   EVENTS   |||||||||||||||||||||||||||||||||||||||||||||||||||
         * 
         * ***********************************************************************************************************************/
+        
+        /********************** OPERATIONS *****************/
+        Boolean directLinking = false;
+        Boolean undirectLinking = false;       
 
         public void closeIsoFormClicked(object sender, EventArgs e)
         {
@@ -350,6 +366,11 @@ namespace editorDeGrafos
             keyA_OR_MoveClick();
         }
 
+        private void moveAllAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private void Remove_Click(object sender, EventArgs e)
         {
             keyX_OR_RemoveClick();
@@ -359,6 +380,40 @@ namespace editorDeGrafos
         {
             keyF_OR_MoRe();
         }
+
+        private void linkingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void directToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            directLinking = !directLinking;
+        }
+
+        private void undirectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            undirectLinking = !undirectLinking;
+        }
+
+        /*********************  View **********************/
+        private void maIn_Click(object sender, EventArgs e)
+        {
+            if (f3.Operation == 1)
+            {
+                graph.allBlack();
+                Invalidate();
+                f3.Operation = 0;
+            }
+
+            if (matIn)
+                matIn = false;
+            else
+                matIn = true;
+            InvalidatePlus();
+        }
+
+        /*********************** file Operations ********************************/
 
         private void Save_Click(object sender, EventArgs e)
         {
@@ -387,40 +442,32 @@ namespace editorDeGrafos
             }
         }
 
+
+        // when load a graph we need to regenerate all the parts of the graph, 
+        //if it is no possible to load, the values are retored.
         private void loadCommonActions()
         {
-            
-            
-            List<Node> nodeList_BU = nodeList;
-            AdjacencyList aListGraph_BU = aListGraph;
-            List<Edge> diEdgeList_BU = diEdgeList;
-            List<Edge> edgeList_BU = edgeList;
-            List<Edge> cicleEdgeList_BU = cicleEdgeList;
+            Graph graph_BU = graph;
+            List<Node> nodeList_BU = graph.NODE_LIST;
+            List<Edge> edgeList_BU = graph.EDGE_LIST;
+            List<Edge> diEdgeList_BU = graph.DIEDGE_LIST;            
+            List<Edge> cicleEdgeList_BU = graph.CIEDGE_LIST;
 
-            List<Node> listOfNodes = aListGraph.listOfNodes_IG ;
-            List<Edge> listOfEdges  = aListGraph.listOfEdges_IG;
+            graph = new Graph();
+            graph.NODE_LIST = new List<Node>();
+            graph.EDGE_LIST = new List<Edge>();
+            graph.DIEDGE_LIST = new List<Edge>();            
+            graph.CIEDGE_LIST = new List<Edge>();
 
-            nodeList = new List<Node>();
-            aListGraph = new AdjacencyList();
-            diEdgeList = new List<Edge>();
-            edgeList = new List<Edge>();
-            cicleEdgeList = new List<Edge>();
-
-            aListGraph.listOfNodes_IG = new List<Node>();
-            aListGraph.listOfEdges_IG = new List<Edge>();
-
-            if (openFile() == 0)
+            if (openFile() == 0)//couldn't open
             {
-                nodeList = nodeList_BU;
-                aListGraph = aListGraph_BU;
-                diEdgeList = diEdgeList_BU;
-                edgeList = edgeList_BU;
-                cicleEdgeList = cicleEdgeList_BU;
-
-                aListGraph.listOfNodes_IG = listOfNodes;
-                aListGraph.listOfEdges_IG = listOfEdges;
+                graph = graph_BU;
+                graph.NODE_LIST = nodeList_BU;
+                graph.EDGE_LIST = edgeList_BU;
+                graph.DIEDGE_LIST = diEdgeList_BU;                
+                graph.CIEDGE_LIST = cicleEdgeList_BU;
             }
-            else
+            else//it was opened succesfully
             {
                 InvalidatePlus();
                 justSaved = true;
@@ -443,13 +490,12 @@ namespace editorDeGrafos
                     {
                         saveFile();
                     }
-                    foreach (Node node in nodeList)
+                    foreach (Node node in graph.NODE_LIST)
                     {
-                        eliminateNexetEdges(node);
-                        aListGraph.eliminateNexetEdges(node);
+                        graph.eliminateNexetEdges(node);
                         //eliminateNexetDirectedEdges(node);
                     }
-                    nodeList = new List<Node>();
+                    graph.NODE_LIST = new List<Node>();
                     justSaved = true;
                 }
             }
@@ -472,13 +518,13 @@ namespace editorDeGrafos
                 selected.Position.Y = e.Y;
                 InvalidatePlus(1);
             }
-            if (mousePressed == true && allMoving == true && selectedJustFor != null)
+            if (mousePressed == true && Move_M_Do == true && selectedJustFor != null)
             {
                 selectedJustFor.Position.X = e.X;
                 selectedJustFor.Position.Y = e.Y;
                 InvalidatePlus(1);
             }
-            if (mousePressed == true && e.Button == MouseButtons.Left && allMoRe == true && selectedJustFor != null)
+            if (mousePressed == true && e.Button == MouseButtons.Left && MoRe_F_Do == true && selectedJustFor != null)
             {
                 selectedJustFor.Position.X = e.X;
                 selectedJustFor.Position.Y = e.Y;
@@ -527,15 +573,15 @@ namespace editorDeGrafos
 
         public void commonInvalidateActions()
         {
-            matrixTB.Text = aListGraph.ToString(matIn);
+            matrixTB.Text = graph.ToString(matIn);
 
             if (selected != null)
             {
                 terminal.Text = "Node selected : " + System.Environment.NewLine + "ID = " + selected.ID + System.Environment.NewLine + "Index = " + selected.Index + "\t" + System.Environment.NewLine;
-                if (aListGraph.Directed() == true)
+                if (graph.Directed() == true)
                 {
                     DirectedGrade dG;
-                    dG = aListGraph.GradeOfDirectedNode(selected);
+                    dG = graph.GradeOfDirectedNode(selected);
                     terminal.Text += "Grado(Nodo): " + dG.Total;
                     terminal.Text += System.Environment.NewLine;
                     terminal.Text += "  GradoEntrada ( [<-] ): " + dG.Input;
@@ -544,25 +590,25 @@ namespace editorDeGrafos
                 }
                 else
                 {
-                    terminal.Text += "Grado(Nodo): " + aListGraph.GradeOfNode(selected);
+                    terminal.Text += "Grado(Nodo): " + graph.GradeOfNode(selected);
                 }
             }
             else
             {
                 terminal.Text = "Node selected : ";
             }
-            statusTB.Text = "Nombre :" + nombreArchivo + System.Environment.NewLine;
-            statusTB.Text += "Grado(Grafo) : " + aListGraph.Grade();
+            statusTB.Text = "Nombre :" + fileName + System.Environment.NewLine;
+            statusTB.Text += "Grado(Grafo) : " + graph.Grade();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Dirigido : " + aListGraph.Directed();
+            statusTB.Text += "Dirigido : " + graph.Directed();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Completo : " + aListGraph.Complete();
+            statusTB.Text += "Completo : " + graph.Complete();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Pseudo: " + aListGraph.Pseudo();
+            statusTB.Text += "Pseudo: " + graph.Pseudo();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Cíclico : " + aListGraph.Cicled();
+            statusTB.Text += "Cíclico : " + graph.Cicled();
             statusTB.Text += System.Environment.NewLine;
-            statusTB.Text += "Bipartita : " + aListGraph.Bip();
+            statusTB.Text += "Bipartita : " + graph.Bip();
             statusTB.Text += System.Environment.NewLine;
 
             if ((formaIsomorfismo == null || (formaIsomorfismo != null && formaIsomorfismo.Visible == false)) && isoForm == false)
@@ -588,24 +634,17 @@ namespace editorDeGrafos
             penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor;
             penDirect.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
 
-
-            /*foreach (Edge edge in edgeList)//undirected edges.
-             {
-                 pen2 = new Pen(edge.COLOR, 5);
-                 graphics.DrawLine(pen2, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
-             }*/
-            foreach (Edge edge in aListGraph.listOfEdges_IG)//undirected edges.
+            foreach (Edge edge in graph.EDGE_LIST)//undirected edges.
             {
                 pen2 = new Pen(edge.COLOR, 5);
                 graphics.DrawLine(pen2, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
             }
 
-            foreach (Edge edge in cicleEdgeList)//cicled edge.
+            foreach (Edge edge in graph.CIEDGE_LIST)//cicled edge.
             {
                 Point StartPoint = new Point(edge.A.X, edge.A.Y);
                 Point unoP = new Point(edge.A.X - generalRadius * 4, edge.A.Y - generalRadius * 4);
                 Point dosP = new Point(edge.A.X - generalRadius * 4, edge.A.Y + generalRadius * 4);
-                //graphics.DrawBezier(pen, StartPoint,unoP,dosP,StartPoint);
                 GraphicsPath gPath = new GraphicsPath();
                 gPath.AddBezier(StartPoint, unoP, dosP, StartPoint);
                 e.Graphics.DrawPath(pen, gPath);
@@ -613,23 +652,17 @@ namespace editorDeGrafos
 
             Double equis_X;
             Double ye_Y;
-            foreach (Edge edge in diEdgeList)//directed edges.
+            foreach (Edge edge in graph.DIEDGE_LIST)//directed edges.
             {
                 Double rate = edge.Distancia / generalRadius;
                 equis_X = (edge.A.X + rate * edge.B.X) / (1 + rate);
                 ye_Y = (edge.A.Y + rate * edge.B.Y) / (1 + rate);
-                //graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
-                graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, (float)equis_X, (float)ye_Y);
-                //int difFromCenterToPin = (int)Math.Pow((generalRadius / 2.0), 0.5);
-                //Coordenate pinOfEdge = new Coordenate(edge.B.X-difFromCenterToPin, edge.B.Y-difFromCenterToPin);              
-
-
-                //graphics.DrawLine(penDirect, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X-generalRadius/2 , pinOfEdge.Y);
-                //graphics.DrawLine(penDirect, pinOfEdge.X, pinOfEdge.Y, pinOfEdge.X, pinOfEdge.Y - generalRadius / 2);               
+                graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, (float)equis_X, (float)ye_Y);                               
             }
-            for (int i = 0; i < aListGraph.GRAPH.Count; i++)//Nodes.
+
+            for (int i = 0; i < graph.GRAPH.Count; i++)//Nodes.
             {
-                NodeRef nod = aListGraph.GRAPH[i][i];
+                NodeRef nod = graph.GRAPH[i][i];
                 rectangle = new Rectangle(nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
                 graphics.FillEllipse(brush, rectangle);
                 pen = new Pen(nod.NODO.COLOR, 5);
@@ -640,17 +673,6 @@ namespace editorDeGrafos
                 int fontSize = generalRadius - 10;
                 graphics.DrawString(index_S, new Font(FontFamily.GenericSansSerif, fontSize), new SolidBrush(Color.Black), nod.NODO.Position.X - (fontSize / 2), nod.NODO.Position.Y - (fontSize / 2));
             }
-
-            /*
-            foreach (Node node in nodeList)
-            {
-                rectangle = new Rectangle(node.Position.X - node.Radius, node.Position.Y - node.Radius, node.Radius * 2, node.Radius * 2);
-                graphics.FillEllipse(brush, rectangle);
-                pen = new Pen(node.COLOR, 5);
-                graphics.DrawEllipse(pen, node.Position.X - node.Radius, node.Position.Y - node.Radius, node.Radius * 2, node.Radius * 2);
-
-            }
-            */
         }
 
         /*************************************************************************************************************************
@@ -696,12 +718,12 @@ namespace editorDeGrafos
             int index;
             int uniqueID;
             */
-            foreach (Node node in aListGraph.LIST_NODES)//all about the node
+            foreach (Node node in graph.NODE_LIST)//all about the node
             {
                 sw.WriteLine(node.ID + "," + node.Index + "," + node.Position.X + "," + node.Position.Y + "," + node.Radius);
             }
             sw.WriteLine("Matrix");
-            foreach (List<NodeRef> row in aListGraph.GRAPH)
+            foreach (List<NodeRef> row in graph.GRAPH)
             {
                 foreach (NodeRef nodeR in row)
                 {
@@ -710,12 +732,12 @@ namespace editorDeGrafos
                 sw.WriteLine();
             }
             sw.WriteLine("Edges");
-            foreach (Edge edge in aListGraph.listOfEdges_IG)
+            foreach (Edge edge in graph.EDGE_LIST)
             {
                 sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
             }
             sw.WriteLine("D_Edges");
-            foreach (Edge edge in diEdgeList)
+            foreach (Edge edge in graph.DIEDGE_LIST)
             {
                 sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
             }
@@ -760,8 +782,8 @@ namespace editorDeGrafos
 
                     Coordenate cor = new Coordenate(x, y);
                     Node node = new Node(cor, radiusON, indexON, idON);
-                    aListGraph.addNode(node);
-                    nodeList.Add(node);
+                    graph.addNode(node);
+                    //nodeList.Add(node);
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
                 if (Input[0] == "Matrix")
@@ -777,7 +799,7 @@ namespace editorDeGrafos
                     for (int j = 0; j < Input.Length; j++)
                     {
                         int.TryParse(Input[j], out Peso);
-                        aListGraph.GRAPH[i][j].W = Peso;
+                        graph.GRAPH[i][j].W = Peso;
                     }
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                     i++;
@@ -796,21 +818,21 @@ namespace editorDeGrafos
                     int nodo_S;
                     int.TryParse(Input[0], out nodo_S);
 
-                    for (int j = 0; j < aListGraph.GRAPH.Count; j++)
+                    for (int j = 0; j < graph.GRAPH.Count; j++)
                     {
-                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_C)
+                        if (graph.GRAPH[j][j].NODO.Index == nodo_C)
                         {
-                            client = aListGraph.GRAPH[j][j].NODO;
+                            client = graph.GRAPH[j][j].NODO;
                         }
-                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_S)
+                        if (graph.GRAPH[j][j].NODO.Index == nodo_S)
                         {
-                            server = aListGraph.GRAPH[j][j].NODO;
+                            server = graph.GRAPH[j][j].NODO;
                         }
                     }
 
                     Edge edge = new Edge(server, client);
-                    edgeList.Add(edge);
-                    aListGraph.addUndirectedEdge(edge);
+                    //edgeList.Add(edge);
+                    graph.addUndirectedEdge(edge);
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
                 if (Input[0] == "D_Edges" && !sr.EndOfStream)
@@ -827,20 +849,20 @@ namespace editorDeGrafos
                     int nodo_S;
                     int.TryParse(Input[0], out nodo_S);
 
-                    for (int j = 0; j < aListGraph.GRAPH.Count; j++)
+                    for (int j = 0; j < graph.GRAPH.Count; j++)
                     {
-                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_C)
+                        if (graph.GRAPH[j][j].NODO.Index == nodo_C)
                         {
-                            client = aListGraph.GRAPH[j][j].NODO;
+                            client = graph.GRAPH[j][j].NODO;
                         }
-                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_S)
+                        if (graph.GRAPH[j][j].NODO.Index == nodo_S)
                         {
-                            server = aListGraph.GRAPH[j][j].NODO;
+                            server = graph.GRAPH[j][j].NODO;
                         }
                     }
 
                     Edge edge = new Edge(server, client);
-                    diEdgeList.Add(edge);
+                    graph.DIEDGE_LIST.Add(edge);
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
                 if (Input[0] == "C_Edges" && !sr.EndOfStream)
@@ -854,11 +876,11 @@ namespace editorDeGrafos
                     int nodo_S;
                     int.TryParse(Input[0], out nodo_S);
 
-                    for (int j = 0; j < aListGraph.GRAPH.Count; j++)
+                    for (int j = 0; j < graph.GRAPH.Count; j++)
                     {
-                        if (aListGraph.GRAPH[j][j].NODO.Index == nodo_S)
+                        if (graph.GRAPH[j][j].NODO.Index == nodo_S)
                         {
-                            server = aListGraph.GRAPH[j][j].NODO;
+                            server = graph.GRAPH[j][j].NODO;
                         }
                     }
 
@@ -897,11 +919,14 @@ namespace editorDeGrafos
             return statusRes;
         }
 
-        public void keyA_OR_MoveClick()
+        /********************* common key-operations ****************************/
+
+
+        public void keyA_OR_MoveClick()//
         {
             if (f3.Operation == 1)
             {
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
                 f3.Operation = 0;
             }
@@ -911,23 +936,23 @@ namespace editorDeGrafos
                 deselect();
             }
 
-            if (allMoving)
+            if (Move_M_Do)
             {
-                foreach (Node node in nodeList)
+                foreach (Node node in graph.NODE_LIST)
                 {
                     node.COLOR = Color.Black;
                 }
-                allMoving = (!allMoving);
+                Move_M_Do = (!Move_M_Do);
             }
             else
             {
-                if (allDeleting == false && allMoRe == false)
+                if (Remove_R_Do == false && MoRe_F_Do == false)
                 {
-                    foreach (Node node in nodeList)
+                    foreach (Node node in graph.NODE_LIST)
                     {
                         node.COLOR = Color.Green;
                     }
-                    allMoving = (!allMoving);
+                    Move_M_Do = (!Move_M_Do);
                 }
             }
             InvalidatePlus(1);
@@ -938,7 +963,7 @@ namespace editorDeGrafos
         {
             if (f3.Operation == 1)
             {
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
                 f3.Operation = 0;
             }
@@ -947,23 +972,23 @@ namespace editorDeGrafos
                 deselect();
             }
 
-            if (allDeleting)
+            if (Remove_R_Do)
             {
-                foreach (Node node in nodeList)
+                foreach (Node node in graph.NODE_LIST)
                 {
                     node.COLOR = Color.Black;
                 }
-                allDeleting = (!allDeleting);
+                Remove_R_Do = (!Remove_R_Do);
             }
             else
             {
-                if (allMoving == false && allMoRe == false)
+                if (Move_M_Do == false && MoRe_F_Do == false)
                 {
-                    foreach (Node node in nodeList)
+                    foreach (Node node in graph.NODE_LIST)
                     {
                         node.COLOR = Color.Red;
                     }
-                    allDeleting = (!allDeleting);
+                    Remove_R_Do = (!Remove_R_Do);
                 }
             }
             deselect();
@@ -974,7 +999,7 @@ namespace editorDeGrafos
         {
             if (f3.Operation == 1)
             {
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
                 f3.Operation = 0;
             }
@@ -983,23 +1008,23 @@ namespace editorDeGrafos
                 deselect();
             }
 
-            if (allMoRe)
+            if (MoRe_F_Do)
             {
-                foreach (Node node in nodeList)
+                foreach (Node node in graph.NODE_LIST)
                 {
                     node.COLOR = Color.Black;
                 }
-                allMoRe = (!allMoRe);
+                MoRe_F_Do = (!MoRe_F_Do);
             }
             else
             {
-                if (allDeleting == false && allMoving == false)
+                if (Remove_R_Do == false && Move_M_Do == false)
                 {
-                    foreach (Node node in nodeList)
+                    foreach (Node node in graph.NODE_LIST)
                     {
                         node.COLOR = Color.Indigo;
                     }
-                    allMoRe = (!allMoRe);
+                    MoRe_F_Do = (!MoRe_F_Do);
                 }
             }
             deselect();
@@ -1010,7 +1035,7 @@ namespace editorDeGrafos
         {
             Node resNode = null;
 
-            foreach (Node onNode in nodeList)
+            foreach (Node onNode in graph.NODE_LIST)
             {
                 if (cor.X > onNode.Position.X - onNode.Radius //for conditions in order to determine wheter or not , a click hit the specific node
                    && cor.X < onNode.Position.X + onNode.Radius
@@ -1036,18 +1061,17 @@ namespace editorDeGrafos
 
         public void eliminate()
         {
-            if (aListGraph.GRAPH.Count <= 1)
+            if (graph.GRAPH.Count <= 1)
                 justSaved = true;
 
             if (selected != null)
             {
-                eliminateNexetEdges(selected);
-                aListGraph.eliminateNexetEdges(selected);
+                graph.eliminateNexetEdges(selected);
                 eliminateNexetDirectedEdges(selected);
                 eliminateCicledEdges(selected);
 
-                aListGraph.removeNode(selected);
-                nodeList.Remove(selected);
+                graph.removeNode(selected);
+                //nodeList.Remove(selected);
                 selected = null;
                 anyNodeSelected = false;
                 indexCount--;
@@ -1059,17 +1083,17 @@ namespace editorDeGrafos
         {
             Coordenate newNodePosition = new Coordenate(cor.X, cor.Y);
             Node newNode;
-            if (allMoRe)
+            if (MoRe_F_Do)
             {
-                newNode = new Node(newNodePosition, generalRadius, aListGraph.GRAPH.Count(), this.uniqueID(), Color.Indigo);
+                newNode = new Node(newNodePosition, generalRadius, graph.GRAPH.Count(), this.uniqueID(), Color.Indigo);
             }
             else
             {
-                newNode = new Node(newNodePosition, generalRadius, aListGraph.GRAPH.Count(), this.uniqueID());
+                newNode = new Node(newNodePosition, generalRadius, graph.GRAPH.Count(), this.uniqueID());
             }
             indexCount++;
-            nodeList.Add(newNode);
-            aListGraph.addNode(newNode);
+            //nodeList.Add(newNode);
+            graph.addNode(newNode);
             InvalidatePlus(1);
         }
 
@@ -1104,33 +1128,18 @@ namespace editorDeGrafos
             return weight;
         }
 
-
-        public void eliminateNexetEdges(Node node)
-        {
-            List<Edge> newEdges = new List<Edge>();
-
-            foreach (Edge edge in edgeList)
-            {
-                if (edge.Client != node && edge.Server != node)
-                {
-                    newEdges.Add(edge);
-                }
-            }
-            edgeList = newEdges;
-        }
-
         public void eliminateNexetDirectedEdges(Node node)
         {
             List<Edge> newEdges = new List<Edge>();
 
-            foreach (Edge edge in diEdgeList)
+            foreach (Edge edge in graph.DIEDGE_LIST)
             {
                 if (edge.Client != node && edge.Server != node)
                 {
                     newEdges.Add(edge);
                 }
             }
-            diEdgeList = newEdges;
+            graph.DIEDGE_LIST = newEdges;
         }
 
         public void eliminateCicledEdges(Node node)
@@ -1161,7 +1170,7 @@ namespace editorDeGrafos
          * 
          * **********************************************/
 
-        AdjacencyList aux;
+        Graph aux;
         List<Edge> cutEdges;
 
         List<Node> estimadedIniFinNodes;
@@ -1180,7 +1189,7 @@ namespace editorDeGrafos
             {
                 //deploy a OK form to finish.
                 MessageBox.Show("no hay circuito de Euler");
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
             }
             else//a trabajar
@@ -1191,7 +1200,7 @@ namespace editorDeGrafos
                 {
                     //deploy a OK form to finish.
                     MessageBox.Show("no hay circuito de Euler");
-                    aListGraph.allBlack();
+                    graph.allBlack();
                     Invalidate();
                 }
                 else
@@ -1221,9 +1230,9 @@ namespace editorDeGrafos
            // aux = new AdjacencyList();
             workingNodes = new List<Node>();
 
-            foreach (Node node in nodeList)
+            foreach (Node node in graph.NODE_LIST)
             {
-                int degreeByN = aListGraph.neighborListNode(node).Count();
+                int degreeByN = graph.neighborListNode(node).Count();
 
                 if (degreeByN > 0)//atleast one neightboor
                 {
@@ -1252,17 +1261,17 @@ namespace editorDeGrafos
         {
             List<Edge> res = new List<Edge>();
             List<Edge> edgeListInside = new List<Edge>();
-            edgeListInside = edgeList;
+            edgeListInside = graph.EDGE_LIST;
             pathOfNodes = new List<Node>();
             pathToAnimate = new List<Edge>();
 
             cutEdges = new List<Edge>();
 
-            aListGraph.markAllLikeNotBridge();
-            aListGraph.markAllLikeNotVisited(1);
+            graph.markAllLikeNotBridge();
+            graph.markAllLikeNotVisited(1);
            
 
-            foreach (Edge edge in aListGraph.listOfEdges_IG)
+            foreach (Edge edge in graph.EDGE_LIST)
             {
                 if (isABridgeBool(edge))
                 {
@@ -1271,7 +1280,7 @@ namespace editorDeGrafos
             }
 
             // Mark all the vertices as not visited 
-            aListGraph.markAllLikeNotVisited();
+            graph.markAllLikeNotVisited();
 
             // Start DFS traversal from a vertex with non-zero degree 
 
@@ -1288,16 +1297,16 @@ namespace editorDeGrafos
 
             List<Node> dejaAlFinal = new List<Node>();
 
-            foreach (Node node in aListGraph.neighborListNode(workingNode))
+            foreach (Node node in graph.neighborListNode(workingNode))
             {
                 //if(node.Visitado == false)
                 //{
-               Edge edge= aListGraph.thisEdge(workingNode,node);
+               Edge edge= graph.thisEdge(workingNode,node);
                    // foreach (Edge edge in aListGraph.listOfEdges_IG)// edgeList)
                    // {
                     if (edge.visitada == false )
                         {
-                            if (isABridgeVisitedsBool(edge,aListGraph))//cutEdges.Contains(edge))//||edge.Bridge == true)
+                            if (isABridgeVisitedsBool(edge,graph))//cutEdges.Contains(edge))//||edge.Bridge == true)
                             {
                                 dejaAlFinal.Add(node);
                             }
@@ -1321,7 +1330,7 @@ namespace editorDeGrafos
             {
                // if (node.Visitado == false)
                 //{
-                    foreach (Edge edge in aListGraph.listOfEdges_IG)
+                    foreach (Edge edge in graph.EDGE_LIST)
                     {
                         if (edge.isThisUndirected(workingNode, node) && edge.visitada == false)
                         {
@@ -1336,11 +1345,11 @@ namespace editorDeGrafos
                 //}
             }
 
-            if (aListGraph.neighborListNode(workingNode).Contains(finalNodePath))
+            if (graph.neighborListNode(workingNode).Contains(finalNodePath))
             {
-                Edge edgeFinal = aListGraph.thisEdge(workingNode,finalNodePath);
+                Edge edgeFinal = graph.thisEdge(workingNode,finalNodePath);
 
-                if (aListGraph.allVisitedExept(edgeFinal) && edgeFinal.visitada == false)
+                if (graph.allVisitedExept(edgeFinal) && edgeFinal.visitada == false)
                 {
                     edgeFinal.visitada = true;
                     pathToAnimate.Add(edgeFinal);
@@ -1359,24 +1368,24 @@ namespace editorDeGrafos
             {
                 //deploy a OK form to finish.
                 MessageBox.Show("no hay camino de Euler");
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
             }
             else//a trabajar
             {
-                if (aListGraph.neighborListNode(initialNodePath).Count() % 2 == 0 
-                 || aListGraph.neighborListNode(finalNodePath).Count() % 2 == 0)
+                if (graph.neighborListNode(initialNodePath).Count() % 2 == 0 
+                 || graph.neighborListNode(finalNodePath).Count() % 2 == 0)
                 {
                     if (estimadedIniFinNodes.Count()>1)
                     {
                         MessageBox.Show("Existe un camino de Euler pero no el sugerido, intenta con " + estimadedIniFinNodes[0].Index + ","+  estimadedIniFinNodes[1].Index);
-                        aListGraph.allBlack();
+                        graph.allBlack();
                         Invalidate();
                     }
                     else
                     {
                         MessageBox.Show("No existe el camino de Euler");
-                        aListGraph.allBlack();
+                        graph.allBlack();
                         Invalidate();
                     }
                 }
@@ -1400,17 +1409,17 @@ namespace editorDeGrafos
         {
             List<Edge> res = new List<Edge>();
             List<Edge> edgeListInside = new List<Edge>();
-            edgeListInside = edgeList;
+            edgeListInside = graph.EDGE_LIST;
             pathOfNodes = new List<Node>();
             pathToAnimate = new List<Edge>();
 
             cutEdges = new List<Edge>();
 
-            aListGraph.markAllLikeNotBridge();
-            aListGraph.markAllLikeNotVisited(1);
+            graph.markAllLikeNotBridge();
+            graph.markAllLikeNotVisited(1);
 
 
-            foreach (Edge edge in aListGraph.listOfEdges_IG)
+            foreach (Edge edge in graph.EDGE_LIST)
             {
                 if (isABridgeBool(edge))
                 {
@@ -1419,7 +1428,7 @@ namespace editorDeGrafos
             }
 
             // Mark all the vertices as not visited 
-            aListGraph.markAllLikeNotVisited();
+            graph.markAllLikeNotVisited();
 
             // Start DFS traversal from a vertex with non-zero degree 
 
@@ -1433,13 +1442,13 @@ namespace editorDeGrafos
         public Boolean pathOfEulerBool()
         {
             bool res = true;
-            aux = new AdjacencyList();
+            aux = new Graph();
             estimadedIniFinNodes = new List<Node>();
             int oddDegreeCont = 0;
 
-            foreach (Node node in nodeList)
+            foreach (Node node in graph.NODE_LIST)
             {
-                int degreeByN = aListGraph.neighborListNode(node).Count();
+                int degreeByN = graph.neighborListNode(node).Count();
 
                 if (degreeByN > 0)//atleast one neightboor
                 {
@@ -1452,7 +1461,7 @@ namespace editorDeGrafos
                 }
             }
 
-            if (aux.LIST_NODES.Count() > 0)
+            if (aux.NODE_LIST.Count() > 0)
             {
                 if (oddDegreeCont != 2)
                 {
@@ -1477,7 +1486,7 @@ namespace editorDeGrafos
             if (!cycleOfHamiltonBool())
             {
                 MessageBox.Show("no hay ciclos de hamilton");
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
             }
             else//a trabajar
@@ -1498,7 +1507,7 @@ namespace editorDeGrafos
                 else
                 {
                     MessageBox.Show("no existe el ciclo de hamilton especificado");
-                    aListGraph.allBlack();
+                    graph.allBlack();
                     Invalidate();
                 }
                    
@@ -1511,12 +1520,12 @@ namespace editorDeGrafos
             Boolean res = true;
 
             //can not have a disconnected node
-            if (!allConected(aListGraph))
+            if (!allConected(graph))
             {
                 return false;
             }
             //not cut vertices
-            foreach (Edge edge in aListGraph.listOfEdges_IG)
+            foreach (Edge edge in graph.EDGE_LIST)
             {
                 if (isABridgeBool(edge))//if any edge is a bridge it return false to hamilton cycle.
                 {
@@ -1524,13 +1533,13 @@ namespace editorDeGrafos
                 }
             }
 
-            foreach (Node node in aListGraph.LIST_NODES)
+            foreach (Node node in graph.NODE_LIST)
             {
-                if (aListGraph.isACutNodeBool(node))//if any node is a cut node return false to hamilton cycle.
+                if (graph.isACutNodeBool(node))//if any node is a cut node return false to hamilton cycle.
                 {
                     return false;
                 }
-                if (aListGraph.neighborListNode(node).Count() < 2)
+                if (graph.neighborListNode(node).Count() < 2)
                 {
                     return false;
                 }
@@ -1546,11 +1555,11 @@ namespace editorDeGrafos
             pathToAnimate = new List<Edge>();
             cutEdges = new List<Edge>();
 
-            aListGraph.markAllLikeNotBridge();
-            aListGraph.markAllLikeNotVisited(1);
+            graph.markAllLikeNotBridge();
+            graph.markAllLikeNotVisited(1);
 
 
-            foreach (Edge edge in aListGraph.listOfEdges_IG)
+            foreach (Edge edge in graph.EDGE_LIST)
             {
                 if (isABridgeBool(edge))
                 {
@@ -1563,7 +1572,7 @@ namespace editorDeGrafos
             // Start DFS traversal from a vertex with non-zero degree 
             //return DFSHamiltonCycle(initialNodePath);
  
-            aListGraph.markAllNodeAndEdgesNotVisited();//marcar todos los nodos y aristas como no visitados.
+            graph.markAllNodeAndEdgesNotVisited();//marcar todos los nodos y aristas como no visitados.
            
             return DFS_Any_HamiltonCycle(initialNodePath);
         }
@@ -1572,15 +1581,15 @@ namespace editorDeGrafos
 Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         {
             workingNode.Visitado= true;//marcar el nodo actual como visitado.
-            List<Node> notVisitedYet = aListGraph.notVisitedList();//nodos sin visitar para restauraciones.
-            List<Node> neightboors = aListGraph.neighborListNode(workingNode);//vecinos del nodo actual.
+            List<Node> notVisitedYet = graph.notVisitedList();//nodos sin visitar para restauraciones.
+            List<Node> neightboors = graph.neighborListNode(workingNode);//vecinos del nodo actual.
 
             /*********************
              *       Caso Base. 
              * *********************/
             if (notVisitedYet.Count() < 1 && neightboors.Contains(initialNodePath))//todos los nodos visitados && el nodo actual tiene de vecino al nodo inicial
             {
-                Edge edge = aListGraph.thisEdge(workingNode, initialNodePath);
+                Edge edge = graph.thisEdge(workingNode, initialNodePath);
                 pathToAnimate.Add(edge);//agrega la arista( actual->inicial) al camino para animar
                 pathOfNodes.Add(initialNodePath);//se agrega por primera vez el nodoInicial(mismo que nodoFinal) al camino de nodos;
                 pathOfNodes.Add(workingNode);//agrega el nodo actual al camino de nodos 
@@ -1590,7 +1599,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             //acomodar los vecinos de menor a mayor en cuestion de grado.
             neightboors.Sort(delegate (Node x, Node y)
             {
-                return aListGraph.neighborListNodeNoVisited(x).Count().CompareTo(aListGraph.neighborListNodeNoVisited(y).Count());
+                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
             });
 
 
@@ -1605,13 +1614,13 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                     {
 
                         // nodesPath.Add(workingNode);
-                        Edge edge = aListGraph.thisEdge(workingNode, node);
+                        Edge edge = graph.thisEdge(workingNode, node);
                         pathOfNodes.Add(workingNode);
                         pathToAnimate.Add(edge);
                         return true;
                     }
                     else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
-                        aListGraph.restoreNotVisited(notVisitedYet);//restaturacion.
+                        graph.restoreNotVisited(notVisitedYet);//restaturacion.
                 }
 
             }
@@ -1638,10 +1647,10 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             List<Node> dejaAlFinal = new List<Node>();
             List<Node> dejarAlMedio = new List<Node>();
 
-            List<Node> neightboors = aListGraph.neighborListNode(workingNode);
+            List<Node> neightboors = graph.neighborListNode(workingNode);
             neightboors.Sort(delegate(Node x, Node y)
             {
-               return aListGraph.neighborListNodeNoVisited(x).Count().CompareTo(aListGraph.neighborListNodeNoVisited(y).Count());
+               return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
             });
 
             Boolean inmovilizado = true ;//when all eas visited already
@@ -1652,10 +1661,10 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                 if (node.Visitado == false)
                 {
                     inmovilizado = false;
-                    Edge edge = aListGraph.thisEdge(workingNode, node);
+                    Edge edge = graph.thisEdge(workingNode, node);
                     if (edge.visitada == false)
                     {
-                        if (isABridgeVisitedsBool(edge, aListGraph))//cutEdges.Contains(edge))//||edge.Bridge == true)
+                        if (isABridgeVisitedsBool(edge, graph))//cutEdges.Contains(edge))//||edge.Bridge == true)
                         {
                             
                             dejaAlFinal.Add(node);
@@ -1681,7 +1690,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             {
                  if (node.Visitado == false)
                 {
-                        Edge edge = aListGraph.thisEdge(workingNode, node);
+                        Edge edge = graph.thisEdge(workingNode, node);
                     if (edge.visitada == false)                    
                     {
                             edge.visitada = true;
@@ -1695,9 +1704,9 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
             if (neightboors.Contains(finalNodePath))
             {
-                Edge edgeFinal = aListGraph.thisEdge(workingNode, finalNodePath);
+                Edge edgeFinal = graph.thisEdge(workingNode, finalNodePath);
 
-                if (aListGraph.allNodesVisitedBool() )//&& edgeFinal.visitada == false)
+                if (graph.allNodesVisitedBool() )//&& edgeFinal.visitada == false)
                 {
                     edgeFinal.visitada = true;                    
                     pathToAnimate.Add(edgeFinal);
@@ -1715,7 +1724,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             {
                 //deploy a OK form to finish.
                 MessageBox.Show("no hay path of hamilton");
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
             }
             else//a trabajar
@@ -1745,13 +1754,13 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         int DFS_Any_HamiltonCycleOrPath(Node workingNode)//recursive function.
         {
             workingNode.Visitado = true;
-            List<Node> notVisitedYet = aListGraph.notVisitedList();
-            List<Node> neightboors = aListGraph.neighborListNode(workingNode);
+            List<Node> notVisitedYet = graph.notVisitedList();
+            List<Node> neightboors = graph.neighborListNode(workingNode);
             if (notVisitedYet.Count() < 1)// si todos los nodos han sido visitados
             {
                 if (neightboors.Contains(initialNodePath) && initialNodePath == finalNodePath)// si cumple el ciclo y se busca el ciclo.
                 {
-                    Edge edge = aListGraph.thisEdge(workingNode, initialNodePath);
+                    Edge edge = graph.thisEdge(workingNode, initialNodePath);
                     pathToAnimate.Add(edge);
                     pathOfNodes.Add(initialNodePath);
                     pathOfNodes.Add(workingNode);
@@ -1769,7 +1778,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                 int res = DFS_Any_HamiltonCycleOrPath(finalNodePath);
                 if (res > 0)
                 {
-                    Edge edge = aListGraph.thisEdge(workingNode, finalNodePath);
+                    Edge edge = graph.thisEdge(workingNode, finalNodePath);
                     pathOfNodes.Add(workingNode);
                     pathToAnimate.Add(edge);
                     return res;
@@ -1779,7 +1788,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
             neightboors.Sort(delegate (Node x, Node y)
             {
-                return aListGraph.neighborListNodeNoVisited(x).Count().CompareTo(aListGraph.neighborListNodeNoVisited(y).Count());
+                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
             });
 
             foreach (Node node in neightboors)
@@ -1791,13 +1800,13 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                     {
 
                         // nodesPath.Add(workingNode);
-                        Edge edge = aListGraph.thisEdge(workingNode, node);
+                        Edge edge = graph.thisEdge(workingNode, node);
                         pathOfNodes.Add(workingNode);
                         pathToAnimate.Add(edge);
                         return res;
                     }
                     else
-                        aListGraph.restoreNotVisited(notVisitedYet);
+                        graph.restoreNotVisited(notVisitedYet);
                 }
 
             }
@@ -1810,9 +1819,9 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
         public Boolean pathOfHamiltonBool()
         {
-            Boolean res = false;
+        // Boolean res = false;
             //can not have a disconnected node
-            if (!allConected(aListGraph))
+            if (!allConected(graph))
             {
                 return false;
             }
@@ -1827,11 +1836,11 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             pathToAnimate = new List<Edge>();
             cutEdges = new List<Edge>();
 
-            aListGraph.markAllLikeNotBridge();
-            aListGraph.markAllLikeNotVisited(1);
+            graph.markAllLikeNotBridge();
+            graph.markAllLikeNotVisited(1);
 
 
-            foreach (Edge edge in aListGraph.listOfEdges_IG)
+            foreach (Edge edge in graph.EDGE_LIST)
             {
                 if (isABridgeBool(edge))
                 {
@@ -1844,7 +1853,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             // Start DFS traversal from a vertex with non-zero degree 
 
             pathOfNodes.Add(initialNodePath);
-            aListGraph.markAllNodeAndEdgesNotVisited();
+            graph.markAllNodeAndEdgesNotVisited();
             //return DFSHamiltonPath(initialNodePath);
             if(DFS_Any_HamiltonCycleOrPath(initialNodePath)>0)
             {
@@ -1866,16 +1875,16 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             List<Node> dejaAlFinal = new List<Node>();
             List<Node> dejarAlMedio = new List<Node>();
 
-            List<Node> neightboors = aListGraph.neighborListNode(workingNode);
+            List<Node> neightboors = graph.neighborListNode(workingNode);
             neightboors.Sort(delegate(Node x, Node y)
             {
-               return aListGraph.neighborListNode(x).Count().CompareTo(aListGraph.neighborListNode(y).Count());
+               return graph.neighborListNode(x).Count().CompareTo(graph.neighborListNode(y).Count());
             });
 
             Boolean inmovilizado = true;//when all eas visited already
 
 
-            if (workingNode == finalNodePath && aListGraph.allNodesVisitedBool())//&& edgeFinal.visitada == false)
+            if (workingNode == finalNodePath && graph.allNodesVisitedBool())//&& edgeFinal.visitada == false)
             {               
                 //pathOfNodes.Add(finalNodePath);
                 return true;
@@ -1888,10 +1897,10 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                     if (node.Visitado == false)
                     {
                         inmovilizado = false;
-                        Edge edge = aListGraph.thisEdge(workingNode, node);
+                        Edge edge = graph.thisEdge(workingNode, node);
                         if (edge.visitada == false)
                         {
-                            if (isABridgeVisitedsBool(edge, aListGraph))//cutEdges.Contains(edge))//||edge.Bridge == true)
+                            if (isABridgeVisitedsBool(edge, graph))//cutEdges.Contains(edge))//||edge.Bridge == true)
                             {
 
                                 dejaAlFinal.Add(node);
@@ -1917,7 +1926,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                 {
                     if (node.Visitado == false)
                     {
-                        Edge edge = aListGraph.thisEdge(workingNode, node);
+                        Edge edge = graph.thisEdge(workingNode, node);
                         if (edge.visitada == false)
                         {
                             edge.visitada = true;
@@ -1945,7 +1954,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         public Boolean allConected(List<Node> nodeList)
         {
             // Mark all the vertices as not visited 
-            aListGraph.markAllLikeNotVisited();
+            graph.markAllLikeNotVisited();
 
             // Start DFS traversal from a vertex with non-zero degree 
             DFSUtilAllConected(nodeList[0]);
@@ -1962,16 +1971,16 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             return true;
         }
 
-        public Boolean allConected(AdjacencyList graph)
+        public Boolean allConected(Graph graph)
         {
             // Mark all the vertices as not visited 
             graph.markAllLikeNotVisited();
 
             // Start DFS traversal from a vertex with non-zero degree 
-            DFSUtilAllConected(graph.LIST_NODES[0]);
+            DFSUtilAllConected(graph.NODE_LIST[0]);
 
             // Check if all non-zero degree vertices are visited 
-            foreach (Node node in graph.LIST_NODES)
+            foreach (Node node in graph.NODE_LIST)
             {
                 if (node.Visitado == false)
                 {
@@ -1989,7 +1998,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
 
             // Recur for all the vertices adjacent to this vertex
-            foreach (Node node in aListGraph.neighborListNode(workingNode))
+            foreach (Node node in graph.neighborListNode(workingNode))
             {
                 if (node.Visitado == false)
                 {
@@ -2001,15 +2010,15 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         public Boolean isABridgeBool(Edge posibleBridge)
         {
             // Mark all the vertices as not visited 
-            aListGraph.markAllLikeNotVisited();
+            graph.markAllLikeNotVisited();
 
             // Start DFS traversal from a vertex with non-zero degree 
             //DFSUtilAllConectedBridge(aux.LIST_NODES[0], posibleBridge);
-            DFSUtilAllConectedBridge(aListGraph.LIST_NODES[0], posibleBridge);
+            DFSUtilAllConectedBridge(graph.NODE_LIST[0], posibleBridge);
 
             // Check if all non-zero degree vertices are visited 
             //foreach (Node node in aux.LIST_NODES)
-            foreach (Node node in aListGraph.LIST_NODES)
+            foreach (Node node in graph.NODE_LIST)
             {
                 if (node.Visitado == false)
                 {
@@ -2030,7 +2039,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
 
             // Recur for all the vertices adjacent to this vertex
-            foreach (Node node in aListGraph.neighborListNode(workingNode))
+            foreach (Node node in graph.neighborListNode(workingNode))
             {
                 if (workingNode == posibleBridge.Client && node == posibleBridge.Server
                  || workingNode == posibleBridge.Server && node == posibleBridge.Client)
@@ -2045,10 +2054,10 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         }
 
 
-        public Boolean isABridgeVisitedsBool(Edge posibleBridge,AdjacencyList graph)
+        public Boolean isABridgeVisitedsBool(Edge posibleBridge, Graph graph)
         {
             List<int> listOfNonVisited = new List<int>();
-            foreach(Node node in graph.LIST_NODES)
+            foreach(Node node in graph.NODE_LIST)
             {
                 if(node.Visitado == false)
                 {
@@ -2061,11 +2070,11 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
             // Start DFS traversal from a vertex with non-zero degree 
             //DFSUtilAllConectedBridge(aux.LIST_NODES[0], posibleBridge);
-            DFSUtilAllConectedVisitedsBridge(graph.LIST_NODES[0], posibleBridge,graph);
+            DFSUtilAllConectedVisitedsBridge(graph.NODE_LIST[0], posibleBridge,graph);
 
             // Check if all non-zero degree vertices are visited 
             //foreach (Node node in aux.LIST_NODES)
-            foreach (Node node in aListGraph.LIST_NODES)
+            foreach (Node node in this.graph.NODE_LIST)
             {
                 if (node.Visitado == false)
                 {
@@ -2073,7 +2082,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                     posibleBridge.Bridge = true;
 
 
-                    foreach (Node nodeG in graph.LIST_NODES)
+                    foreach (Node nodeG in graph.NODE_LIST)
                     {
                         if (listOfNonVisited.Contains(nodeG.Index))
                         {
@@ -2091,7 +2100,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
             posibleBridge.Bridge = false;
 
-            foreach (Node node in graph.LIST_NODES)
+            foreach (Node node in graph.NODE_LIST)
             {
                 if (listOfNonVisited.Contains(node.Index))
                 {
@@ -2108,7 +2117,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             return false;//if all vertices was visited evenif the edge was cutted.
         }
 
-        void DFSUtilAllConectedVisitedsBridge(Node workingNode, Edge posibleBridge,AdjacencyList graph/*int v, bool visited[]*/)
+        void DFSUtilAllConectedVisitedsBridge(Node workingNode, Edge posibleBridge, Graph graph/*int v, bool visited[]*/)
         {
             // Mark the current node as visited
             workingNode.Visitado = true;
@@ -2146,27 +2155,12 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
         }
 
-        private void maIn_Click(object sender, EventArgs e)
-        {
-            if (f3.Operation == 1)
-            {
-                aListGraph.allBlack();
-                Invalidate();
-                f3.Operation = 0;
-            }
-
-            if (matIn)
-                matIn = false;
-            else
-                matIn = true;
-            InvalidatePlus();
-        }
-
+        
         protected virtual void isoForm_Click(object sender, EventArgs e)
         {
             if (f3.Operation == 1)
             {
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
                 f3.Operation = 0;
             }
@@ -2193,7 +2187,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                 timerColor.Stop();
                 if(f3.Operation == 1)
                 {
-                    aListGraph.allBlack();
+                    graph.allBlack();
                     Invalidate();
                     f3.Operation = 0;
                 }
@@ -2234,7 +2228,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                     timerColor.Stop();
                     if (f3.Operation == 1)
                     {
-                        aListGraph.allBlack();
+                        graph.allBlack();
                         Invalidate();
                         f3.Operation = 0;
                     }
@@ -2250,12 +2244,12 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
         public void GraphTimerColor2(object sender, EventArgs e)
         {
-            aListGraph.markAllLikeNotVisited();
+            graph.markAllLikeNotVisited();
             
 
             
-            Edge[] workingEdgesArray = new Edge[edgeList.Count()];
-            edgeList.CopyTo(workingEdgesArray);
+            Edge[] workingEdgesArray = new Edge[graph.EDGE_LIST.Count()];
+            graph.EDGE_LIST.CopyTo(workingEdgesArray);
             workingEdgesList = workingEdgesArray.ToList();
 
             marAllEdgesAsNotVisited(workingEdgesList);
@@ -2273,7 +2267,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             node.Visitado = true;
             node.COLOR = Color.Red;
 
-            foreach(Node nodo in aListGraph.neighborListNode(node))
+            foreach(Node nodo in graph.neighborListNode(node))
             {
                 foreach (Edge edge in workingEdgesList)
                 {
@@ -2290,7 +2284,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                    
             }
             Invalidate();
-
         }
 
         
@@ -2324,55 +2317,16 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
         }
 
-        //ISOMORFISMO:
-        protected virtual void fuerzaBrutaToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if(formaIsomorfismo != null && formaIsomorfismo.Visible)
-            {
-                changeIsomtextBox(this.aListGraph.Isom_Fuerza_Bruta(formaIsomorfismo.aListGraph).ToString());
-            }
-        }
-
-        protected virtual void traspuestaToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
-            {
-                changeIsomtextBox(this.aListGraph.Isom_Traspuesta(formaIsomorfismo.aListGraph).ToString());
-            }
-        }
-
-        protected virtual void intercambioToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
-            {
-                changeIsomtextBox(this.aListGraph.Isom_Inter(formaIsomorfismo.aListGraph).ToString());
-            }
-        }
+       
 
         String typeOfPath;
-        private void eulerToolStripMenuItem_Click(object sender, EventArgs e)//make happend 
-        {
-            deselect();
-            eulerBoolDo = true;
-            hamiltonBoolDo = false;
-            nodePathsReady = false;   
-            
-        }
-
-        private void hamiltonToolStripMenuItem_Click(object sender, EventArgs e)//make happend
-        {
-            deselect();
-            eulerBoolDo = false;
-            hamiltonBoolDo = true;
-            nodePathsReady = false;
-
-        }
+        
 
         private void caminosToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (f3.Operation == 1)
             {
-                aListGraph.allBlack();
+                graph.allBlack();
                 Invalidate();
                 f3.Operation = 0;
             }
@@ -2381,24 +2335,95 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
         private void brToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach(Edge edge in edgeList)
+            foreach(Edge edge in graph.EDGE_LIST)
             {
                 isABridgeBool(edge);
             }
         }
+        
+    
 
+        /*************************************************************************************************
+         * 
+         * 
+         *||||||||||||||||||||||||||||||||  ALGORITMOS EVENTS ||||||||||||||||||||||||||||||||||||||||||
+         *          
+         * 
+         * ************************************************************************************************/
+       
 
-        Boolean directLinking = false;
-        Boolean undirectLinking = false;
-
-        private void directToolStripMenuItem_Click(object sender, EventArgs e)
+        //ISOMORFISMO:
+        protected virtual void fuerzaBrutaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            directLinking = !directLinking;
+            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
+            {
+                changeIsomtextBox(this.graph.Isom_Fuerza_Bruta(formaIsomorfismo.graph).ToString());
+            }
         }
 
-        private void undirectToolStripMenuItem_Click(object sender, EventArgs e)
+        protected virtual void traspuestaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            undirectLinking = !undirectLinking;
+            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
+            {
+                changeIsomtextBox(this.graph.Isom_Traspuesta(formaIsomorfismo.graph).ToString());
+            }
         }
+
+        protected virtual void intercambioToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
+            {
+                changeIsomtextBox(this.graph.Isom_Inter(formaIsomorfismo.graph).ToString());
+            }
+        }
+
+
+        //CAMINOS:
+        private void eulerToolStripMenuItem_Click(object sender, EventArgs e)//make happend 
+        {
+            deselect();
+            caminos_Euler_Do = true;
+            caminos_Hamilton_Do = false;
+            nodePathsReady = false;
+        }
+
+        private void hamiltonToolStripMenuItem_Click(object sender, EventArgs e)//make happend
+        {
+            deselect();
+            caminos_Hamilton_Do = false;
+            caminos_Euler_Do = true;
+            nodePathsReady = false;
+        }
+
+       
+        //DIJKSTRA:
+        private void dijkstraToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            dijkstra_Do = !dijkstra_Do;
+        }
+
+        //PRIM:
+        private void primToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //KRUSKAL:
+        private void kruskalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }  
+
+        //Isomorfismo_FB_Do = true;
+        //Isomorfismo_TS_Do  = true;
+        //Iomorfismo_IN_Do  = true;
+        //caminos_EU_Do  = true;
+        //caminos_HA_Do  = true;
+        //dijkstra_Do  = true;
+        //floyd_Do  = true;
+        // warshall_Do  = true; 
+        //prim_Do  = true;
+        //kruskal_Do  = true;
+
     }//Form.
 }//namespace.
