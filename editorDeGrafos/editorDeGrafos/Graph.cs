@@ -181,6 +181,7 @@ namespace editorDeGrafos
 
         public void addUndirectedEdge(Node client, Node server, int weight)
         {
+            edgeList_G.Add(new Edge(client, server));
             if (graph.Count > client.Index && graph.Count > server.Index)
             {
                 if (graph[client.Index].Count > server.Index && graph[server.Index].Count > client.Index)
@@ -188,16 +189,12 @@ namespace editorDeGrafos
                     graph[client.Index][server.Index].W = weight;
                     graph[server.Index][client.Index].W = weight;
                 }
-            }
-
-            //cadena = " index de cliente " + client.Index + " index de servidor " + server.Index;
+            }            
         }
 
         public void addUndirectedEdge(Edge edge)
         {
             edgeList_G.Add(edge);
-
-            //cadena = " index de cliente " + client.Index + " index de servidor " + server.Index;
         }
 
         public void addUndirectedEdge(Edge edge, int weight)
@@ -211,8 +208,6 @@ namespace editorDeGrafos
                     graph[edge.server.Index][edge.client.Index].W = weight;
                 }
             }
-
-            //cadena = " index de cliente " + client.Index + " index de servidor " + server.Index;
         }
 
         public void addDirectedEdge(Node client, Node server, int weight)
@@ -221,6 +216,17 @@ namespace editorDeGrafos
             this.diEdgeList_G.Add(new Edge(client,server));
         }
 
+        public void addCicledEdge(Node node, int  weight)
+        {
+            graph[node.Index][node.Index].W = weight;
+            this.diEdgeList_G.Add(new Edge(node));
+        }
+
+        public void addCicledEdge(Node node)
+        {
+            graph[node.Index][node.Index].W = 0;
+            this.diEdgeList_G.Add(new Edge(node));
+        }
 
 
         public String ToString(bool paramBool)
@@ -249,6 +255,38 @@ namespace editorDeGrafos
             }
             return resString;
         }
+
+
+
+        public void eliminateNexetDirectedEdges(Node node)
+        {
+            List<Edge> newEdges = new List<Edge>();
+
+            foreach (Edge edge in diEdgeList_G)
+            {
+                if (edge.Client != node && edge.Server != node)
+                {
+                    newEdges.Add(edge);
+                }
+            }
+            diEdgeList_G = newEdges;
+        }
+
+        public void eliminateCicledEdges(Node node)
+        {
+            List<Edge> newEdges = new List<Edge>();
+
+            foreach (Edge edge in cicleEdgeList_G)
+            {
+                if (edge.Client != node && edge.Server != node)
+                {
+                    newEdges.Add(edge);
+                }
+            }
+            cicleEdgeList_G = newEdges;
+        }
+
+
 
 
         /*************************  Information  ***************************/

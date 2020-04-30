@@ -14,38 +14,30 @@ using System.Drawing.Drawing2D;
 namespace editorDeGrafos
 {
     public partial class Form1 : Form
-    {
-        Boolean isoForm;
-
-        List<Edge> cicleEdgeList;
-
-        //for paths and cicles:
-        Boolean eulerBoolDo = false;
-        List<Edge> pathToAnimate;
-
-        Boolean nodePathsReady = false;
-        Node initialNodePath = null;
-        Node finalNodePath = null;
-        Timer timerColor = new System.Windows.Forms.Timer();
-        int timerColorOption = 0;
-        int tmpCount = 0;
-
-     
-        Boolean hamiltonBoolDo = false;
-
-        Node selectedNode;
+    {   
+        /********************* Selected node control ***********************/
         Node selected = null;
         Node selectedJustFor = null;
+        Boolean anyNodeSelected;       
 
-        public int generalRadius;
-        Boolean anyNodeSelected;
-        int indexCount;
-        public Graph graph;
+        /*********************  Inner flags ********************/
         Boolean mousePressed;
-        List<int> IDList;
-
         Boolean justSaved = true;// -> storage saveStateAuxiliar.
 
+        List<int> IDList;//list of created IDs.
+        String fileName = "";//   -> fileName.
+        public Graph graph;// -> graph of the form.
+
+        /***************** windows and Forms ******************************/
+        Form2 IsomorfismForm;//-> form for isomofism comparison.
+        SaveChangesWindow gdc;// -> changes window.
+
+        /************************ other variables ********************/
+        public int generalRadius;
+
+
+        /****************** view Operations ****************************/
+        Boolean matIn = false;    
 
         /****************************** operations Do ******************
          * 
@@ -61,26 +53,32 @@ namespace editorDeGrafos
 
         /******************************** ALGORITMOS EVENTS  **********************************************/
         //Dos...............................
-        Boolean Isomorfismo_FB_Do = false;
-        Boolean Isomorfismo_TS_Do = false;
-        Boolean Isomorfismo_IN_Do = false;
-        Boolean caminos_Euler_Do = false;
-        Boolean caminos_Hamilton_Do = false;
+        Boolean Isomorphism_FB_Do = false;
+        Boolean Isomorphism_TS_Do = false;
+        Boolean Isomorphism_IN_Do = false;
+        Boolean path_Euler_Do = false;
+        Boolean path_Hamilton_Do = false;
         Boolean dijkstra_Do = false;
         Boolean floyd_Do = false;
         Boolean warshall_Do = false;
         Boolean prim_Do = false;
         Boolean kruskal_Do = false;
         //Dos--------------------------------
+        /****************** for Isomorphism *************************/
+        Boolean isoForm;
+        /****************** for paths and cicles ********************/
+        List<Edge> pathToAnimate;
+        Node initialNodePath = null;
+        Node finalNodePath = null;
+        Boolean nodePathsReady = false;
+        Timer timerColor = new System.Windows.Forms.Timer();
+        int timerColorOption = 0;
+        int tmpCount = 0;
 
-
-        String fileName = "";//   -> fileName
-
-        Boolean matIn = false;
-        Form2 formaIsomorfismo;// = null;
-        SaveChangesWindow gdc;
-
-        //Boolean nodeMoved = false;
+        /****************** for Floyd    *****************************/
+        /****************** for Warshall *****************************/
+        /****************** for Prim     *****************************/
+        /****************** for Kruskal  *****************************/
 
         public Form1()
         {
@@ -108,9 +106,7 @@ namespace editorDeGrafos
         {
             generalRadius = 30; 
 
-            selectedNode = new Node();
             anyNodeSelected = false;
-            indexCount = 0;
             mousePressed = false;
             graph = new Graph();
             IDList = new List<int>();
@@ -136,7 +132,7 @@ namespace editorDeGrafos
 
             
             mousePressed = true;
-            if ((eulerBoolDo || hamiltonBoolDo) && graph.GRAPH.Count() > 1)
+            if ((path_Euler_Do || path_Hamilton_Do) && graph.GRAPH.Count() > 1)
             {
 
                 if (initialNodePath == null || finalNodePath == null)//if any node does not exist.
@@ -169,9 +165,9 @@ namespace editorDeGrafos
 
                         nodePathsReady = true;
 
-                        if (eulerBoolDo)//le toca a euler.
+                        if (path_Euler_Do)//le toca a euler.
                         {
-                            eulerBoolDo = false;
+                            path_Euler_Do = false;
                             if (initialNodePath == finalNodePath)//cycle
                             {
                                 finalNodePath.COLOR = Color.Beige;//
@@ -185,7 +181,7 @@ namespace editorDeGrafos
                         }
                         else//le toca a hamilton.
                         {
-                            hamiltonBoolDo = false;
+                            path_Hamilton_Do = false;
                             if (initialNodePath == finalNodePath)//cycle
                             {
                                 finalNodePath.COLOR = Color.Beige;//
@@ -327,8 +323,7 @@ namespace editorDeGrafos
                                     //int weight = 0;
                                     if (weight >= 0)
                                     {
-                                        graph.addDirectedEdge(selected, selected, weight);
-                                        cicleEdgeList.Add(new Edge(selected));
+                                        graph.addCicledEdge(selected,weight);
                                     }
                                     InvalidatePlus(1);
                                 }
@@ -611,7 +606,7 @@ namespace editorDeGrafos
             statusTB.Text += "Bipartita : " + graph.Bip();
             statusTB.Text += System.Environment.NewLine;
 
-            if ((formaIsomorfismo == null || (formaIsomorfismo != null && formaIsomorfismo.Visible == false)) && isoForm == false)
+            if ((IsomorfismForm == null || (IsomorfismForm != null && IsomorfismForm.Visible == false)) && isoForm == false)
             {
                 IsomtextBox.Visible = false;
             }
@@ -712,7 +707,7 @@ namespace editorDeGrafos
                 MessageBox.Show(saveFileDialog.FileName);
             }
             /*
-             * atributes of a node that can be unique
+            atributes of a node that can be unique
             Coordenate position; 
             int radiusLenght; 
             int index;
@@ -742,7 +737,7 @@ namespace editorDeGrafos
                 sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
             }
             sw.WriteLine("C_Edges");
-            foreach (Edge edge in cicleEdgeList)
+            foreach (Edge edge in graph.CIEDGE_LIST)
             {
                 sw.WriteLine(edge.Client.Index);
             }
@@ -884,44 +879,19 @@ namespace editorDeGrafos
                         }
                     }
 
-                    Edge edge = new Edge(server, server);
-                    cicleEdgeList.Add(edge);
+                    //Edge edge = new Edge(server, server);
+                    //cicleEdgeList.Add(edge);
+                    graph.addCicledEdge(server);
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
                 sr.Close();
                 statusRes = 1;
             }
 
-            /*
-            StreamReader sr = null;
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-
-           
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                sr = new StreamReader(openFileDialog.FileName);
-                char[] Delimiters = new char[] { ',' };
-                string[] Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
-                while ( !sr.EndOfStream )
-                {
-                    foreach (string pal in Input)
-                    {
-                        matrixTB.Text += pal + System.Environment.NewLine;
-                    }
-                    Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
-                }
-
-            }
-
-            
-            */
             return statusRes;
         }
 
         /********************* common key-operations ****************************/
-
-
         public void keyA_OR_MoveClick()//
         {
             if (f3.Operation == 1)
@@ -1067,14 +1037,13 @@ namespace editorDeGrafos
             if (selected != null)
             {
                 graph.eliminateNexetEdges(selected);
-                eliminateNexetDirectedEdges(selected);
-                eliminateCicledEdges(selected);
+                graph.eliminateNexetDirectedEdges(selected);
+                graph.eliminateCicledEdges(selected);
 
                 graph.removeNode(selected);
                 //nodeList.Remove(selected);
                 selected = null;
                 anyNodeSelected = false;
-                indexCount--;
             }
             InvalidatePlus(1);
         }
@@ -1085,14 +1054,12 @@ namespace editorDeGrafos
             Node newNode;
             if (MoRe_F_Do)
             {
-                newNode = new Node(newNodePosition, generalRadius, graph.GRAPH.Count(), this.uniqueID(), Color.Indigo);
+                newNode = new Node(newNodePosition, generalRadius, graph.NODE_LIST.Count(), this.uniqueID(), Color.Indigo);
             }
             else
             {
-                newNode = new Node(newNodePosition, generalRadius, graph.GRAPH.Count(), this.uniqueID());
+                newNode = new Node(newNodePosition, generalRadius, graph.NODE_LIST.Count(), this.uniqueID());
             }
-            indexCount++;
-            //nodeList.Add(newNode);
             graph.addNode(newNode);
             InvalidatePlus(1);
         }
@@ -1128,33 +1095,6 @@ namespace editorDeGrafos
             return weight;
         }
 
-        public void eliminateNexetDirectedEdges(Node node)
-        {
-            List<Edge> newEdges = new List<Edge>();
-
-            foreach (Edge edge in graph.DIEDGE_LIST)
-            {
-                if (edge.Client != node && edge.Server != node)
-                {
-                    newEdges.Add(edge);
-                }
-            }
-            graph.DIEDGE_LIST = newEdges;
-        }
-
-        public void eliminateCicledEdges(Node node)
-        {
-            List<Edge> newEdges = new List<Edge>();
-
-            foreach (Edge edge in cicleEdgeList)
-            {
-                if (edge.Client != node && edge.Server != node)
-                {
-                    newEdges.Add(edge);
-                }
-            }
-            cicleEdgeList = newEdges;
-        }
         public void changeIsomtextBox(String str)
         {
             IsomtextBox.Text = "Isomorfismo : ";
@@ -1162,13 +1102,13 @@ namespace editorDeGrafos
             IsomtextBox.Text += str;
         }
 
-        /*******************************************
+        /*******************************************************************
          * 
          * 
          *  ////////////////   paths and cycles.(caminos y circuitos).
          *      
          * 
-         * **********************************************/
+         * *****************************************************************/
 
         Graph aux;
         List<Edge> cutEdges;
@@ -2164,10 +2104,10 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                 Invalidate();
                 f3.Operation = 0;
             }
-            if (formaIsomorfismo == null || formaIsomorfismo.Visible == false)
+            if (IsomorfismForm == null || IsomorfismForm.Visible == false)
             {
-                formaIsomorfismo = new Form2(this);
-                formaIsomorfismo.Show();
+                IsomorfismForm = new Form2(this);
+                IsomorfismForm.Show();
             }
 
             fuerzaBrutaToolStripMenuItem.Visible = true;
@@ -2355,25 +2295,25 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         //ISOMORFISMO:
         protected virtual void fuerzaBrutaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
+            if (IsomorfismForm != null && IsomorfismForm.Visible)
             {
-                changeIsomtextBox(this.graph.Isom_Fuerza_Bruta(formaIsomorfismo.graph).ToString());
+                changeIsomtextBox(this.graph.Isom_Fuerza_Bruta(IsomorfismForm.graph).ToString());
             }
         }
 
         protected virtual void traspuestaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
+            if (IsomorfismForm != null && IsomorfismForm.Visible)
             {
-                changeIsomtextBox(this.graph.Isom_Traspuesta(formaIsomorfismo.graph).ToString());
+                changeIsomtextBox(this.graph.Isom_Traspuesta(IsomorfismForm.graph).ToString());
             }
         }
 
         protected virtual void intercambioToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (formaIsomorfismo != null && formaIsomorfismo.Visible)
+            if (IsomorfismForm != null && IsomorfismForm.Visible)
             {
-                changeIsomtextBox(this.graph.Isom_Inter(formaIsomorfismo.graph).ToString());
+                changeIsomtextBox(this.graph.Isom_Inter(IsomorfismForm.graph).ToString());
             }
         }
 
@@ -2382,16 +2322,16 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         private void eulerToolStripMenuItem_Click(object sender, EventArgs e)//make happend 
         {
             deselect();
-            caminos_Euler_Do = true;
-            caminos_Hamilton_Do = false;
+            path_Euler_Do = true;
+            path_Hamilton_Do = false;
             nodePathsReady = false;
         }
 
         private void hamiltonToolStripMenuItem_Click(object sender, EventArgs e)//make happend
         {
             deselect();
-            caminos_Hamilton_Do = false;
-            caminos_Euler_Do = true;
+            path_Hamilton_Do = false;
+            path_Euler_Do = true;
             nodePathsReady = false;
         }
 

@@ -11,16 +11,13 @@ namespace editorDeGrafos
     {
         public Node client = null;
         public Node server = null;
+
         Boolean directed;
         Color color = Color.Black;
         Boolean visited = false;
         Boolean bridge = false;
+        int weight;
 
-
-        //Coordenate a;
-        //Coordenate b;
-        //int weight;
-        //int direction;
 
         //for undirected edges.
         public Edge(Node client, Node server)
