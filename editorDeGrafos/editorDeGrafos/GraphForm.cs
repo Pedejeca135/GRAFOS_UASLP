@@ -50,6 +50,11 @@ namespace editorDeGrafos
         Boolean Link_D_Do = false;
         Boolean Link_U_Do = false;
 
+        /********** for linking operations ************************/
+        Boolean D_linkingAnimation = false;
+        Boolean U_LinkingAnimation = false;
+        Edge linkingEdge = null;
+
 
         /******************************** for ALGORITMOS EVENTS  **********************************************/
         //Dos...............................
@@ -361,7 +366,7 @@ namespace editorDeGrafos
         Coordenate mouseLastPosition = null;//for last position in all moving.
 
 
-        private void Form1_MouseMove(object sender, MouseEventArgs e)//for the mouse moving.
+        public void Form1_MouseMove(object sender, MouseEventArgs e)//for the mouse moving.
         {
             if (mousePressed == true && e.Button == MouseButtons.Right && selected != null && selected.Status == 1)//Selected: mouse moving 
             {
@@ -399,18 +404,67 @@ namespace editorDeGrafos
                 selectedJustFor_Moving.Position.Y = e.Y;
                 InvalidatePlus(1);
             }
-            if (mousePressed == true && e.Button == MouseButtons.Left && Link_Do == true && selectedJustFor_Moving != null)//Linking
+            if (mousePressed == true && (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right ) && Link_Do == true && selectedJustFor_Linking != null)//Linking
             {
+                Node auxMouseUperNode = findNodeClicked(new Coordenate(e.X,e.Y));
+                Coordenate corToDraw;
 
-                InvalidatePlus(1);
+                if (auxMouseUperNode != null)
+                {
+                    corToDraw = auxMouseUperNode.Position;
+                }
+                else
+                {
+                    corToDraw = new Coordenate(e.X, e.Y);
+                }
+
+                linkingEdge = new Edge(selectedJustFor_Linking, corToDraw);
+
+                if (e.Button == MouseButtons.Left )//for undirected Edges.
+                {
+                    U_LinkingAnimation = true;                 
+                }
+                else//directed edges
+                {
+                    D_linkingAnimation = true;                    
+                }
+                
+                Invalidate();
+
             }
-            if (mousePressed == true && e.Button == MouseButtons.Left && Link_D_Do == true && selectedJustFor_Moving != null)//Linking D
+            if (mousePressed == true && (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && Link_D_Do == true && selectedJustFor_Linking != null)//Linking D
             {
-                InvalidatePlus(1);
+                Node auxMouseUperNode = findNodeClicked(new Coordenate(e.X, e.Y));
+                Coordenate corToDraw;
+
+                if (auxMouseUperNode != null)
+                {
+                    corToDraw = auxMouseUperNode.Position;
+                }
+                else
+                {
+                    corToDraw = new Coordenate(e.X, e.Y);
+                }               
+                    D_linkingAnimation = true;
+                    linkingEdge = new Edge(selectedJustFor_Linking, corToDraw);
+                    Invalidate();
             }
-            if (mousePressed == true && e.Button == MouseButtons.Left && Link_U_Do == true && selectedJustFor_Moving != null)//Linking U
+            if (mousePressed == true && (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && Link_U_Do == true && selectedJustFor_Linking != null)//Linking D
             {
-                InvalidatePlus(1);
+                Node auxMouseUperNode = findNodeClicked(new Coordenate(e.X, e.Y));
+                Coordenate corToDraw;
+
+                if (auxMouseUperNode != null)
+                {
+                    corToDraw = auxMouseUperNode.Position;
+                }
+                else
+                {
+                    corToDraw = new Coordenate(e.X, e.Y);
+                }
+                U_LinkingAnimation = true;
+                linkingEdge = new Edge(selectedJustFor_Linking, corToDraw);
+                Invalidate();
             }
 
         }
@@ -1102,13 +1156,10 @@ namespace editorDeGrafos
         {
             Graphics graphics = e.Graphics;
             Pen pen = new Pen(Color.Black, 5);
+
             Brush brush = new SolidBrush(BackColor);
             Rectangle rectangle;
-            Pen pen2;
 
-            Pen penDirect = new Pen(Color.DimGray, 8);
-            penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor;
-            penDirect.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
 
             foreach (Edge edge in graph.EDGE_LIST)//undirected edges.
             {
@@ -1120,16 +1171,9 @@ namespace editorDeGrafos
                 drawCicledEdge(graphics, edge, e);
             }
 
-            //Double equis_X;
-            //Double ye_Y;
             foreach (Edge edge in graph.DIEDGE_LIST)//directed edges.
             {
-                Double equis_X;
-                Double ye_Y;
-                Double rate = edge.Distancia / generalRadius;
-                equis_X = (edge.A.X + rate * edge.B.X) / (1 + rate);
-                ye_Y = (edge.A.Y + rate * edge.B.Y) / (1 + rate);
-                graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, (float)equis_X, (float)ye_Y);
+                drawDirectedEdge(graphics, edge);
             }
 
             for (int i = 0; i < graph.GRAPH.Count; i++)//Nodes.
@@ -1145,7 +1189,25 @@ namespace editorDeGrafos
                 int fontSize = generalRadius - 10;
                 graphics.DrawString(index_S, new Font(FontFamily.GenericSansSerif, fontSize), new SolidBrush(Color.Black), nod.NODO.Position.X - (fontSize / 2), nod.NODO.Position.Y - (fontSize / 2));
             }
+
+            if (D_linkingAnimation || U_LinkingAnimation)
+            { 
+                if (D_linkingAnimation && Link_Do)//for undirected 
+                {
+                    drawEdge(graphics, linkingEdge);
+                }
+                else if (U_LinkingAnimation && Link_Do)//for directed 
+                {
+                    drawDirectedEdge(graphics, linkingEdge);
+                }
+
+                D_linkingAnimation = false;
+                U_LinkingAnimation = false;
+            }
+
         }
+
+               
 
         private void drawEdge(Graphics graphics, Edge edge)
         {
@@ -1164,15 +1226,17 @@ namespace editorDeGrafos
             e.Graphics.DrawPath(pen, gPath);
         }
 
-        private void drawDirectedEdge(Graphics graphics, Edge edge, PaintEventArgs e)
+        private void drawDirectedEdge(Graphics graphics, Edge edge)
         {
-            Pen pen = new Pen(Color.Black, 5);
-            Point StartPoint = new Point(edge.A.X, edge.A.Y);
-            Point unoP = new Point(edge.A.X - generalRadius * 4, edge.A.Y - generalRadius * 4);
-            Point dosP = new Point(edge.A.X - generalRadius * 4, edge.A.Y + generalRadius * 4);
-            GraphicsPath gPath = new GraphicsPath();
-            gPath.AddBezier(StartPoint, unoP, dosP, StartPoint);
-            e.Graphics.DrawPath(pen, gPath);
+            Pen penDirect = new Pen(Color.DimGray, 8);
+            penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor;
+            penDirect.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
+            Double equis_X;
+            Double ye_Y;
+            Double rate = edge.Distancia / generalRadius;
+            equis_X = (edge.A.X + rate * edge.B.X) / (1 + rate);
+            ye_Y = (edge.A.Y + rate * edge.B.Y) / (1 + rate);
+            graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, (float)equis_X, (float)ye_Y);
         }
 
         #endregion
