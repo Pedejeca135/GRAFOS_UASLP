@@ -183,7 +183,7 @@
             this.isomToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(116, 1);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(380, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(260, 24);
             this.menuStrip1.TabIndex = 4;
             this.menuStrip1.Text = "menuStrip1";
             this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
@@ -235,7 +235,7 @@
             this.directToolStripMenuItem});
             this.linkingToolStripMenuItem.Name = "linkingToolStripMenuItem";
             this.linkingToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.linkingToolStripMenuItem.Text = "Linking";
+            this.linkingToolStripMenuItem.Text = "Linking (L)";
             this.linkingToolStripMenuItem.Click += new System.EventHandler(this.linking_Click);
             // 
             // undirectToolStripMenuItem
@@ -243,14 +243,14 @@
             this.undirectToolStripMenuItem.Name = "undirectToolStripMenuItem";
             this.undirectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.undirectToolStripMenuItem.Text = "Undirect (U)";
-            this.undirectToolStripMenuItem.Click += new System.EventHandler(this.linking_D_Click);
+            this.undirectToolStripMenuItem.Click += new System.EventHandler(this.linking_U_Click);
             // 
             // directToolStripMenuItem
             // 
             this.directToolStripMenuItem.Name = "directToolStripMenuItem";
             this.directToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.directToolStripMenuItem.Text = "Direct (D)";
-            this.directToolStripMenuItem.Click += new System.EventHandler(this.linking_U_Click);
+            this.directToolStripMenuItem.Click += new System.EventHandler(this.linking_D_Click);
             // 
             // viewToolStripMenuItem
             // 

@@ -43,6 +43,14 @@ namespace editorDeGrafos
             directed = false;
         }
 
+        // for not used edges
+        public Edge(Node client , Coordenate cor)
+        {
+            this.client = client;
+            this.server = new Node(cor.X,cor.Y);
+        }
+
+
         public Boolean visitada
         {
             get { return this.visited; }

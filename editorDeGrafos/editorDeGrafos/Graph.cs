@@ -251,7 +251,6 @@ namespace editorDeGrafos
         {
             edgeList_G.Add(edge);
         }
-
         public void addUndirectedEdge(Edge edge, int weight)
         {
             edgeList_G.Add(edge);
@@ -265,23 +264,29 @@ namespace editorDeGrafos
             }
         }
 
+
+
         public void addDirectedEdge(Node client, Node server, int weight)
         {            
             graph[client.Index][server.Index].W = weight;
             this.diEdgeList_G.Add(new Edge(client,server));
         }
 
+
+
         public void addCicledEdge(Node node, int  weight)
         {
             graph[node.Index][node.Index].W = weight;
-            this.diEdgeList_G.Add(new Edge(node));
+            this.cicleEdgeList_G.Add(new Edge(node));
         }
 
         public void addCicledEdge(Node node)
         {
             graph[node.Index][node.Index].W = 0;
-            this.diEdgeList_G.Add(new Edge(node));
+            this.cicleEdgeList_G.Add(new Edge(node));
         }
+
+
 
 
         public String ToString(bool paramBool)

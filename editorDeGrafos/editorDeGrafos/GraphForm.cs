@@ -15,9 +15,11 @@ namespace editorDeGrafos
 {
     public partial class GraphForm : Form
     {
+        #region GraphFormVariables
         /********************* Selected node control ***********************/
         Node selected = null;
-        Node selectedJustFor = null;
+        Node selectedJustFor_Moving = null;//for moving.
+        Node selectedJustFor_Linking = null;
 
         /*********************  Inner flags ********************/
         Boolean mousePressed;
@@ -47,7 +49,7 @@ namespace editorDeGrafos
         Boolean Link_Do = false;
         Boolean Link_D_Do = false;
         Boolean Link_U_Do = false;
-        
+
 
         /******************************** for ALGORITMOS EVENTS  **********************************************/
         //Dos...............................
@@ -78,6 +80,10 @@ namespace editorDeGrafos
         /****************** for Prim     *****************************/
         /****************** for Kruskal  *****************************/
 
+        #endregion
+
+        #region GraphFormConstructors
+
         /****************************************************************************************
          * 
          * 
@@ -106,7 +112,6 @@ namespace editorDeGrafos
             intercambioToolStripMenuItem.Visible = true;
             IsomtextBox.Visible = true;
         }
-
         private void commonCostructor()// for all common variables.
         {
             generalRadius = 30;
@@ -116,18 +121,23 @@ namespace editorDeGrafos
             terminal.Text = "Node selected : ";
         }
 
+        #endregion
+
+        #region MouseEvents
         /************* tha mouse , tha f()#/&g boss*****************/
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
-
+            /*
             if (f3.Operation == 1)
             {
                 graph.allBlack();
                 Invalidate();
                 f3.Operation = 0;
             }
+            */
 
             mousePressed = true;
+
             if ((path_Euler_Do || path_Hamilton_Do) && graph.GRAPH.Count() > 1)//######## Do paths ##########
             {
 
@@ -196,18 +206,25 @@ namespace editorDeGrafos
 
                 }
             }
-            else if (Move_M_Do || Remove_R_Do || MoRe_F_Do)//######## Do operations ##########
+            else if (Move_M_Do || MoveAll_A_Do || Remove_R_Do || MoRe_F_Do || Link_Do || Link_D_Do || Link_U_Do)//######## Do operations ##########
             {
-                selectedJustFor = findNodeClicked(new Coordenate(e.X, e.Y));
-                selected = selectedJustFor;
+                selectedJustFor_Moving = findNodeClicked(new Coordenate(e.X, e.Y));
+                selected = selectedJustFor_Moving;
 
                 if (Remove_R_Do)
                 {
                     eliminate();
                 }
+                if(Link_Do || Link_D_Do || Link_U_Do) // if doing a link and mousedown
+                {
+                    if(selectedJustFor_Linking == null)
+                    {
+                        selectedJustFor_Linking = selected;
+                    }
+                }
                 if (MoRe_F_Do)
                 {
-                    selected = selectedJustFor;
+                    selected = selectedJustFor_Moving;
                     if (e.Button == System.Windows.Forms.MouseButtons.Right)
                     {
                         eliminate();
@@ -221,7 +238,7 @@ namespace editorDeGrafos
                         }
                     }
                 }
-                InvalidatePlus(1);
+                InvalidatePlus();
             }
             else//######### Do other operations ##############
             {
@@ -333,22 +350,89 @@ namespace editorDeGrafos
             InvalidatePlus();
         }//Form_MouseDown(). BYE FOR THE MDF KING!!!! 
 
+        private void Form1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                mousePressed = false;
+            }
+        }
+
+        Coordenate mouseLastPosition = null;//for last position in all moving.
+
+
+        private void Form1_MouseMove(object sender, MouseEventArgs e)//for the mouse moving.
+        {
+            if (mousePressed == true && e.Button == MouseButtons.Right && selected != null && selected.Status == 1)//Selected: mouse moving 
+            {
+                selected.Position.X = e.X;
+                selected.Position.Y = e.Y;
+                InvalidatePlus(1);
+            }
+            if (mousePressed == true && Move_M_Do == true && selectedJustFor_Moving != null)//Move
+            {
+                selectedJustFor_Moving.Position.X = e.X;
+                selectedJustFor_Moving.Position.Y = e.Y;
+                InvalidatePlus(1);
+            }
+            if (mousePressed == true && MoveAll_A_Do == true && selectedJustFor_Moving != null)//MoveAll
+            {
+                if (mouseLastPosition != null)
+                {
+                    //Calculate delta of the mouse moving
+                    int deltaX = selectedJustFor_Moving.Position.X - e.X;
+                    int deltaY = selectedJustFor_Moving.Position.Y - e.Y;
+                    Coordenate deltaOfCoordenate = new Coordenate(deltaX, deltaY);                
+
+                    foreach (Node node in graph.NODE_LIST)
+                    {
+                            node.Position.X -= deltaOfCoordenate.X;
+                            node.Position.Y -= deltaOfCoordenate.Y;
+                    }                    
+                }
+                    mouseLastPosition = new Coordenate(e.X, e.Y);
+                InvalidatePlus(1);
+            }
+            if (mousePressed == true && e.Button == MouseButtons.Left && MoRe_F_Do == true && selectedJustFor_Moving != null)//MoRe
+            {
+                selectedJustFor_Moving.Position.X = e.X;
+                selectedJustFor_Moving.Position.Y = e.Y;
+                InvalidatePlus(1);
+            }
+            if (mousePressed == true && e.Button == MouseButtons.Left && Link_Do == true && selectedJustFor_Moving != null)//Linking
+            {
+
+                InvalidatePlus(1);
+            }
+            if (mousePressed == true && e.Button == MouseButtons.Left && Link_D_Do == true && selectedJustFor_Moving != null)//Linking D
+            {
+                InvalidatePlus(1);
+            }
+            if (mousePressed == true && e.Button == MouseButtons.Left && Link_U_Do == true && selectedJustFor_Moving != null)//Linking U
+            {
+                InvalidatePlus(1);
+            }
+
+        }
+
+
+        #endregion
+
+
 
         /*************************************************************************************************************************
         * 
         * |||||||||||||||||||||||||||||||||||||||||||||||||||||  General EVENTS   |||||||||||||||||||||||||||||||||||||||||||||||||||
         * 
         * ***********************************************************************************************************************/
-
-        /********************** OPERATIONS *****************/
-        Boolean directLinking = false;
-        Boolean undirectLinking = false;
-
         public void closeIsoFormClicked(object sender, EventArgs e)
         {
             InvalidatePlus();
         }
 
+        #region operation
+        /********************** OPERATIONS *****************/
+        #region operationEvents
         /************************ clicking an operation *****************/
 
         private void Move_Click(object sender, EventArgs e)
@@ -373,7 +457,7 @@ namespace editorDeGrafos
 
         private void linking_Click(object sender, EventArgs e)
         {
-            keyL_OR_LinkingClick();   
+            keyL_OR_LinkingClick();
         }
 
         private void linking_D_Click(object sender, EventArgs e)
@@ -396,7 +480,7 @@ namespace editorDeGrafos
             if (e.KeyCode == Keys.M)//Move (M).
             {
                 keyM_OR_MoveClick();
-            }
+            } 
             if (e.KeyCode == Keys.A)//Move All (A).
             {
                 keyA_OR_MoveAllClick();
@@ -429,174 +513,213 @@ namespace editorDeGrafos
 
         }
 
+        #endregion
+        #region commonKeyOperations
         /********************* common key-operations (Begin) ****************************/
         private void keyM_OR_MoveClick()//
-        {
-            if (f3.Operation == 1)
             {
-                graph.allBlack();
-                Invalidate();
-                f3.Operation = 0;
-            }
-
-            if (selected != null)
-            {
-                deselect();
-            }
-
-            if (Move_M_Do)
-            {
-                foreach (Node node in graph.NODE_LIST)
+               /* if (f3.Operation == 1)
                 {
-                    node.COLOR = Color.Black;
+                    graph.allBlack();
+                    Invalidate();
+                    f3.Operation = 0;
                 }
-                Move_M_Do = (!Move_M_Do);
-            }
-            else
-            {
-                if (Remove_R_Do == false && MoRe_F_Do == false)
+                */
+                
+                deselect();               
+
+                if (Move_M_Do)
                 {
                     foreach (Node node in graph.NODE_LIST)
                     {
-                        node.COLOR = Color.Green;
+                        node.COLOR = Color.Black;
                     }
                     Move_M_Do = (!Move_M_Do);
                 }
-            }
-            InvalidatePlus(1);
-        }
-
-        private void keyA_OR_MoveAllClick()
-        {
-            if (f3.Operation == 1)
-            {
-                graph.allBlack();
-                Invalidate();
-                f3.Operation = 0;
-            }
-
-            if (selected != null)
-            {
-                deselect();
-            }
-
-            if (MoveAll_A_Do)
-            {
-                foreach (Node node in graph.NODE_LIST)
+                else
                 {
-                    node.COLOR = Color.Black;
+                      allOperationOff();                
+                      foreach (Node node in graph.NODE_LIST)
+                      {
+                        node.COLOR = Color.Green; 
+                      }
+                        Move_M_Do = (!Move_M_Do);                    
                 }
-                MoveAll_A_Do = (!MoveAll_A_Do);
+                InvalidatePlus(1);
             }
-            else
+
+            private void keyA_OR_MoveAllClick()
             {
-                if (Remove_R_Do == false && MoRe_F_Do == false)
+                    deselect();                
+
+                if (MoveAll_A_Do)
                 {
                     foreach (Node node in graph.NODE_LIST)
                     {
-                        node.COLOR = Color.Green;
+                        node.COLOR = Color.Black;
                     }
                     MoveAll_A_Do = (!MoveAll_A_Do);
                 }
-            }
-            InvalidatePlus(1);
-        }
-
-        private void keyR_OR_RemoveClick()
-        {
-            if (f3.Operation == 1)
-            {
-                graph.allBlack();
-                Invalidate();
-                f3.Operation = 0;
-            }
-            if (selected != null)
-            {
-                deselect();
-            }
-
-            if (Remove_R_Do)
-            {
-                foreach (Node node in graph.NODE_LIST)
+                else
                 {
-                    node.COLOR = Color.Black;
+                        allOperationOff();
+                        foreach (Node node in graph.NODE_LIST)
+                        {
+                            node.COLOR = Color.LimeGreen;
+                        }
+                        MoveAll_A_Do = (!MoveAll_A_Do);                    
                 }
-                Remove_R_Do = (!Remove_R_Do);
+                InvalidatePlus(1);
             }
-            else
+
+            private void keyR_OR_RemoveClick()
             {
-                if (Move_M_Do == false && MoRe_F_Do == false)
+
+               deselect();              
+
+                if (Remove_R_Do)
                 {
                     foreach (Node node in graph.NODE_LIST)
                     {
-                        node.COLOR = Color.Red;
+                        node.COLOR = Color.Black;
                     }
                     Remove_R_Do = (!Remove_R_Do);
                 }
-            }
-            deselect();
-            InvalidatePlus(1);
-        }
-
-        private void keyF_OR_MoReClick()
-        {
-            if (f3.Operation == 1)
-            {
-                graph.allBlack();
-                Invalidate();
-                f3.Operation = 0;
-            }
-            if (selected != null)
-            {
-                deselect();
-            }
-
-            if (MoRe_F_Do)
-            {
-                foreach (Node node in graph.NODE_LIST)
+                else
                 {
-                    node.COLOR = Color.Black;
+                        allOperationOff();
+                        foreach (Node node in graph.NODE_LIST)
+                        {
+                            node.COLOR = Color.Red;
+                        }
+                        Remove_R_Do = (!Remove_R_Do);                    
                 }
-                MoRe_F_Do = (!MoRe_F_Do);
+
+                InvalidatePlus(1);
             }
-            else
+            private void keyF_OR_MoReClick()
             {
-                if (Remove_R_Do == false && Move_M_Do == false)
+                deselect();                
+
+                if (MoRe_F_Do)
                 {
                     foreach (Node node in graph.NODE_LIST)
                     {
-                        node.COLOR = Color.Indigo;
+                        node.COLOR = Color.Black;
                     }
                     MoRe_F_Do = (!MoRe_F_Do);
                 }
+                else
+                {
+                        allOperationOff();
+                        foreach (Node node in graph.NODE_LIST)
+                        {
+                            node.COLOR = Color.Indigo;
+                        }
+                        MoRe_F_Do = (!MoRe_F_Do);                    
+                }
+
+                InvalidatePlus(1);
             }
-            deselect();
-            InvalidatePlus(1);
-        }
-        private void keyL_OR_LinkingClick()
-        {
+            private void keyL_OR_LinkingClick()
+            {
+                deselect();
 
-        }
+                if (Link_Do)
+                {
+                    foreach (Node node in graph.NODE_LIST)
+                    {
+                        node.COLOR = Color.Black;
+                    }
+                    Link_Do = (!Link_Do);
+                }
+                else
+                {
+                    allOperationOff();
+                    foreach (Node node in graph.NODE_LIST)
+                    {
+                        node.COLOR = Color.Purple;
+                    }
+                    Link_Do = (!Link_Do);
+                }
+                InvalidatePlus(1);
+            }
 
-        private void keyD_OR_D_LinkingClick()
-        {
+            private void keyD_OR_D_LinkingClick()
+            {
+                deselect();
 
-        }
+                if (Link_D_Do)
+                {
+                    foreach (Node node in graph.NODE_LIST)
+                    {
+                        node.COLOR = Color.Black;
+                    }
+                    Link_D_Do = (!Link_D_Do);
+                }
+                else
+                {
+                    allOperationOff();
+                    foreach (Node node in graph.NODE_LIST)
+                    {
+                        node.COLOR = Color.Orange;
+                    }
+                    Link_D_Do = (!Link_D_Do);
+                }
 
-        private void keyU_OR_U_LinkingClick()
-        {
+                InvalidatePlus(1);
+            }
 
-        }
+            private void keyU_OR_U_LinkingClick()
+            {
+                deselect();
+
+                if (Link_U_Do)
+                {
+                    foreach (Node node in graph.NODE_LIST)
+                    {
+                        node.COLOR = Color.Black;
+                    }
+                    Link_U_Do = (!Link_U_Do);
+                }
+                else
+                {
+                    allOperationOff();
+                    foreach (Node node in graph.NODE_LIST)
+                    {
+                        node.COLOR = Color.RoyalBlue;
+                    }
+                    Link_U_Do = (!Link_U_Do);
+                }
+
+                InvalidatePlus(1);
+            }
+
+
+            /**************** deselect Operations ***************/
+            private void allOperationOff()
+            {
+                Move_M_Do = false;
+                MoveAll_A_Do = false;
+                Remove_R_Do = false;
+                MoRe_F_Do = false;
+                Link_Do = false;
+                Link_D_Do = false;
+                Link_U_Do = false;
+            }
+
         /********************* common key-operations (END) ****************************/
+        #endregion
+        #endregion
 
-
-     /*************************************************************************************************
-     * 
-     * 
-     *||||||||||||||||||||||||||||||||  ALGORITMOS EVENTS (Begin)|||||||||||||||||||||||||||||||||||
-     *          
-     * 
-     * ************************************************************************************************/
+        #region algorithmsEvents
+        /*************************************************************************************************
+        * 
+        * 
+        *||||||||||||||||||||||||||||||||  ALGORITMOS EVENTS (Begin)|||||||||||||||||||||||||||||||||||
+        *          
+        * 
+        * ************************************************************************************************/
 
 
         //ISOMORFISMO:
@@ -662,7 +785,9 @@ namespace editorDeGrafos
         }
 
         /***************||||||||||||||  ALGORITMOS EVENTS (END) |||||||||||||||||||||||*******************/
+        #endregion
 
+        #region viewEvents
         /*********************  View (Begin) **********************/
         private void maIn_Click(object sender, EventArgs e)
         {
@@ -679,6 +804,9 @@ namespace editorDeGrafos
                 matIn = true;
             InvalidatePlus();
         }
+        #endregion
+
+        #region fileOperations
 
         /*********************** file Operations (Begin) ********************************/
 
@@ -724,14 +852,15 @@ namespace editorDeGrafos
                     foreach (Node node in graph.NODE_LIST)
                     {
                         graph.eliminateNexetEdges(node);
-                        //eliminateNexetDirectedEdges(node);
                     }
-                    graph.NODE_LIST = new List<Node>();
+                    //graph.NODE_LIST = new List<Node>();
+                    graph = new Graph();
                     justSaved = true;
                 }
             }
             Invalidate();
         }
+
         // when load a graph we need to regenerate all the parts of the graph, 
         //if it is no possible to load, the values are retored.
         private void loadCommonActions()
@@ -960,76 +1089,10 @@ namespace editorDeGrafos
             return statusRes;
         }
         /**************************** file operations(END) **********************/
+        #endregion
 
         /******************* events(s,e) (Begin) ********************************/
-
-        private void Form1_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                mousePressed = false;
-            }
-        }
-
-        Coordenate mouseLastPosition = null;//for last position in all moving.
-
-
-        private void Form1_MouseMove(object sender, MouseEventArgs e)//for the mouse moving.
-        {
-            if (mousePressed == true && e.Button == MouseButtons.Right && selected != null && selected.Status == 1)//Selected: mouse moving 
-            {
-                selected.Position.X = e.X;
-                selected.Position.Y = e.Y;
-                InvalidatePlus(1);
-            }
-            if (mousePressed == true && Move_M_Do == true && selectedJustFor != null)//Move
-            {
-                selectedJustFor.Position.X = e.X;
-                selectedJustFor.Position.Y = e.Y;
-                InvalidatePlus(1);
-            }
-            if (mousePressed == true && MoveAll_A_Do == true && selectedJustFor != null)//MoveAll
-            {
-                if (mouseLastPosition == null)
-                    mouseLastPosition = new Coordenate(e.X, e.Y);
-                else
-                {
-                    Coordenate deltaOfCoordenate = new Coordenate(mouseLastPosition.X - e.X, mouseLastPosition.Y - e.Y);
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.Position.X += deltaOfCoordenate.X;
-                        node.Position.Y += deltaOfCoordenate.Y;
-                    }
-                }
-                InvalidatePlus(1);
-            }
-            if (mousePressed == true && e.Button == MouseButtons.Left && MoRe_F_Do == true && selectedJustFor != null)//MoRe
-            {
-                selectedJustFor.Position.X = e.X;
-                selectedJustFor.Position.Y = e.Y;
-                InvalidatePlus(1);
-            }
-            if (mousePressed == true && e.Button == MouseButtons.Left && Link_Do == true && selectedJustFor != null)//Linking
-            {
-                InvalidatePlus(1);
-            }
-            if (mousePressed == true && e.Button == MouseButtons.Left && Link_D_Do == true && selectedJustFor != null)//Linking D
-            {
-                InvalidatePlus(1);
-            }
-            if (mousePressed == true && e.Button == MouseButtons.Left && Link_U_Do == true && selectedJustFor != null)//Linking U
-            {
-                InvalidatePlus(1);
-            }
-
-
-
-            //nodeMoved = true;
-        }
-
-       
-
-
+        #region Paint
         /*****************************
          * 
          *      method for painting.
@@ -1049,24 +1112,20 @@ namespace editorDeGrafos
 
             foreach (Edge edge in graph.EDGE_LIST)//undirected edges.
             {
-                pen2 = new Pen(edge.COLOR, 5);
-                graphics.DrawLine(pen2, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
+                drawEdge(graphics, edge);
             }
 
             foreach (Edge edge in graph.CIEDGE_LIST)//cicled edge.
             {
-                Point StartPoint = new Point(edge.A.X, edge.A.Y);
-                Point unoP = new Point(edge.A.X - generalRadius * 4, edge.A.Y - generalRadius * 4);
-                Point dosP = new Point(edge.A.X - generalRadius * 4, edge.A.Y + generalRadius * 4);
-                GraphicsPath gPath = new GraphicsPath();
-                gPath.AddBezier(StartPoint, unoP, dosP, StartPoint);
-                e.Graphics.DrawPath(pen, gPath);
+                drawCicledEdge(graphics, edge, e);
             }
 
-            Double equis_X;
-            Double ye_Y;
+            //Double equis_X;
+            //Double ye_Y;
             foreach (Edge edge in graph.DIEDGE_LIST)//directed edges.
             {
+                Double equis_X;
+                Double ye_Y;
                 Double rate = edge.Distancia / generalRadius;
                 equis_X = (edge.A.X + rate * edge.B.X) / (1 + rate);
                 ye_Y = (edge.A.Y + rate * edge.B.Y) / (1 + rate);
@@ -1087,8 +1146,40 @@ namespace editorDeGrafos
                 graphics.DrawString(index_S, new Font(FontFamily.GenericSansSerif, fontSize), new SolidBrush(Color.Black), nod.NODO.Position.X - (fontSize / 2), nod.NODO.Position.Y - (fontSize / 2));
             }
         }
+
+        private void drawEdge(Graphics graphics, Edge edge)
+        {
+            Pen pen2 = new Pen(edge.COLOR, 5);
+            graphics.DrawLine(pen2, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
+        }
+
+        private void drawCicledEdge(Graphics graphics, Edge edge, PaintEventArgs e)
+        {
+            Pen pen = new Pen(Color.Black, 5);
+            Point StartPoint = new Point(edge.A.X, edge.A.Y);
+            Point unoP = new Point(edge.A.X - generalRadius * 4, edge.A.Y - generalRadius * 4);
+            Point dosP = new Point(edge.A.X - generalRadius * 4, edge.A.Y + generalRadius * 4);
+            GraphicsPath gPath = new GraphicsPath();
+            gPath.AddBezier(StartPoint, unoP, dosP, StartPoint);
+            e.Graphics.DrawPath(pen, gPath);
+        }
+
+        private void drawDirectedEdge(Graphics graphics, Edge edge, PaintEventArgs e)
+        {
+            Pen pen = new Pen(Color.Black, 5);
+            Point StartPoint = new Point(edge.A.X, edge.A.Y);
+            Point unoP = new Point(edge.A.X - generalRadius * 4, edge.A.Y - generalRadius * 4);
+            Point dosP = new Point(edge.A.X - generalRadius * 4, edge.A.Y + generalRadius * 4);
+            GraphicsPath gPath = new GraphicsPath();
+            gPath.AddBezier(StartPoint, unoP, dosP, StartPoint);
+            e.Graphics.DrawPath(pen, gPath);
+        }
+
+        #endregion
+
         /******************* events(s,e) (END) ********************************/
 
+        #region InvalidatePlus
         /****************************************************************************
          * 
          *  ||||||||||||||||||||| MENTADO INVALIDATE() (Begin) ||||||||||||||||||||
@@ -1155,6 +1246,8 @@ namespace editorDeGrafos
             }
         }
         /****************** invalidate common (END) ***************************/
+#endregion
+
 
         /*************************************************************************************************************************
          * 
@@ -2417,21 +2510,45 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                 isABridgeBool(edge);
             }
         }
-        
-    
 
-        
 
-        //Isomorfismo_FB_Do = true;
-        //Isomorfismo_TS_Do  = true;
-        //Iomorfismo_IN_Do  = true;
-        //caminos_EU_Do  = true;
-        //caminos_HA_Do  = true;
-        //dijkstra_Do  = true;
-        //floyd_Do  = true;
-        // warshall_Do  = true; 
-        //prim_Do  = true;
-        //kruskal_Do  = true;
+        #region Algorithms
+
+
+            #region Isomorphism
+            #endregion
+
+
+            #region Paths and Cycles
+
+            #region Euler
+            #endregion
+
+            #region Hamilton
+            #endregion
+
+            #endregion
+
+
+            #region Dijkstra
+            #endregion
+
+
+            #region Floyd
+            #endregion
+
+
+            #region Warshall
+            #endregion
+
+
+            #region Prim
+            #endregion
+
+
+            #region Kruskal
+            #endregion
+        #endregion
 
     }//Form.
 }//namespace.
