@@ -373,6 +373,7 @@ namespace editorDeGrafos
             return res;
         }
 
+        /*
         public int GradeOfNode(Node nodo)
         {
             int res = 0;
@@ -382,7 +383,7 @@ namespace editorDeGrafos
             {
                 if (nodeR.W > -1)
                 {
-                    if (nodeIndex == i)
+                    if (i == nodeIndex)
                     {
                         res += 2;
                     }
@@ -395,6 +396,14 @@ namespace editorDeGrafos
             }
             return res;
         }
+        */
+
+
+        public int GradeOfNode(Node node)
+        {
+            return neighborListNode(node).Count();
+        }
+
 
         public DirectedGrade GradeOfDirectedNode(Node nodo)
         {
@@ -439,6 +448,7 @@ namespace editorDeGrafos
 
         public Boolean Directed()
         {
+            /*
             for (int i = 0; i < graph.Count(); i++)
             {
                 for (int j = 0; j < graph.Count(); j++)
@@ -449,7 +459,15 @@ namespace editorDeGrafos
                     }
                 }
             }
-            return false;
+            */
+            if(diEdgeList_G.Count() > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
 
@@ -1168,11 +1186,9 @@ namespace editorDeGrafos
                 if (graph[workingNode.Index][i].W > -1)
                 {
                     res.Add(graph[workingNode.Index][i].NODO);
-
                 }
             }
             return res;
-
         }
 
         public List<Node> neighborListNodeNoVisited(Node workingNode)
@@ -1187,7 +1203,6 @@ namespace editorDeGrafos
                 }
             }
             return res;
-
         }
 
         public List<Node> notVisitedList()

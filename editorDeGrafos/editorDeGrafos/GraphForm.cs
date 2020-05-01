@@ -54,6 +54,8 @@ namespace editorDeGrafos
         Boolean D_linkingAnimation = false;
         Boolean U_LinkingAnimation = false;
         Edge linkingEdge = null;
+        Boolean left_Linkind = false;
+        Boolean right_Linking = false;
 
 
         /******************************** for ALGORITMOS EVENTS  **********************************************/
@@ -361,10 +363,38 @@ namespace editorDeGrafos
             {
                 mousePressed = false;
             }
+            if (Link_Do || Link_D_Do || Link_U_Do)//Linking
+            {
+                Node auxMouseUperNode = findNodeClicked(new Coordenate(e.X, e.Y));
+                if (auxMouseUperNode != null)
+                {
+                    if (Link_Do)
+                    {
+                        if (left_Linkind)//undirected
+                        {
+                            graph.addUndirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
+                        }
+                        else if (right_Linking)//directed
+                        {
+                            graph.addDirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
+                        }
+                    }
+                    else if (Link_D_Do)
+                    {
+                        graph.addDirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
+                    }
+                    else if (Link_U_Do)
+                    {
+                        graph.addUndirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
+                    }
+                }
+                selectedJustFor_Linking = null;
+                InvalidatePlus(1);                
+            }
         }
 
-        Coordenate mouseLastPosition = null;//for last position in all moving.
 
+        Coordenate mouseLastPosition = null;//for last position in all moving.
 
         public void Form1_MouseMove(object sender, MouseEventArgs e)//for the mouse moving.
         {
@@ -422,11 +452,15 @@ namespace editorDeGrafos
 
                 if (e.Button == MouseButtons.Left )//for undirected Edges.
                 {
-                    U_LinkingAnimation = true;                 
+                    U_LinkingAnimation = true;
+                    left_Linkind = true;
+                    right_Linking = false;
                 }
-                else//directed edges
+                else if(e.Button == MouseButtons.Right)//directed edges
                 {
-                    D_linkingAnimation = true;                    
+                    D_linkingAnimation = true;
+                    left_Linkind = false;
+                    right_Linking = true;
                 }
                 
                 Invalidate();
@@ -468,7 +502,6 @@ namespace editorDeGrafos
             }
 
         }
-
 
         #endregion
 
@@ -760,6 +793,7 @@ namespace editorDeGrafos
                 Link_Do = false;
                 Link_D_Do = false;
                 Link_U_Do = false;
+                mousePressed = false;
             }
 
         /********************* common key-operations (END) ****************************/
@@ -1145,7 +1179,6 @@ namespace editorDeGrafos
         /**************************** file operations(END) **********************/
         #endregion
 
-        /******************* events(s,e) (Begin) ********************************/
         #region Paint
         /*****************************
          * 
@@ -1192,13 +1225,13 @@ namespace editorDeGrafos
 
             if (D_linkingAnimation || U_LinkingAnimation)
             { 
-                if (D_linkingAnimation && Link_Do)//for undirected 
+                if (D_linkingAnimation)//for undirected 
+                {
+                    drawDirectedEdge(graphics, linkingEdge);                    
+                }
+                else if (U_LinkingAnimation)//for directed 
                 {
                     drawEdge(graphics, linkingEdge);
-                }
-                else if (U_LinkingAnimation && Link_Do)//for directed 
-                {
-                    drawDirectedEdge(graphics, linkingEdge);
                 }
 
                 D_linkingAnimation = false;
@@ -1240,8 +1273,6 @@ namespace editorDeGrafos
         }
 
         #endregion
-
-        /******************* events(s,e) (END) ********************************/
 
         #region InvalidatePlus
         /****************************************************************************
