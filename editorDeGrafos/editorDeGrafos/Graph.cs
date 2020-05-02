@@ -317,6 +317,15 @@ namespace editorDeGrafos
         }
 
 
+        public void markAllEdgesAsNotVisited(List<Edge> listEdge)
+        {
+            foreach (Edge edge in listEdge)
+            {
+                edge.visitada = false;
+                edge.COLOR = Color.Black;
+            }
+        }
+
 
         public void eliminateNexetDirectedEdges(Node node)
         {
@@ -344,6 +353,21 @@ namespace editorDeGrafos
                 }
             }
             cicleEdgeList_G = newEdges;
+        }
+
+        public void reset()
+        {
+             graph = new List<List<NodeRef>>();//list of lists of NodeRef is a graph
+
+             this.nodeList_G = new List<Node>();//all Nodes in the graph.
+
+             this.edgeList_G = new List<Edge>();//all undirected Edges.
+
+             this.diEdgeList_G = new List<Edge>();//all directed Edges.
+
+             this.cicleEdgeList_G = new List<Edge>();// all cicled Edges.
+
+             List<int> IDList_G = new List<int>();//list of created IDs.
         }
 
 /********************** Basics Operations (End) **************************/

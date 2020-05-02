@@ -148,8 +148,7 @@
             this.terminal.ReadOnly = true;
             this.terminal.Size = new System.Drawing.Size(151, 122);
             this.terminal.TabIndex = 1;
-            this.terminal.TabStop = false;
-            this.terminal.TextChanged += new System.EventHandler(this.terminal_TextChanged);
+            this.terminal.TabStop = false;            
             // 
             // matrixTB
             // 

@@ -343,7 +343,8 @@ namespace editorDeGrafos
                     }
                     else // want to make and add a new node 
                     {
-                        create(new Coordenate(e.X, e.Y));
+                        graph.create(new Coordenate(e.X, e.Y),generalRadius);
+                        justSaved = false;
                     }
 
                 }//left mouse button presed.           
@@ -362,6 +363,7 @@ namespace editorDeGrafos
                                     if (weight >= 0)
                                     {
                                         graph.addCicledEdge(selected, weight);
+                                        justSaved = false;
                                     }
                                     InvalidatePlus(1);
                                 }
@@ -393,19 +395,23 @@ namespace editorDeGrafos
                         if (left_Linkind)//undirected
                         {
                             graph.addUndirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
+                            justSaved = false;
                         }
                         else if (right_Linking)//directed
                         {
                             graph.addDirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
+                            justSaved = false;
                         }
                     }
                     else if (Link_D_Do)
                     {
                         graph.addDirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
+                        justSaved = false;
                     }
                     else if (Link_U_Do)
                     {
                         graph.addUndirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
+                        justSaved = false;
                     }
                 }
                 selectedJustFor_Linking = null;
@@ -947,7 +953,7 @@ namespace editorDeGrafos
 
         private void New_Click(object sender, EventArgs e)
         {
-            if (justSaved == false)
+            if (justSaved == false)//si el trabajo no ha sido guardado
             {
                 SaveChangesWindow gdc = new SaveChangesWindow();
                 gdc.ShowDialog();
@@ -957,17 +963,16 @@ namespace editorDeGrafos
                     {
                         saveFile();
                     }
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        graph.eliminateNexetEdges(node);
-                    }
-                    //graph.NODE_LIST = new List<Node>();
-                    graph = new Graph();
-                    justSaved = true;
                 }
             }
-            Invalidate();
+            this.reset();
+            graph.reset();
+            fileName = "";
+            justSaved = true;
+            InvalidatePlus();
         }
+
+        
 
         // when load a graph we need to regenerate all the parts of the graph, 
         //if it is no possible to load, the values are retored.
@@ -994,10 +999,10 @@ namespace editorDeGrafos
                 graph.CIEDGE_LIST = cicleEdgeList_BU;
             }
             else//it was opened succesfully
-            {
-                InvalidatePlus();
+            {                
                 justSaved = true;
             }
+            InvalidatePlus();
         }
 
         public void saveFile()
@@ -1011,45 +1016,52 @@ namespace editorDeGrafos
             {
                 sw = new StreamWriter(saveFileDialog.FileName);
                 MessageBox.Show(saveFileDialog.FileName);
-            }
-            /*
-            atributes of a node that can be unique
-            Coordenate position; 
-            int radiusLenght; 
-            int index;
-            int uniqueID;
-            */
-            foreach (Node node in graph.NODE_LIST)//all about the node
-            {
-                sw.WriteLine(node.ID + "," + node.Index + "," + node.Position.X + "," + node.Position.Y + "," + node.Radius);
-            }
-            sw.WriteLine("Matrix");
-            foreach (List<NodeRef> row in graph.GRAPH)
-            {
-                foreach (NodeRef nodeR in row)
-                {
-                    sw.Write(nodeR.W + ",");
-                }
-                sw.WriteLine();
-            }
-            sw.WriteLine("Edges");
-            foreach (Edge edge in graph.EDGE_LIST)
-            {
-                sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
-            }
-            sw.WriteLine("D_Edges");
-            foreach (Edge edge in graph.DIEDGE_LIST)
-            {
-                sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
-            }
-            sw.WriteLine("C_Edges");
-            foreach (Edge edge in graph.CIEDGE_LIST)
-            {
-                sw.WriteLine(edge.Client.Index);
-            }
-            sw.Close();
-            justSaved = true;
 
+                String auxFileName  = saveFileDialog.FileName;
+                fileName = " " + auxFileName.Substring(auxFileName.LastIndexOf(@"\") + 1 ,auxFileName.Length - auxFileName.LastIndexOf(@"\") -1);
+            }
+            /********************************************* 
+                atributes of a node that can be unique
+                Coordenate position; 
+                int radiusLenght; 
+                int index;
+                int uniqueID;
+            *************************************************/
+            if (sw != null)
+            {
+
+                foreach (Node node in graph.NODE_LIST)//all about the node
+                {
+                    sw.WriteLine(node.ID + "," + node.Index + "," + node.Position.X + "," + node.Position.Y + "," + node.Radius);
+                }
+                sw.WriteLine("Matrix");
+                foreach (List<NodeRef> row in graph.GRAPH)
+                {
+                    foreach (NodeRef nodeR in row)
+                    {
+                        sw.Write(nodeR.W + ",");
+                    }
+                    sw.WriteLine();
+                }
+                sw.WriteLine("Edges");
+                foreach (Edge edge in graph.EDGE_LIST)
+                {
+                    sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
+                }
+                sw.WriteLine("D_Edges");
+                foreach (Edge edge in graph.DIEDGE_LIST)
+                {
+                    sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
+                }
+                sw.WriteLine("C_Edges");
+                foreach (Edge edge in graph.CIEDGE_LIST)
+                {
+                    sw.WriteLine(edge.Client.Index);
+                }
+                sw.Close();
+                justSaved = true;
+            }
+            InvalidatePlus();
         }
 
         public int openFile()
@@ -1062,12 +1074,16 @@ namespace editorDeGrafos
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                sr = new StreamReader(openFileDialog.FileName);
+                String auxFileName = openFileDialog.FileName;
+                fileName = " " + auxFileName.Substring(auxFileName.LastIndexOf(@"\") + 1, auxFileName.Length - auxFileName.LastIndexOf(@"\") - 1);
+
+                sr = new StreamReader(auxFileName);
                 char[] Delimiters = new char[] { ',' };
                 string[] Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
 
                 while (sr != null && !sr.EndOfStream && Input[0] != "Matrix")
                 {
+                    
                     int idON;
                     int indexON;
                     int x;
@@ -1193,7 +1209,7 @@ namespace editorDeGrafos
                 sr.Close();
                 statusRes = 1;
             }
-
+            InvalidatePlus();
             return statusRes;
         }
         /**************************** file operations(END) **********************/
@@ -1361,7 +1377,7 @@ namespace editorDeGrafos
             }
         }
         /****************** invalidate common (END) ***************************/
-#endregion
+        #endregion
 
 
         /*************************************************************************************************************************
@@ -1369,15 +1385,56 @@ namespace editorDeGrafos
          * |||||||||||||||||||||||||||||||||||||||||||||||||||||   OTHER METHODS ()  |||||||||||||||||||||||||||||||||||||||||||||||||||
          * 
          * ***********************************************************************************************************************/
-        private void marAllEdgesAsNotVisited(List<Edge> listEdge)
+
+        private void reset()
         {
-            foreach (Edge edge in listEdge)
-            {
-                edge.visitada = false;
-                edge.COLOR = Color.Black;
-            }
-        }
-        public int AFWeight(String type)
+             selected = null;
+             selectedJustFor_Moving = null;//for moving.
+             selectedJustFor_Linking = null;
+             mousePressed = false;
+             justSaved = true;// -> storage saveStateAuxiliar.        
+            //Boolean matIn = false;
+         Move_M_Do = false;
+         MoveAll_A_Do = false;
+         Remove_R_Do = false;
+         MoRe_F_Do = false;
+         Link_Do = false;
+         Link_D_Do = false;
+         Link_U_Do = false;
+
+        /********** for linking operations ************************/
+         D_linkingAnimation = false;
+         U_LinkingAnimation = false;
+         linkingEdge = null;
+         left_Linkind = false;
+         right_Linking = false;
+
+
+        /******************************** for ALGORITMOS EVENTS  **********************************************/
+        //Dos...............................
+         Isomorphism_FB_Do = false;
+         Isomorphism_TS_Do = false;
+         Isomorphism_IN_Do = false;
+         path_Euler_Do = false;
+         path_Hamilton_Do = false;
+         dijkstra_Do = false;
+         floyd_Do = false;
+         warshall_Do = false;
+         prim_Do = false;
+         kruskal_Do = false;
+            //Dos--------------------------------
+            /****************** for Isomorphism *************************/
+             isoForm = false;
+        /****************** for paths and cicles ********************/
+      
+         initialNodePath = null;
+         finalNodePath = null;
+         nodePathsReady = false;
+        int timerColorOption = 0;
+        int tmpCount = 0;
+    }
+
+    public int AFWeight(String type)
         {
             int res = 0;
             AskForWeight afaw = new AskForWeight(type);
@@ -1429,28 +1486,6 @@ namespace editorDeGrafos
                 selected = null;
             }
             InvalidatePlus(1);
-        }
-
-        public void create(Coordenate cor)
-        {
-            Coordenate newNodePosition = new Coordenate(cor.X, cor.Y);
-            Node newNode;
-            if (MoRe_F_Do)
-            {
-                graph.create(newNodePosition,generalRadius, Color.Indigo);
-            }
-            else
-            {
-                graph.create(newNodePosition, generalRadius);
-            }
-            InvalidatePlus(1);
-        }
-
-        private int AskForAWeight()
-        {
-            int weight = 0;
-
-            return weight;
         }
 
         public void changeIsomtextBox(String str)
@@ -2349,7 +2384,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             }
         }
 
-
         public Boolean isABridgeVisitedsBool(Edge posibleBridge, Graph graph)
         {
             List<int> listOfNonVisited = new List<int>();
@@ -2407,9 +2441,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                     node.Visitado = true;
                 }
             }
-
-
-
             return false;//if all vertices was visited evenif the edge was cutted.
         }
 
@@ -2417,7 +2448,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         {
             // Mark the current node as visited
             workingNode.Visitado = true;
-
 
             // Recur for all the vertices adjacent to this vertex
             foreach (Node node in graph.neighborListNode(workingNode))
@@ -2434,13 +2464,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             }
         }
 
-
-        private void terminal_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        
         protected virtual void isoForm_Click(object sender, EventArgs e)
         {
             if (f3.Operation == 1)
@@ -2537,7 +2560,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             graph.EDGE_LIST.CopyTo(workingEdgesArray);
             workingEdgesList = workingEdgesArray.ToList();
 
-            marAllEdgesAsNotVisited(workingEdgesList);
+            graph.markAllEdgesAsNotVisited(workingEdgesList);
 
             do {
                 BFSColored(initialNodePath);
@@ -2571,8 +2594,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             Invalidate();
         }
 
-        
-
         public Boolean allVisited(List<Edge> listEdges)
         {
             foreach(Edge edge in listEdges)
@@ -2582,8 +2603,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             }
             return true;
         }
-
-       
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -2595,17 +2614,10 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             tmpCount = 0;
         }
 
-        
-
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
 
         }
-
-       
-
-        String typeOfPath;
-        
 
         private void caminosToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2625,7 +2637,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
                 isABridgeBool(edge);
             }
         }
-
 
         #region Algorithms
 
