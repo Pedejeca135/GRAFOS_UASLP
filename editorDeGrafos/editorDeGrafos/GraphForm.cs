@@ -159,8 +159,6 @@ namespace editorDeGrafos
                             initialNodePath.COLOR = Color.Blue;//change the color of the initial node
                             Invalidate();
                         }
-
-
                         if (graph.GRAPH.Count() == 1)
                         {
                             finalNodePath = initialNodePath;
@@ -213,7 +211,7 @@ namespace editorDeGrafos
 
                 }
             }
-            else if (Move_M_Do || MoveAll_A_Do || Remove_R_Do || MoRe_F_Do || Link_Do || Link_D_Do || Link_U_Do)//######## Do operations ##########
+            else if ( Move_M_Do ||  MoveAll_A_Do || Remove_R_Do || MoRe_F_Do || Link_Do || Link_D_Do || Link_U_Do)//######## Do operations ##########
             {
                 selectedJustFor_Moving = findNodeClicked(new Coordenate(e.X, e.Y));
                 selected = selectedJustFor_Moving;
@@ -222,14 +220,7 @@ namespace editorDeGrafos
                 {
                     eliminate();
                 }
-                if(Link_Do || Link_D_Do || Link_U_Do) // if doing a link and mousedown
-                {
-                    if(selectedJustFor_Linking == null)
-                    {
-                        selectedJustFor_Linking = selected;
-                    }
-                }
-                if (MoRe_F_Do)
+                else if (MoRe_F_Do)
                 {
                     selected = selectedJustFor_Moving;
                     if (e.Button == System.Windows.Forms.MouseButtons.Right)
@@ -240,11 +231,40 @@ namespace editorDeGrafos
                     {
                         if (selected == null)
                         {
-                            create(new Coordenate(e.X, e.Y));
+                            graph.create(new Coordenate(e.X, e.Y),generalRadius);
                             justSaved = false;
                         }
                     }
                 }
+                else if (Link_Do || Link_D_Do || Link_U_Do) // if doing a link and mousedown
+                {
+                    if(selectedJustFor_Linking == null)
+                    {
+                        if (selected == null)
+                        {
+                            Color colorToCreateNode = Color.Black;
+                            if(Link_Do)
+                            {
+                                colorToCreateNode = Color.Purple;
+                            }
+                            else if(Link_D_Do)
+                            {
+                                colorToCreateNode = Color.Orange;
+                            }
+                            else if(Link_U_Do)
+                            {
+                                colorToCreateNode = Color.RoyalBlue;
+                            }
+                                    
+                            graph.create(new Coordenate(e.X, e.Y),generalRadius, colorToCreateNode);
+                            justSaved = false;
+                        }
+                        else
+                        {
+                            selectedJustFor_Linking = selected;
+                        }
+                    }
+                }                
                 InvalidatePlus();
             }
             else//######### Do other operations ##############
@@ -366,7 +386,7 @@ namespace editorDeGrafos
             if (Link_Do || Link_D_Do || Link_U_Do)//Linking
             {
                 Node auxMouseUperNode = findNodeClicked(new Coordenate(e.X, e.Y));
-                if (auxMouseUperNode != null)
+                if (auxMouseUperNode != null && selectedJustFor_Linking != null)
                 {
                     if (Link_Do)
                     {
