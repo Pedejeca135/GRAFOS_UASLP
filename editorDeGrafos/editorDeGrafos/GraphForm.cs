@@ -36,6 +36,7 @@ namespace editorDeGrafos
 
         /****************** for view Operations ****************************/
         Boolean matIn = false;
+        Boolean pesosActivated = true;
 
         /****************************** for operations Do ******************
          * 
@@ -56,6 +57,9 @@ namespace editorDeGrafos
         Edge linkingEdge = null;
         Boolean left_Linkind = false;
         Boolean right_Linking = false;
+
+        /**************** Trunqued grades ************************/
+        Boolean trunquedGrade = false;
 
 
         /******************************** for ALGORITMOS EVENTS  **********************************************/
@@ -308,24 +312,39 @@ namespace editorDeGrafos
                             {
                                 if (selected.Status == 2)//undirected link
                                 {
+                                    int weight;
                                     //here i have to ask the weight of the link.
-                                    int weight = AFWeight("Bidireccional");
+                                    if (trunquedGrade)
+                                    {
+                                        int.TryParse(trunquedGradeTextBox.Text, out weight);
+                                    }
+                                    else 
+                                    {
+                                        weight = AFWeight("Bidireccional");
+                                    }
+
                                     //int weight = 0;
                                     if (weight >= 0)
                                     {
-                                        Edge edge = new Edge(selected, oneNode);
-
+                                        Edge edge = new Edge(selected, oneNode,weight);
                                         graph.addUndirectedEdge(edge, weight);
                                     }
                                 }
                                 if (selected.Status == 3)//directed link
                                 {
+                                    int weight;
                                     //here i have to ask the weight of the link.
-                                    int weight = AFWeight("Dirijido");
-                                    //int weight = 0;
+                                    if (trunquedGrade)
+                                    {
+                                        int.TryParse(trunquedGradeTextBox.Text, out weight);
+                                    }
+                                    else
+                                    {
+                                        weight = AFWeight("Dirijido");
+                                    }
+
                                     if (weight >= 0)
                                     {
-                                        graph.DIEDGE_LIST.Add(new Edge(selected, oneNode, true));
                                         graph.addDirectedEdge(selected, oneNode, weight);
                                     }
                                 }
@@ -358,8 +377,17 @@ namespace editorDeGrafos
                             {
                                 if (selected.Status == 2)//make a own link
                                 {
-                                    int weight = AFWeight("Ciclo");
-                                    //int weight = 0;
+                                    int weight;
+                                    //here i have to ask the weight of the link.
+                                    if (trunquedGrade)
+                                    {
+                                        int.TryParse(trunquedGradeTextBox.Text, out weight);
+                                    }
+                                    else
+                                    {
+                                        weight = AFWeight("Ciclo");
+                                    }
+
                                     if (weight >= 0)
                                     {
                                         graph.addCicledEdge(selected, weight);
@@ -387,6 +415,8 @@ namespace editorDeGrafos
             }
             if (Link_Do || Link_D_Do || Link_U_Do)//Linking
             {
+                int weight = 0;
+
                 Node auxMouseUperNode = findNodeClicked(new Coordenate(e.X, e.Y));
                 if (auxMouseUperNode != null && selectedJustFor_Linking != null)
                 {
@@ -394,24 +424,75 @@ namespace editorDeGrafos
                     {
                         if (left_Linkind)//undirected
                         {
-                            graph.addUndirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
-                            justSaved = false;
+                            
+                            //here i have to ask the weight of the link.
+                            if (trunquedGrade)
+                            {
+                                int.TryParse(trunquedGradeTextBox.Text, out weight);
+                            }
+                            else
+                            {
+                                weight = AFWeight("Bidireccional");
+                            }
+
+                            if (weight >= 0)
+                            {
+                                graph.addUndirectedEdge(selectedJustFor_Linking, auxMouseUperNode, weight);
+                                justSaved = false;
+                            }
                         }
                         else if (right_Linking)//directed
                         {
-                            graph.addDirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
-                            justSaved = false;
+                            //here i have to ask the weight of the link.
+                            if (trunquedGrade)
+                            {
+                                int.TryParse(trunquedGradeTextBox.Text, out weight);
+                            }
+                            else
+                            {
+                                weight = AFWeight("Dirijido");
+                            }
+
+                            if (weight >= 0)
+                            {
+                                graph.addDirectedEdge(selectedJustFor_Linking, auxMouseUperNode, weight);
+                                justSaved = false;
+                            }
                         }
                     }
                     else if (Link_D_Do)
                     {
-                        graph.addDirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
-                        justSaved = false;
+                        //here i have to ask the weight of the link.
+                        if (trunquedGrade)
+                        {
+                            int.TryParse(trunquedGradeTextBox.Text, out weight);
+                        }
+                        else
+                        {
+                            weight = AFWeight("Dirijido");
+                        }
+                        if (weight >= 0)
+                        {
+                            graph.addDirectedEdge(selectedJustFor_Linking, auxMouseUperNode, weight);
+                            justSaved = false;
+                        }
                     }
                     else if (Link_U_Do)
                     {
-                        graph.addUndirectedEdge(selectedJustFor_Linking, auxMouseUperNode, 0);
-                        justSaved = false;
+                        //here i have to ask the weight of the link.
+                        if (trunquedGrade)
+                        {
+                            int.TryParse(trunquedGradeTextBox.Text, out weight);
+                        }
+                        else
+                        {
+                            weight = AFWeight("Bidireccional");
+                        }
+                        if (weight >= 0)
+                        {
+                            graph.addUndirectedEdge(selectedJustFor_Linking, auxMouseUperNode, weight);
+                            justSaved = false;
+                        }
                     }
                 }
                 selectedJustFor_Linking = null;
@@ -1046,17 +1127,17 @@ namespace editorDeGrafos
                 sw.WriteLine("Edges");
                 foreach (Edge edge in graph.EDGE_LIST)
                 {
-                    sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
+                    sw.WriteLine(edge.Client.Index + "," + edge.Server.Index + "," + edge.Weight);
                 }
                 sw.WriteLine("D_Edges");
                 foreach (Edge edge in graph.DIEDGE_LIST)
                 {
-                    sw.WriteLine(edge.Client.Index + "," + edge.Server.Index);
+                    sw.WriteLine(edge.Client.Index + "," + edge.Server.Index + "," + edge.Weight);
                 }
                 sw.WriteLine("C_Edges");
                 foreach (Edge edge in graph.CIEDGE_LIST)
                 {
-                    sw.WriteLine(edge.Client.Index);
+                    sw.WriteLine(edge.Client.Index + "," + edge.Weight);
                 }
                 sw.Close();
                 justSaved = true;
@@ -1130,10 +1211,13 @@ namespace editorDeGrafos
                     Node server = new Node();
                     Node client = new Node();
 
+                    int weigth;
+                    int.TryParse(Input[2], out weigth);
                     int nodo_C;
                     int.TryParse(Input[1], out nodo_C);
                     int nodo_S;
                     int.TryParse(Input[0], out nodo_S);
+
 
                     for (int j = 0; j < graph.GRAPH.Count; j++)
                     {
@@ -1147,8 +1231,8 @@ namespace editorDeGrafos
                         }
                     }
 
-                    Edge edge = new Edge(server, client);
-                    //edgeList.Add(edge);
+                    Edge edge = new Edge(server, client,weigth);
+
                     graph.addUndirectedEdge(edge);
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
@@ -1161,6 +1245,8 @@ namespace editorDeGrafos
                     Node server = new Node();
                     Node client = new Node();
 
+                    int weight;
+                    int.TryParse(Input[2], out weight);
                     int nodo_C;
                     int.TryParse(Input[1], out nodo_C);
                     int nodo_S;
@@ -1178,7 +1264,7 @@ namespace editorDeGrafos
                         }
                     }
 
-                    Edge edge = new Edge(server, client);
+                    Edge edge = new Edge(server, client,weight);
                     graph.DIEDGE_LIST.Add(edge);
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
@@ -1190,6 +1276,8 @@ namespace editorDeGrafos
                 {
                     Node server = new Node();
 
+                    int weight;
+                    int.TryParse(Input[1], out weight);
                     int nodo_S;
                     int.TryParse(Input[0], out nodo_S);
 
@@ -1200,10 +1288,8 @@ namespace editorDeGrafos
                             server = graph.GRAPH[j][j].NODO;
                         }
                     }
-
-                    //Edge edge = new Edge(server, server);
-                    //cicleEdgeList.Add(edge);
-                    graph.addCicledEdge(server);
+                                        
+                    graph.addCicledEdge(server,weight);
                     Input = sr.ReadLine().Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
                 }
                 sr.Close();
@@ -1282,6 +1368,14 @@ namespace editorDeGrafos
         {
             Pen pen2 = new Pen(edge.COLOR, 5);
             graphics.DrawLine(pen2, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
+
+            if (pesosActivated)
+            {
+                Brush brush = new SolidBrush(Color.Gray);
+                String fuente = "Arial";
+                Font f = new Font(fuente, 15);
+                graphics.DrawString("e" + edge.Weight + "", f, brush, (edge.A.X + edge.B.X) / 2 + 2, (edge.A.Y + edge.B.Y) / 2 + 2, new StringFormat());
+            }
         }
 
         private void drawCicledEdge(Graphics graphics, Edge edge, PaintEventArgs e)
@@ -1293,6 +1387,14 @@ namespace editorDeGrafos
             GraphicsPath gPath = new GraphicsPath();
             gPath.AddBezier(StartPoint, unoP, dosP, StartPoint);
             e.Graphics.DrawPath(pen, gPath);
+
+            if (pesosActivated)
+            {
+                Brush brush = new SolidBrush(Color.Green);
+                String fuente = "Arial";
+                Font f = new Font(fuente, 15);
+                graphics.DrawString("e" + edge.Weight + "", f, brush, edge.A.X - 85, edge.A.Y - 10, new StringFormat());
+            }
         }
 
         private void drawDirectedEdge(Graphics graphics, Edge edge)
@@ -1306,6 +1408,14 @@ namespace editorDeGrafos
             equis_X = (edge.A.X + rate * edge.B.X) / (1 + rate);
             ye_Y = (edge.A.Y + rate * edge.B.Y) / (1 + rate);
             graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, (float)equis_X, (float)ye_Y);
+
+            if (pesosActivated)
+            {
+                Brush brush = new SolidBrush(Color.Gray);
+                String fuente = "Arial";
+                Font f = new Font(fuente, 15);
+                graphics.DrawString("e" + edge.Weight + "", f, brush, (edge.A.X + edge.B.X) / 2 + 2, (edge.A.Y + edge.B.Y) / 2 + 2, new StringFormat());
+            }
         }
 
         #endregion
@@ -2638,43 +2748,65 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             }
         }
 
+
+
+
+
+
         #region Algorithms
 
 
-            #region Isomorphism
-            #endregion
-
-
-            #region Paths and Cycles
-
-            #region Euler
-            #endregion
-
-            #region Hamilton
-            #endregion
-
-            #endregion
-
-
-            #region Dijkstra
-            #endregion
-
-
-            #region Floyd
-            #endregion
-
-
-            #region Warshall
-            #endregion
-
-
-            #region Prim
-            #endregion
-
-
-            #region Kruskal
-            #endregion
+        #region Isomorphism
         #endregion
+
+        #region Paths and Cycles
+
+        #region Euler
+        #endregion
+
+        #region Hamilton
+        #endregion
+
+        #endregion
+
+        #region Dijkstra
+        #endregion
+
+        #region Floyd
+        #endregion
+
+        #region Warshall
+        #endregion
+
+        #region Prim
+        #endregion
+
+        #region Kruskal
+        #endregion
+
+        #endregion
+
+        
+
+        private void gradoTruncadoButton_Click(object sender, EventArgs e)
+        {
+            trunquedGrade = !trunquedGrade;
+            if (trunquedGrade)
+            {
+                gradoTruncadoButton.BackColor = Color.DarkSeaGreen;
+            }
+            else
+            {
+                gradoTruncadoButton.BackColor = Color.White;
+            }
+
+        }
+
+        private void pesosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pesosActivated = !pesosActivated;
+            Invalidate();
+        }
 
     }//Form.
 }//namespace.

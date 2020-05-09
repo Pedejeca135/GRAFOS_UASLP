@@ -236,7 +236,7 @@ namespace editorDeGrafos
 
         public void addUndirectedEdge(Node client, Node server, int weight)
         {
-            edgeList_G.Add(new Edge(client, server));
+            edgeList_G.Add(new Edge(client, server,weight));
             if (graph.Count > client.Index && graph.Count > server.Index)
             {
                 if (graph[client.Index].Count > server.Index && graph[server.Index].Count > client.Index)
@@ -269,7 +269,7 @@ namespace editorDeGrafos
         public void addDirectedEdge(Node client, Node server, int weight)
         {            
             graph[client.Index][server.Index].W = weight;
-            this.diEdgeList_G.Add(new Edge(client,server));
+            this.diEdgeList_G.Add(new Edge(client,server,weight));
         }
 
 
@@ -277,17 +277,8 @@ namespace editorDeGrafos
         public void addCicledEdge(Node node, int  weight)
         {
             graph[node.Index][node.Index].W = weight;
-            this.cicleEdgeList_G.Add(new Edge(node));
+            this.cicleEdgeList_G.Add(new Edge(node,weight));
         }
-
-        public void addCicledEdge(Node node)
-        {
-            graph[node.Index][node.Index].W = 0;
-            this.cicleEdgeList_G.Add(new Edge(node));
-        }
-
-
-
 
         public String ToString(bool paramBool)
         {
@@ -985,6 +976,110 @@ namespace editorDeGrafos
             return band;
         }
 
+        public Boolean equals(Graph other)
+        {
+            if (other.GRAPH.Count() != this.GRAPH.Count())
+            {
+                return false;
+            }
+            for(int j = 0; j< other.GRAPH.Count(); j++)
+            {
+                for(int i = 0; i < other.GRAPH.Count(); i++)
+                {
+                    if(this.GRAPH[j][i].W != other.GRAPH[j][i].W)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+
+        public Boolean Isomo_Fuerza_Bruta(Graph other)
+        {
+            //Boolean res = false;              
+            if (heuristicIsom(other))
+            {
+                //PermutationSetStruct gradePairs;
+                //gradePairs = heuristicIsom_SEC_FASE(other);
+
+                if (other.GRAPH.Count() < 1 && this.GRAPH.Count() < 1)//
+                {
+                    return true;
+                }
+                else
+                {
+                    if (this.equals(other))//si los grafos son iguales retorna true.
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        thisIsomList = new listOfNodeListsGrade();
+                        otherIsomList = new listOfNodeListsGrade();
+                        thisIsomList.init(this);
+                        otherIsomList.init(other);
+
+                        return true;// Isomo_Fuerza_Bruta_Algorithm();                       
+                    }
+                }
+            }//END of the heuristic.
+            return false;
+        }
+
+        listOfNodeListsGrade thisIsomList;
+        listOfNodeListsGrade otherIsomList;
+/*
+        public Boolean Isomo_Fuerza_Bruta_Algorithm()
+        {
+        
+           
+            if (notVisitedYet.Count() < 1)//todos los nodos visitados && el nodo actual tiene de vecino al nodo inicial
+            {
+                Edge edge = graph.thisEdge(workingNode, initialNodePath);
+                pathToAnimate.Add(edge);//agrega la arista( actual->inicial) al camino para animar
+                pathOfNodes.Add(initialNodePath);//se agrega por primera vez el nodoInicial(mismo que nodoFinal) al camino de nodos;
+                pathOfNodes.Add(workingNode);//agrega el nodo actual al camino de nodos 
+                return true;
+            }
+
+            //acomodar los vecinos de menor a mayor en cuestion de grado.
+            neightboors.Sort(delegate (Node x, Node y)
+            {
+                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
+            });
+
+
+            
+            foreach (Node node in neightboors)
+            {
+                if (node.Visitado == false)
+                {
+                    if (DFS_Any_HamiltonCycle(node))//si el nodo vecino retorna un ciclo
+                    {
+
+                        // nodesPath.Add(workingNode);
+                        Edge edge = graph.thisEdge(workingNode, node);
+                        pathOfNodes.Add(workingNode);
+                        pathToAnimate.Add(edge);
+                        return true;
+                    }
+                    else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
+                        graph.restoreNotVisited(notVisitedYet);//restaturacion.
+                }
+
+            }
+
+            //no se encontro nigun ciclo.
+            return false;
+        }//DFS_Any_HamiltonCycle(END).
+
+
+
+
+    */
+
         /********************************************************************************************
         * 
         * 
@@ -1176,32 +1271,7 @@ namespace editorDeGrafos
             return res;
         }
 
-        public List<int> neighborList(List<NodeRef> row)
-        {
-            List<int> res = null;
-            for (int i = 0; i < row.Count(); i++)
-            {
-                if (row[i].W > -1)
-                {
-                    res.Add(row[i].NODO.Index);
-                }
-            }
-            return res;
-        }
-
-        public List<NodeRef> neighborListRef(List<NodeRef> row)
-        {
-            List<NodeRef> res = new List<NodeRef>();
-            for (int i = 0; i < row.Count(); i++)
-            {
-                if (row[i].W > -1)
-                {
-                    res.Add(row[i]);
-                }
-            }
-            return res;
-        }
-
+       
         public List<Node> neighborListNode(Node workingNode)
         {
             List<Node> res = new List<Node>();
@@ -1381,8 +1451,6 @@ namespace editorDeGrafos
             }
         }
 
-
-
         public void markIsolateNodesAsVisited()
         {
             List < Node > conectedNodes = listOfconectedNodes();
@@ -1395,12 +1463,6 @@ namespace editorDeGrafos
             }
         }
 
-
-
-
-
-
-
         public void allBlack()
         {
             foreach(Edge edge in edgeList_G)
@@ -1412,7 +1474,6 @@ namespace editorDeGrafos
                 node.COLOR = Color.Black;
             }
         }
-
 
         public void eliminateNexetEdges(Node node)
         {
@@ -1427,12 +1488,6 @@ namespace editorDeGrafos
             }
            this.edgeList_G =  newEdges;
         }
-
-
-
-
-
-
 
 
         public void markAllLikeVisited()

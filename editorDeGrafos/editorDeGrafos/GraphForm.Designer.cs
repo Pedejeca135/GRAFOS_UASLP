@@ -69,6 +69,9 @@
             this.traspuestaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.intercambioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.IsomtextBox = new System.Windows.Forms.TextBox();
+            this.gradoTruncadoButton = new System.Windows.Forms.Button();
+            this.trunquedGradeTextBox = new System.Windows.Forms.TextBox();
+            this.pesosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -148,7 +151,7 @@
             this.terminal.ReadOnly = true;
             this.terminal.Size = new System.Drawing.Size(151, 122);
             this.terminal.TabIndex = 1;
-            this.terminal.TabStop = false;            
+            this.terminal.TabStop = false;
             // 
             // matrixTB
             // 
@@ -182,7 +185,7 @@
             this.isomToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(116, 1);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(260, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(380, 24);
             this.menuStrip1.TabIndex = 4;
             this.menuStrip1.Text = "menuStrip1";
             this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
@@ -202,28 +205,28 @@
             // moveMToolStripMenuItem
             // 
             this.moveMToolStripMenuItem.Name = "moveMToolStripMenuItem";
-            this.moveMToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveMToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.moveMToolStripMenuItem.Text = "Move (M) ";
             this.moveMToolStripMenuItem.Click += new System.EventHandler(this.Move_Click);
             // 
             // moveAllAToolStripMenuItem
             // 
             this.moveAllAToolStripMenuItem.Name = "moveAllAToolStripMenuItem";
-            this.moveAllAToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveAllAToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.moveAllAToolStripMenuItem.Text = "Move All (A)";
             this.moveAllAToolStripMenuItem.Click += new System.EventHandler(this.MoveAll_Click);
             // 
             // removeXToolStripMenuItem
             // 
             this.removeXToolStripMenuItem.Name = "removeXToolStripMenuItem";
-            this.removeXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.removeXToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.removeXToolStripMenuItem.Text = "Remove (R)";
             this.removeXToolStripMenuItem.Click += new System.EventHandler(this.Remove_Click);
             // 
             // moReFToolStripMenuItem
             // 
             this.moReFToolStripMenuItem.Name = "moReFToolStripMenuItem";
-            this.moReFToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moReFToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.moReFToolStripMenuItem.Text = "MoRe (F)";
             this.moReFToolStripMenuItem.Click += new System.EventHandler(this.MoRe_Click);
             // 
@@ -233,21 +236,21 @@
             this.undirectToolStripMenuItem,
             this.directToolStripMenuItem});
             this.linkingToolStripMenuItem.Name = "linkingToolStripMenuItem";
-            this.linkingToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.linkingToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.linkingToolStripMenuItem.Text = "Linking (L)";
             this.linkingToolStripMenuItem.Click += new System.EventHandler(this.linking_Click);
             // 
             // undirectToolStripMenuItem
             // 
             this.undirectToolStripMenuItem.Name = "undirectToolStripMenuItem";
-            this.undirectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.undirectToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.undirectToolStripMenuItem.Text = "Undirect (U)";
             this.undirectToolStripMenuItem.Click += new System.EventHandler(this.linking_U_Click);
             // 
             // directToolStripMenuItem
             // 
             this.directToolStripMenuItem.Name = "directToolStripMenuItem";
-            this.directToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.directToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.directToolStripMenuItem.Text = "Direct (D)";
             this.directToolStripMenuItem.Click += new System.EventHandler(this.linking_D_Click);
             // 
@@ -255,6 +258,7 @@
             // 
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.matrizDeIncidenciaToolStripMenuItem,
+            this.pesosToolStripMenuItem,
             this.bridgesToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
@@ -419,11 +423,38 @@
             this.IsomtextBox.TabIndex = 6;
             this.IsomtextBox.TabStop = false;
             // 
+            // gradoTruncadoButton
+            // 
+            this.gradoTruncadoButton.BackColor = System.Drawing.SystemColors.Control;
+            this.gradoTruncadoButton.Location = new System.Drawing.Point(471, 5);
+            this.gradoTruncadoButton.Name = "gradoTruncadoButton";
+            this.gradoTruncadoButton.Size = new System.Drawing.Size(56, 20);
+            this.gradoTruncadoButton.TabIndex = 7;
+            this.gradoTruncadoButton.Text = "GradoT";
+            this.gradoTruncadoButton.UseVisualStyleBackColor = false;
+            this.gradoTruncadoButton.Click += new System.EventHandler(this.gradoTruncadoButton_Click);
+            // 
+            // trunquedGradeTextBox
+            // 
+            this.trunquedGradeTextBox.Location = new System.Drawing.Point(403, 5);
+            this.trunquedGradeTextBox.Name = "trunquedGradeTextBox";
+            this.trunquedGradeTextBox.Size = new System.Drawing.Size(62, 20);
+            this.trunquedGradeTextBox.TabIndex = 8;
+            // 
+            // pesosToolStripMenuItem
+            // 
+            this.pesosToolStripMenuItem.Name = "pesosToolStripMenuItem";
+            this.pesosToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pesosToolStripMenuItem.Text = "Pesos";
+            this.pesosToolStripMenuItem.Click += new System.EventHandler(this.pesosToolStripMenuItem_Click);
+            // 
             // GraphForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1370, 749);
+            this.Controls.Add(this.trunquedGradeTextBox);
+            this.Controls.Add(this.gradoTruncadoButton);
             this.Controls.Add(this.IsomtextBox);
             this.Controls.Add(this.statusTB);
             this.Controls.Add(this.matrixTB);
@@ -434,7 +465,7 @@
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "GraphForm";
-            this.Text = "Grafo";
+            this.Text = "Grafos";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
@@ -492,6 +523,9 @@
         private System.Windows.Forms.ToolStripMenuItem warshallToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem primToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem kruskalToolStripMenuItem;
+        private System.Windows.Forms.Button gradoTruncadoButton;
+        private System.Windows.Forms.TextBox trunquedGradeTextBox;
+        private System.Windows.Forms.ToolStripMenuItem pesosToolStripMenuItem;
     }
 }
 

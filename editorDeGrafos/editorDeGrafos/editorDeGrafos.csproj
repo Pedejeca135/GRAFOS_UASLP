@@ -69,6 +69,7 @@
     <Compile Include="GraphFormIsomorphic.Designer.cs">
       <DependentUpon>GraphFormIsomorphic.cs</DependentUpon>
     </Compile>
+    <Compile Include="listOfNodeListsGrade.cs" />
     <Compile Include="pathsOK.cs">
       <SubType>Form</SubType>
     </Compile>

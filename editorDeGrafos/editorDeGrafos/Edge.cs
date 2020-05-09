@@ -19,6 +19,13 @@ namespace editorDeGrafos
         int weight;
 
 
+        public int Weight
+        {
+            get { return weight; }
+            set { this.weight = value; }
+        }
+
+
         //for undirected edges.
         public Edge(Node client, Node server)
         {
@@ -26,6 +33,16 @@ namespace editorDeGrafos
             this.server = server;
             directed = false;
         }
+
+        //for undirected edges.
+        public Edge(Node client, Node server,int weight)
+        {
+            this.client = client;
+            this.server = server;
+            directed = false;
+            this.weight = weight;
+        }
+
 
         //for directed edges.
         public Edge(Node client, Node server, Boolean directedBool)
@@ -35,12 +52,22 @@ namespace editorDeGrafos
             directed = directedBool;
         }
 
+        //for directed edges.
+        public Edge(Node client, Node server,int weight, Boolean directedBool)
+        {
+            this.client = client;
+            this.server = server;
+            directed = directedBool;
+            this.weight = weight;
+        }
+
         //for cicle edge
-        public Edge(Node unique)
+        public Edge(Node unique,int weight)
         {
             this.client = unique;
             this.server = unique;
             directed = false;
+            this.weight = weight;
         }
 
         // for not used edges
