@@ -9,6 +9,7 @@ namespace editorDeGrafos
     public class listOfNodeListsGrade
     {
         private List<NodeListGrade> listOfList;
+
         public listOfNodeListsGrade()
         {
             listOfList = new List<NodeListGrade>();
@@ -47,62 +48,113 @@ namespace editorDeGrafos
             this.addNode(node,grade);
         }
 
-
-        public class NodeListGrade
+        public Boolean containsGrade(int grade)
         {
-            int grade;
-            List<NodeGrade> nodeList;
-
-            public NodeListGrade(int grade)
+            foreach (NodeListGrade nlg in listOfList)
             {
-                this.grade = grade;
-                nodeList = new List<NodeGrade>();
+                if(nlg.GRADE == grade)
+                {
+                    return true;
+                }
             }
-            /********* geters and sters *************/
+            return false;
+        }
 
-            public int GRADE
+        public NodeListGrade containsGrade(NodeListGrade otherNlg)
+        {
+            foreach (NodeListGrade nlg in listOfList)
             {
-                get { return grade; }
+                if (nlg.GRADE == otherNlg.GRADE)
+                {
+                    return nlg;
+                }
             }
+            return null;
+        }
 
-            public List<NodeGrade> GRADE_NODE_LIST
+
+        public Boolean equals(listOfNodeListsGrade other)
+        {
+            if(this.LIST_OF_LISTS.Count() != other.LIST_OF_LISTS.Count())
             {
-                get { return nodeList; }
+                return false; 
             }
-
-            public void addNode(Node node, int grade)
+            else
             {
-                NodeGrade nodeGrade = new NodeGrade(node,grade);
-                nodeList.Add(nodeGrade);
+                foreach (NodeListGrade nlg in  this.listOfList )
+                {
+                    NodeListGrade auxNlg = other.containsGrade(nlg);
+                    if (auxNlg != null)
+                    {
+                        if(auxNlg.GRADE_NODE_LIST.Count() != nlg.GRADE_NODE_LIST.Count())
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }            
+        }
+
+        public void Rotate()
+        {
+            Boolean lastRotate = true;
+            foreach(NodeListGrade nlg in listOfList)   
+            {
+                if(lastRotate)
+                {
+                    nlg.Rotate();
+                    if(nlg.ROTATIONS >= nlg.GRADE_NODE_LIST.Count())
+                    {
+                        lastRotate = true;
+                        nlg.rotationNumberReset();
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
             }
         }
 
-       public  class NodeGrade
+        public Coordenate cor_Of_Index(int index)
         {
-            int grade;
-            Node node = null;
-            Boolean treated = false;
-            public NodeGrade(Node node, int grade)
-            {
-                this.grade = grade;
-                this.node = node;
-            }
+            int x, y;
 
-            public int GRADE
+            for (int i = 0; i< listOfList.Count(); i++)
             {
-                get {return grade; }
+                if (listOfList[i].contains(index))
+                {
+                    x = i;
+                    y = listOfList[i].indexOfNodeIndex(index);
+                    return new Coordenate(x,y);
+                }
             }
-
-            public Node NODE
-            {
-                get { return node; }
-            }
-            public Boolean TREATED
-            {
-                get { return TREATED; }
-                set { this.treated = value; }
-            }
+            return null;
         }
+
+        public int Index_Of_cor(Coordenate cor)
+        {
+            int res;
+            if(cor.X < this.listOfList.Count())
+            {
+                if(listOfList[cor.X].GRADE_NODE_LIST.Count() > cor.Y)
+                {
+                    return listOfList[cor.X].GRADE_NODE_LIST[cor.Y].NODE.Index;
+                }
+            }
+            return 999999999;
+        }
+
+        //public class NodeListGrade
+        
+
+       //public  class NodeGrade
+        
 
     }
 }

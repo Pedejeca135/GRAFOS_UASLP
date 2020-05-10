@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
+
 namespace editorDeGrafos
 {
     public class Graph
@@ -816,6 +817,45 @@ namespace editorDeGrafos
                 return false;
             }
         }
+
+        public Node mostGrade(List<Node> nodeList)
+        {
+            int mostGrade = 0;
+            Node res = null;
+
+            foreach(Node node in nodeList)
+            {
+                if(this.GradeOfNode(node) > mostGrade)
+                {
+                    res = node;
+                    mostGrade = this.GradeOfNode(node);
+                }
+            }
+            return res;
+        }
+
+        public List<Node> mostGrades(List<Node> nodeList)
+        {
+            int mostGrade = 0;
+            List<Node> res = null;
+
+            foreach (Node node in nodeList)
+            {
+                if (this.GradeOfNode(node) > mostGrade)
+                {
+                    res = new List<Node>();
+                    res.Add(node);
+
+                    mostGrade = this.GradeOfNode(node);
+                }
+                else if(this.GradeOfNode(node) == mostGrade)
+                {
+                    res.Add(node);
+                }
+            }
+            return res;
+        }
+
         /******************************************************************************************************************
          * 
          * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
@@ -927,7 +967,9 @@ namespace editorDeGrafos
                     {
                         if (gradePairs.validateSet())
                         {
-                            return Isom_Fuerza_Bruta_Algorithm(other, gradePairs);
+                            //return true;
+                            //return Isom_Fuerza_Bruta_Algorithm(other, gradePairs);
+                            return Isomo_Fuerza_Bruta(other);
                         }
                     }
                 }
@@ -1004,7 +1046,7 @@ namespace editorDeGrafos
                 //PermutationSetStruct gradePairs;
                 //gradePairs = heuristicIsom_SEC_FASE(other);
 
-                if (other.GRAPH.Count() < 1 && this.GRAPH.Count() < 1)//
+                if (other.GRAPH.Count() <= 1 && this.GRAPH.Count() <= 1)//
                 {
                     return true;
                 }
@@ -1020,8 +1062,17 @@ namespace editorDeGrafos
                         otherIsomList = new listOfNodeListsGrade();
                         thisIsomList.init(this);
                         otherIsomList.init(other);
+                        if(!thisIsomList.equals(otherIsomList))
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            // return true;// Isomo_Fuerza_Bruta_Algorithm();    
+                            return Isomo_Fuerza_Bruta_Algorithm(thisIsomList, otherIsomList, other);
+                        }
 
-                        return true;// Isomo_Fuerza_Bruta_Algorithm();                       
+                                           
                     }
                 }
             }//END of the heuristic.
@@ -1030,55 +1081,68 @@ namespace editorDeGrafos
 
         listOfNodeListsGrade thisIsomList;
         listOfNodeListsGrade otherIsomList;
-/*
-        public Boolean Isomo_Fuerza_Bruta_Algorithm()
+
+        public Boolean Isomo_Fuerza_Bruta_Algorithm(listOfNodeListsGrade this_L_Nlg, listOfNodeListsGrade other_L_Nlg, Graph other)
         {
-        
-           
-            if (notVisitedYet.Count() < 1)//todos los nodos visitados && el nodo actual tiene de vecino al nodo inicial
+            this.markAllNodeAndEdgesNotVisited();
+            other.markAllNodeAndEdgesNotVisited();
+
+            int iterations = 1;
+            int i_Other = 0;
+            int j_Other = 0;
+
+            foreach (NodeListGrade nlg in other_L_Nlg.LIST_OF_LISTS )
             {
-                Edge edge = graph.thisEdge(workingNode, initialNodePath);
-                pathToAnimate.Add(edge);//agrega la arista( actual->inicial) al camino para animar
-                pathOfNodes.Add(initialNodePath);//se agrega por primera vez el nodoInicial(mismo que nodoFinal) al camino de nodos;
-                pathOfNodes.Add(workingNode);//agrega el nodo actual al camino de nodos 
-                return true;
+                iterations *= nlg.GRADE_NODE_LIST.Count();
             }
 
-            //acomodar los vecinos de menor a mayor en cuestion de grado.
-            neightboors.Sort(delegate (Node x, Node y)
-            {
-                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
-            });
+            Boolean res = true;
 
-
-            
-            foreach (Node node in neightboors)
+            for (int k = 0; k < iterations; k++)
             {
-                if (node.Visitado == false)
+                res = true;
+                for (int j = 0; j < this.graph.Count(); j++)
                 {
-                    if (DFS_Any_HamiltonCycle(node))//si el nodo vecino retorna un ciclo
+                    j_Other = other_L_Nlg.Index_Of_cor(this_L_Nlg.cor_Of_Index(j));
+                    for (int i = 0; i < other.GRAPH.Count(); i++)
                     {
-
-                        // nodesPath.Add(workingNode);
-                        Edge edge = graph.thisEdge(workingNode, node);
-                        pathOfNodes.Add(workingNode);
-                        pathToAnimate.Add(edge);
-                        return true;
+                        i_Other = other_L_Nlg.Index_Of_cor(this_L_Nlg.cor_Of_Index(i));
+                        if(this.GRAPH[j][i].W !=  other.GRAPH[j_Other][i_Other].W)
+                        {
+                            res = false;
+                            break;
+                        }
                     }
-                    else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
-                        graph.restoreNotVisited(notVisitedYet);//restaturacion.
+                    if (res == false)
+                    {
+                        break;
+                    }
                 }
 
+                if(res)
+                {
+                    return res;
+                }
+                else
+                {
+                    other_L_Nlg.Rotate();
+                }                
             }
-
-            //no se encontro nigun ciclo.
             return false;
-        }//DFS_Any_HamiltonCycle(END).
+        }// (END)
+
+        public Boolean DFS_Isomo_FB(Node nodeThis, Node nodeOther, ref Graph other)
+        {
+            nodeThis.Visitado = true;
+            nodeOther.Visitado = true;
+            List<Node> thisNotVisitedYed = notVisitedList();
+            List<Node> othernotVisitedYed = other.notVisitedList();
 
 
+            return false;
 
+        }
 
-    */
 
         /********************************************************************************************
         * 
@@ -1499,6 +1563,16 @@ namespace editorDeGrafos
                 }
         }
 
+        public Boolean allNodesVisitedBool()
+        {
+            foreach (Node node in nodeList_G)
+            {
+                if (node.Visitado == false)
+                    return false;
+            }
+            return true;
+        }
+
         public void markAllNodesLikeNotVisited()
         {
             foreach(Node node in this.nodeList_G)
@@ -1507,15 +1581,7 @@ namespace editorDeGrafos
             }
         }
 
-        public Boolean allNodesVisitedBool()
-        {
-            foreach(Node node in nodeList_G)
-            {
-                if (node.Visitado == false)
-                    return false;
-            }
-            return true;
-        }
+        
 
         public void markAllEdgesLikeNotVisited()
         {

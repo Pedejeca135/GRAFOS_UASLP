@@ -46,6 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NodeGrade.cs" />
+    <Compile Include="NodeListGrade.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="Arista.cs" />
     <Compile Include="AskForWeight.cs">

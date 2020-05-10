@@ -92,7 +92,7 @@ namespace editorDeGrafos
         /****************** for Kruskal  *****************************/
 
         #endregion
-
+        #region GraphFormFunctionality
         #region GraphFormConstructors
 
         /****************************************************************************************
@@ -619,10 +619,7 @@ namespace editorDeGrafos
         * |||||||||||||||||||||||||||||||||||||||||||||||||||||  General EVENTS   |||||||||||||||||||||||||||||||||||||||||||||||||||
         * 
         * ***********************************************************************************************************************/
-        public void closeIsoFormClicked(object sender, EventArgs e)
-        {
-            InvalidatePlus();
-        }
+        
 
         #region operation
         /********************** OPERATIONS *****************/
@@ -941,6 +938,10 @@ namespace editorDeGrafos
                 changeIsomtextBox(this.graph.Isom_Inter(IsomorfismForm.graph).ToString());
             }
         }
+        public void closeIsoFormClicked(object sender, EventArgs e)
+        {
+            InvalidatePlus();
+        }
 
 
         //CAMINOS:
@@ -999,6 +1000,28 @@ namespace editorDeGrafos
                 matIn = true;
             InvalidatePlus();
         }
+
+        private void gradoTruncadoButton_Click(object sender, EventArgs e)
+        {
+            trunquedGrade = !trunquedGrade;
+            if (trunquedGrade)
+            {
+                gradoTruncadoButton.BackColor = Color.DarkSeaGreen;
+            }
+            else
+            {
+                gradoTruncadoButton.BackColor = Color.White;
+            }
+
+        }
+
+        private void pesosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pesosActivated = !pesosActivated;
+            Invalidate();
+        }
+
+
         #endregion
 
         #region fileOperations
@@ -1490,6 +1513,7 @@ namespace editorDeGrafos
         #endregion
 
 
+
         /*************************************************************************************************************************
          * 
          * |||||||||||||||||||||||||||||||||||||||||||||||||||||   OTHER METHODS ()  |||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -1604,7 +1628,9 @@ namespace editorDeGrafos
             IsomtextBox.Text += System.Environment.NewLine;
             IsomtextBox.Text += str;
         }
+        #endregion
 
+        #region algorithms
         /*************************************************************************************************************************
          * 
          * |||||||||||||||||||||||||||||||||||||||||||||||||||||   ALGORITHMS  |||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -2770,6 +2796,8 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         #endregion
 
         #region Dijkstra
+
+
         #endregion
 
         #region Floyd
@@ -2786,27 +2814,9 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
         #endregion
 
-        
+        #endregion
 
-        private void gradoTruncadoButton_Click(object sender, EventArgs e)
-        {
-            trunquedGrade = !trunquedGrade;
-            if (trunquedGrade)
-            {
-                gradoTruncadoButton.BackColor = Color.DarkSeaGreen;
-            }
-            else
-            {
-                gradoTruncadoButton.BackColor = Color.White;
-            }
-
-        }
-
-        private void pesosToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            pesosActivated = !pesosActivated;
-            Invalidate();
-        }
+       
 
     }//Form.
 }//namespace.
