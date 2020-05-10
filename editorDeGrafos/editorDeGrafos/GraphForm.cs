@@ -667,6 +667,7 @@ namespace editorDeGrafos
             if ((e.KeyCode == Keys.Escape || e.KeyCode == Keys.S) && selected != null)
             {
                 deselect();
+                
             }
             if (e.KeyCode == Keys.M)//Move (M).
             {
@@ -919,7 +920,7 @@ namespace editorDeGrafos
         {
             if (IsomorfismForm != null && IsomorfismForm.Visible)
             {
-                changeIsomtextBox(this.graph.Isom_Fuerza_Bruta(IsomorfismForm.graph).ToString());
+                changeIsomtextBox(this.graph.Isomo_Fuerza_Bruta(IsomorfismForm.graph).ToString());
             }
         }
 
@@ -1603,6 +1604,7 @@ namespace editorDeGrafos
                 selected.SelectedBool =AllowDrop = false;//
                 selected = null;
             }
+            Invalidate();
         }
 
         public void eliminate()
@@ -2779,6 +2781,8 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
 
 
+
+
         #region Algorithms
 
 
@@ -2816,7 +2820,9 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
 
         #endregion
 
-       
-
+        private void pruebasToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.graph.Dijkstra();
+        }
     }//Form.
 }//namespace.

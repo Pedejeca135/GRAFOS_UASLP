@@ -856,6 +856,7 @@ namespace editorDeGrafos
             return res;
         }
 
+        #region isomorphism
         /******************************************************************************************************************
          * 
          * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
@@ -865,8 +866,163 @@ namespace editorDeGrafos
          * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
          * 
          ********************************************************************************************************************/
+        private Boolean heuristicIsom(Graph other)
+        {
+            if (this.GRAPH.Count() == other.GRAPH.Count())
+            {
+                if (this.Grade() == other.Grade())
+                    if (this.Directed() == other.Directed())
+                        if (this.Complete() == other.Complete())
+                            if (this.Pseudo() == other.Pseudo())
+                                if (this.Cicled() == other.Cicled())
+                                    if (this.Bip() == other.Bip())
+                                        return true;
+            }
+            return false;
+        }
+
+        private PermutationSetStruct heuristicIsom_SEC_FASE(Graph other)
+        {
+            PermutationSetStruct res = new PermutationSetStruct(other.GRAPH.Count());
+            int grade_T;
+            int grade_O;
+
+            for (int i = 0; i < other.GRAPH.Count(); i++)
+            {
+                grade_T = this.GradeOfNode(this.GRAPH[i][i].NODO);
+                res.addIndex_T(grade_T, this.GRAPH[i][i].NODO.Index);
+
+                grade_O = other.GradeOfNode(other.GRAPH[i][i].NODO);
+                res.addIndex_O(grade_O, other.GRAPH[i][i].NODO.Index);
+            }
+            return res;
+        }
+
+        #region isomorphism_Brute_Force
+        /********************************************************************************************
+        * 
+        * 
+        *      ISOMORPHISM : First algorithm of isimorphism. Implemented by me... ñ_ñ 
+        * 
+        * 
+        * *******************************************************************************************/
+        listOfNodeListsGrade thisIsomList;
+        listOfNodeListsGrade otherIsomList;
+        public Boolean equals(Graph other)
+        {
+            if (other.GRAPH.Count() != this.GRAPH.Count())
+            {
+                return false;
+            }
+            for (int j = 0; j < other.GRAPH.Count(); j++)
+            {
+                for (int i = 0; i < other.GRAPH.Count(); i++)
+                {
+                    if (this.GRAPH[j][i].W != other.GRAPH[j][i].W)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
 
+        public Boolean Isomo_Fuerza_Bruta(Graph other)
+        {
+            //Boolean res = false;              
+            if (heuristicIsom(other))
+            {
+                //PermutationSetStruct gradePairs;
+                //gradePairs = heuristicIsom_SEC_FASE(other);
+
+                if (other.GRAPH.Count() <= 1 && this.GRAPH.Count() <= 1)//
+                {
+                    return true;
+                }
+                else
+                {
+                    if (this.equals(other))//si los grafos son iguales retorna true.
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        thisIsomList = new listOfNodeListsGrade();
+                        otherIsomList = new listOfNodeListsGrade();
+                        thisIsomList.init(this);
+                        otherIsomList.init(other);
+                        if (!thisIsomList.equals(otherIsomList))
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            // return true;// Isomo_Fuerza_Bruta_Algorithm();    
+                            return Isomo_Fuerza_Bruta_Algorithm(thisIsomList, otherIsomList, other);
+                        }
+
+
+                    }
+                }
+            }//END of the heuristic.
+            return false;
+        }
+
+
+
+        public Boolean Isomo_Fuerza_Bruta_Algorithm(listOfNodeListsGrade this_L_Nlg, listOfNodeListsGrade other_L_Nlg, Graph other)
+        {
+            this.markAllNodeAndEdgesNotVisited();
+            other.markAllNodeAndEdgesNotVisited();
+
+            int iterations = 1;
+            int i_Other = 0;
+            int j_Other = 0;
+
+            foreach (NodeListGrade nlg in other_L_Nlg.LIST_OF_LISTS)
+            {
+                iterations *= nlg.GRADE_NODE_LIST.Count();
+            }
+
+            Boolean res = true;
+
+            for (int k = 0; k < iterations; k++)
+            {
+                res = true;
+                for (int j = 0; j < this.graph.Count(); j++)
+                {
+                    j_Other = other_L_Nlg.Index_Of_cor(this_L_Nlg.cor_Of_Index(j));
+                    for (int i = 0; i < other.GRAPH.Count(); i++)
+                    {
+                        i_Other = other_L_Nlg.Index_Of_cor(this_L_Nlg.cor_Of_Index(i));
+                        if (this.GRAPH[j][i].W != other.GRAPH[j_Other][i_Other].W)
+                        {
+                            res = false;
+                            break;
+                        }
+                    }
+                    if (res == false)
+                    {
+                        break;
+                    }
+                }
+
+                if (res)
+                {
+                    return res;
+                }
+                else
+                {
+                    other_L_Nlg.Rotate();
+                }
+            }
+            return false;
+        }// (END)
+
+        #endregion
+
+        #region isomorphism_traspose_matrix
         /********************************************************************************************
          * 
          * 
@@ -937,212 +1093,10 @@ namespace editorDeGrafos
             return false;
         }
 
-        /********************************************************************************************
-        * 
-        * 
-        *      ISOMORPHISM : First algorithm of isimorphism. Implemented by me... ñ_ñ 
-        * 
-        * 
-        * *******************************************************************************************/
 
-        public Boolean Isom_Fuerza_Bruta(Graph other)
-        {
-            //Boolean res = false;              
-            if (heuristicIsom(other))
-            {
-                PermutationSetStruct gradePairs;
-                gradePairs = heuristicIsom_SEC_FASE(other);
+        #endregion
 
-                if (other.GRAPH.Count() < 1 && this.GRAPH.Count() < 1)//
-                {
-                    return true;
-                }
-                else
-                {
-                    if (this.GRAPH.Equals(other.GRAPH))//si los grafos son iguales retorna true.
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        if (gradePairs.validateSet())
-                        {
-                            //return true;
-                            //return Isom_Fuerza_Bruta_Algorithm(other, gradePairs);
-                            return Isomo_Fuerza_Bruta(other);
-                        }
-                    }
-                }
-            }//END of the heuristic.
-            return false;
-        }
-
-        public Boolean Isom_Fuerza_Bruta_Algorithm(Graph other, PermutationSetStruct gradePairs)
-        {
-
-            int limitOfPermutations = 40000;
-            Matrix thisMatrix = this.toMatrix();
-            Matrix otherMatrix = other.toMatrix();
-
-            bool band = false;
-
-            List<int[]> listOfPermutations = gradePairs.makeAllPermutationsPure();
-            int[] permutationArray;
-
-            while (limitOfPermutations > 0 && listOfPermutations.Count() > 0 && !band)
-            {
-                //get the next permutation:
-                permutationArray = listOfPermutations.ElementAt(0);
-                listOfPermutations.RemoveAt(0);
-
-                band = true;
-                int j;
-                for (j = 0; j < permutationArray.Length; j++)
-                {
-                    for (int i = 0; i < permutationArray.Length; i++)
-                    {
-                        if (otherMatrix.MATRIX[j, i] != thisMatrix.MATRIX[permutationArray[j], permutationArray[i]])
-                        {
-                            band = false;
-                            continue;
-                        }
-                    }
-                    if (!band)
-                    {
-                        continue;
-                    }
-                }
-                limitOfPermutations--;
-            }//END(while).     
-
-            return band;
-        }
-
-        public Boolean equals(Graph other)
-        {
-            if (other.GRAPH.Count() != this.GRAPH.Count())
-            {
-                return false;
-            }
-            for(int j = 0; j< other.GRAPH.Count(); j++)
-            {
-                for(int i = 0; i < other.GRAPH.Count(); i++)
-                {
-                    if(this.GRAPH[j][i].W != other.GRAPH[j][i].W)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-
-        public Boolean Isomo_Fuerza_Bruta(Graph other)
-        {
-            //Boolean res = false;              
-            if (heuristicIsom(other))
-            {
-                //PermutationSetStruct gradePairs;
-                //gradePairs = heuristicIsom_SEC_FASE(other);
-
-                if (other.GRAPH.Count() <= 1 && this.GRAPH.Count() <= 1)//
-                {
-                    return true;
-                }
-                else
-                {
-                    if (this.equals(other))//si los grafos son iguales retorna true.
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        thisIsomList = new listOfNodeListsGrade();
-                        otherIsomList = new listOfNodeListsGrade();
-                        thisIsomList.init(this);
-                        otherIsomList.init(other);
-                        if(!thisIsomList.equals(otherIsomList))
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            // return true;// Isomo_Fuerza_Bruta_Algorithm();    
-                            return Isomo_Fuerza_Bruta_Algorithm(thisIsomList, otherIsomList, other);
-                        }
-
-                                           
-                    }
-                }
-            }//END of the heuristic.
-            return false;
-        }
-
-        listOfNodeListsGrade thisIsomList;
-        listOfNodeListsGrade otherIsomList;
-
-        public Boolean Isomo_Fuerza_Bruta_Algorithm(listOfNodeListsGrade this_L_Nlg, listOfNodeListsGrade other_L_Nlg, Graph other)
-        {
-            this.markAllNodeAndEdgesNotVisited();
-            other.markAllNodeAndEdgesNotVisited();
-
-            int iterations = 1;
-            int i_Other = 0;
-            int j_Other = 0;
-
-            foreach (NodeListGrade nlg in other_L_Nlg.LIST_OF_LISTS )
-            {
-                iterations *= nlg.GRADE_NODE_LIST.Count();
-            }
-
-            Boolean res = true;
-
-            for (int k = 0; k < iterations; k++)
-            {
-                res = true;
-                for (int j = 0; j < this.graph.Count(); j++)
-                {
-                    j_Other = other_L_Nlg.Index_Of_cor(this_L_Nlg.cor_Of_Index(j));
-                    for (int i = 0; i < other.GRAPH.Count(); i++)
-                    {
-                        i_Other = other_L_Nlg.Index_Of_cor(this_L_Nlg.cor_Of_Index(i));
-                        if(this.GRAPH[j][i].W !=  other.GRAPH[j_Other][i_Other].W)
-                        {
-                            res = false;
-                            break;
-                        }
-                    }
-                    if (res == false)
-                    {
-                        break;
-                    }
-                }
-
-                if(res)
-                {
-                    return res;
-                }
-                else
-                {
-                    other_L_Nlg.Rotate();
-                }                
-            }
-            return false;
-        }// (END)
-
-        public Boolean DFS_Isomo_FB(Node nodeThis, Node nodeOther, ref Graph other)
-        {
-            nodeThis.Visitado = true;
-            nodeOther.Visitado = true;
-            List<Node> thisNotVisitedYed = notVisitedList();
-            List<Node> othernotVisitedYed = other.notVisitedList();
-
-
-            return false;
-
-        }
-
+        #region isomorphism_manual
 
         /********************************************************************************************
         * 
@@ -1293,6 +1247,7 @@ namespace editorDeGrafos
 
             return false;
         }
+        #endregion
 
         /******************************************************************************************************************
         * 
@@ -1303,39 +1258,8 @@ namespace editorDeGrafos
         * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
         * 
         ********************************************************************************************************************/
-        private Boolean heuristicIsom(Graph other)
-        {
-            if (this.GRAPH.Count() == other.GRAPH.Count())
-            {
-                if (this.Grade() == other.Grade())
-                    if (this.Directed() == other.Directed())
-                        if (this.Complete() == other.Complete())
-                            if (this.Pseudo() == other.Pseudo())
-                                if (this.Cicled() == other.Cicled())
-                                    if (this.Bip() == other.Bip())
-                                        return true;
-            }
-            return false;
-        }
+        #endregion
 
-        private PermutationSetStruct heuristicIsom_SEC_FASE(Graph other)
-        {
-            PermutationSetStruct res = new PermutationSetStruct(other.GRAPH.Count());
-            int grade_T;
-            int grade_O;
-
-            for (int i = 0; i < other.GRAPH.Count(); i++)
-            {
-                grade_T = this.GradeOfNode(this.GRAPH[i][i].NODO);
-                res.addIndex_T(grade_T, this.GRAPH[i][i].NODO.Index);
-
-                grade_O = other.GradeOfNode(other.GRAPH[i][i].NODO);
-                res.addIndex_O(grade_O, other.GRAPH[i][i].NODO.Index);
-            }
-            return res;
-        }
-
-       
         public List<Node> neighborListNode(Node workingNode)
         {
             List<Node> res = new List<Node>();
@@ -1494,9 +1418,12 @@ namespace editorDeGrafos
                     return false;
                 }
             }
-
             return true;
         }
+
+
+       
+
 
 
         void DFSUtilAllConected(Node workingNode/*int v, bool visited[]*/)
@@ -1650,10 +1577,6 @@ namespace editorDeGrafos
             graph[index][index].NODO.Visitado = mark;
         }
 
-
-
-    
-
         public Matrix toMatrix()
         {
             Matrix res;
@@ -1691,6 +1614,125 @@ namespace editorDeGrafos
        * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
        * 
        ********************************************************************************************************************/
+
+        #region Dijkstra
+        /******************************************************************************************************************
+        * 
+        * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
+        * 
+        *                         ----- START OF DIJKSTRA ALGORITHM -----
+        *                                    
+        * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
+        * 
+        ********************************************************************************************************************/
+            
+        public List<Edge> Dijkstra()
+        {
+            if(this.isConected())
+            {
+                List<Edge> res = new List<Edge>();
+                Dijkstra_Algorithm(0);
+                return res;
+            }
+            else
+            {
+                Console.WriteLine("adios wacho");
+                return null;
+            }
+        }
+
+        int minDistance(int[] dist,
+                   bool[] sptSet)
+        {
+            // Initialize min value 
+            int min = int.MaxValue, min_index = -1;
+
+            for (int v = 0; v < this.GRAPH.Count(); v++)
+                if (sptSet[v] == false && dist[v] <= min)
+                {
+                    min = dist[v];
+                    min_index = v;
+                }
+
+            return min_index;
+        }
+
+        // Funtion that implements Dijkstra's 
+        // single source shortest path algorithm 
+        // for a graph represented using adjacency 
+        // matrix representation 
+        private void Dijkstra_Algorithm(int src)
+        {
+            int[] dist = new int[this.GRAPH.Count()]; // The output array. dist[i] 
+                                     // will hold the shortest 
+                                     // distance from src to i 
+
+            // sptSet[i] will true if vertex 
+            // i is included in shortest path 
+            // tree or shortest distance from 
+            // src to i is finalized 
+            bool[] sptSet = new bool[this.GRAPH.Count()];
+
+            // Initialize all distances as 
+            // INFINITE and stpSet[] as false 
+            for (int i = 0; i < this.GRAPH.Count(); i++)
+            {
+                dist[i] = int.MaxValue;
+                sptSet[i] = false;
+            }
+
+            // Distance of source vertex 
+            // from itself is always 0 
+            dist[src] = 0;
+
+            // Find shortest path for all vertices 
+            for (int count = 0; count < this.GRAPH.Count() - 1; count++)
+            {
+                // Pick the minimum distance vertex 
+                // from the set of vertices not yet 
+                // processed. u is always equal to 
+                // src in first iteration. 
+                int u = minDistance(dist, sptSet);
+
+                // Mark the picked vertex as processed 
+                sptSet[u] = true;
+
+                // Update dist value of the adjacent 
+                // vertices of the picked vertex. 
+                for (int v = 0; v < this.GRAPH.Count(); v++)
+
+                    // Update dist[v] only if is not in 
+                    // sptSet, there is an edge from u 
+                    // to v, and total weight of path 
+                    // from src to v through u is smaller 
+                    // than current value of dist[v] 
+                    if (!sptSet[v] && this.GRAPH[u][v].W != 0 && dist[u] != int.MaxValue && dist[u] + this.GRAPH[u][v].W < dist[v])
+                        dist[v] = dist[u] + this.GRAPH[u][v].W;
+            }
+
+            // print the constructed distance array 
+             printSolution(dist);
+            
+        }
+
+        void printSolution(int[] dist)
+        {
+            Console.Write("Vertex \t\t Distance "
+                          + "from Source\n");
+            for (int i = 0; i < graph.Count(); i++)
+                Console.Write(i + " \t\t " + dist[i] + "\n");
+        }
+
+        /******************************************************************************************************************
+       * 
+       * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
+       * 
+       *                              ----- END OF DIJKSTRA ALGORITHM -----
+       *                                    
+       * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
+       * 
+       ********************************************************************************************************************/
+        #endregion
 
 
     }//AdjacencyList(END).    

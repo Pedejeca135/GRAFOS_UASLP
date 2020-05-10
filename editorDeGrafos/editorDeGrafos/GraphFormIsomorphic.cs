@@ -33,7 +33,7 @@ namespace editorDeGrafos
         {
             if(this.graph != null)
             {
-                changeIsomtextBox( this.graph.Isom_Fuerza_Bruta(f1.graph).ToString());
+                changeIsomtextBox( this.graph.Isomo_Fuerza_Bruta(f1.graph).ToString());
             }
         }
 

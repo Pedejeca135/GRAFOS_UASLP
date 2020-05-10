@@ -50,6 +50,7 @@
             this.directToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.matrizDeIncidenciaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pesosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bridgesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.algoritmosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.isomorfismoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,7 +72,7 @@
             this.IsomtextBox = new System.Windows.Forms.TextBox();
             this.gradoTruncadoButton = new System.Windows.Forms.Button();
             this.trunquedGradeTextBox = new System.Windows.Forms.TextBox();
-            this.pesosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pruebasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -259,7 +260,8 @@
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.matrizDeIncidenciaToolStripMenuItem,
             this.pesosToolStripMenuItem,
-            this.bridgesToolStripMenuItem});
+            this.bridgesToolStripMenuItem,
+            this.pruebasToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "Vista";
@@ -270,6 +272,13 @@
             this.matrizDeIncidenciaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.matrizDeIncidenciaToolStripMenuItem.Text = "Matriz de Incidencia";
             this.matrizDeIncidenciaToolStripMenuItem.Click += new System.EventHandler(this.maIn_Click);
+            // 
+            // pesosToolStripMenuItem
+            // 
+            this.pesosToolStripMenuItem.Name = "pesosToolStripMenuItem";
+            this.pesosToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pesosToolStripMenuItem.Text = "Pesos";
+            this.pesosToolStripMenuItem.Click += new System.EventHandler(this.pesosToolStripMenuItem_Click);
             // 
             // bridgesToolStripMenuItem
             // 
@@ -299,7 +308,7 @@
             this.transpuestaToolStripMenuItem,
             this.intercambioManualToolStripMenuItem});
             this.isomorfismoToolStripMenuItem.Name = "isomorfismoToolStripMenuItem";
-            this.isomorfismoToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.isomorfismoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.isomorfismoToolStripMenuItem.Text = "Isomorfismo";
             // 
             // fuerzaBrutaToolStripMenuItem1
@@ -329,7 +338,7 @@
             this.eulerToolStripMenuItem1,
             this.hamiltonToolStripMenuItem1});
             this.caminosToolStripMenuItem1.Name = "caminosToolStripMenuItem1";
-            this.caminosToolStripMenuItem1.Size = new System.Drawing.Size(141, 22);
+            this.caminosToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.caminosToolStripMenuItem1.Text = "Caminos";
             // 
             // eulerToolStripMenuItem1
@@ -349,33 +358,33 @@
             // dijkstraToolStripMenuItem
             // 
             this.dijkstraToolStripMenuItem.Name = "dijkstraToolStripMenuItem";
-            this.dijkstraToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.dijkstraToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.dijkstraToolStripMenuItem.Text = "Dijkstra";
             this.dijkstraToolStripMenuItem.Click += new System.EventHandler(this.dijkstraToolStripMenuItem_Click);
             // 
             // floydToolStripMenuItem
             // 
             this.floydToolStripMenuItem.Name = "floydToolStripMenuItem";
-            this.floydToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.floydToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.floydToolStripMenuItem.Text = "Floyd";
             // 
             // warshallToolStripMenuItem
             // 
             this.warshallToolStripMenuItem.Name = "warshallToolStripMenuItem";
-            this.warshallToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.warshallToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.warshallToolStripMenuItem.Text = "Warshall";
             // 
             // primToolStripMenuItem
             // 
             this.primToolStripMenuItem.Name = "primToolStripMenuItem";
-            this.primToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.primToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.primToolStripMenuItem.Text = "Prim";
             this.primToolStripMenuItem.Click += new System.EventHandler(this.primToolStripMenuItem_Click);
             // 
             // kruskalToolStripMenuItem
             // 
             this.kruskalToolStripMenuItem.Name = "kruskalToolStripMenuItem";
-            this.kruskalToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.kruskalToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.kruskalToolStripMenuItem.Text = "Kruskal";
             this.kruskalToolStripMenuItem.Click += new System.EventHandler(this.kruskalToolStripMenuItem_Click);
             // 
@@ -441,12 +450,12 @@
             this.trunquedGradeTextBox.Size = new System.Drawing.Size(62, 20);
             this.trunquedGradeTextBox.TabIndex = 8;
             // 
-            // pesosToolStripMenuItem
+            // pruebasToolStripMenuItem
             // 
-            this.pesosToolStripMenuItem.Name = "pesosToolStripMenuItem";
-            this.pesosToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.pesosToolStripMenuItem.Text = "Pesos";
-            this.pesosToolStripMenuItem.Click += new System.EventHandler(this.pesosToolStripMenuItem_Click);
+            this.pruebasToolStripMenuItem.Name = "pruebasToolStripMenuItem";
+            this.pruebasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pruebasToolStripMenuItem.Text = "pruebas";
+            this.pruebasToolStripMenuItem.Click += new System.EventHandler(this.pruebasToolStripMenuItem_Click);
             // 
             // GraphForm
             // 
@@ -526,6 +535,7 @@
         private System.Windows.Forms.Button gradoTruncadoButton;
         private System.Windows.Forms.TextBox trunquedGradeTextBox;
         private System.Windows.Forms.ToolStripMenuItem pesosToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pruebasToolStripMenuItem;
     }
 }
 
