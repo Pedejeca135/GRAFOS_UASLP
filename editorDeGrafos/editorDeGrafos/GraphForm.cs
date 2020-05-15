@@ -138,10 +138,13 @@ namespace editorDeGrafos
         /************* tha mouse , tha f()#/&g boss*****************/
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
+            offWhenClickingMouseOrKey();
             mousePressed = true;
             //this algorithms need sewlected nodes by the user.
-            if ((path_Euler_Do || path_Hamilton_Do|| dijkstra_Do ) && graph.GRAPH.Count() > 1)//######## Do paths ##########
-            {               
+            if ((path_Euler_Do || path_Hamilton_Do || dijkstra_Do) && graph.GRAPH.Count() > 1)//######## Do paths ##########
+            {
+            
+
                 if (initialNodePath == null || finalNodePath == null)//if any node does not exist.
                 {
                     if (initialNodePath == null)
@@ -152,11 +155,16 @@ namespace editorDeGrafos
                         {
                             initialNodePath.COLOR = Color.Blue;//change the color of the initial node
                             Invalidate();
+                            if (dijkstra_Do)
+                            {
+                                Form1_MouseDown(sender, e);
+                            }
                         }
                         if (graph.GRAPH.Count() == 1 || dijkstra_Do)
                         {
-                            finalNodePath = initialNodePath;
+                            finalNodePath = initialNodePath;                            
                         }
+
                     }
                     else
                     {
@@ -166,7 +174,6 @@ namespace editorDeGrafos
                             finalNodePath.COLOR = Color.Red;//change the color of the final node
                             Invalidate();
                         }
-                        nodePathsReady = true;
                         if (path_Euler_Do)//le toca a euler.
                         {
                             path_Euler_Do = false;
@@ -198,9 +205,8 @@ namespace editorDeGrafos
                         else if(dijkstra_Do)
                         {
                             dijkstra_Do = false;
-                            
+                            dijkstraAlgorithm();
                         }
-
                         initialNodePath = null;
                         finalNodePath = null;
                     }
@@ -656,6 +662,7 @@ namespace editorDeGrafos
         /************************ clicking operation keys *****************/
         private void Form1_KeyDown(object sender, KeyEventArgs e)// keys down.
         {
+            offWhenClickingMouseOrKey();
             if ((e.KeyCode == Keys.Escape || e.KeyCode == Keys.S) && selected != null)
             {
                 deselect();
@@ -982,7 +989,7 @@ namespace editorDeGrafos
         {
             deselect();
             reset();
-            prim_Do = true;
+            PrimAlgoritm();
         }
 
         //KRUSKAL:
@@ -1403,6 +1410,28 @@ namespace editorDeGrafos
         private void drawEdge(Graphics graphics, Edge edge)
         {
             Pen pen2 = new Pen(edge.COLOR, 5);
+            if ((dijkstraShow || primShow) && (edgesToColor[edge.Client.Index] == edge.Server.Index || edgesToColor[edge.Server.Index] == edge.Client.Index))
+            {
+                if (primShow)
+                {
+                    if(visitatedEdgesPrim[edge.Client.Index,edge.Server.Index] || visitatedEdgesPrim[edge.Server.Index, edge.Client.Index])
+                    {
+                        pen2 = new Pen(Color.Red, 5);
+                    }
+                    else
+                    {
+                        pen2 = new Pen(edge.COLOR, 5);
+                    }
+                }
+                else
+                {
+                    pen2 = new Pen(Color.Red, 5);
+                }
+            }
+            else 
+            {
+                pen2 = new Pen(edge.COLOR, 5);
+            }
             graphics.DrawLine(pen2, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
 
             if (pesosActivated)
@@ -1436,6 +1465,18 @@ namespace editorDeGrafos
         private void drawDirectedEdge(Graphics graphics, Edge edge)
         {
             Pen penDirect = new Pen(Color.DimGray, 8);
+            if (dijkstraShow && (edgesToColor[edge.Client.Index] == edge.Server.Index))
+            {
+                penDirect = new Pen(Color.Red, 5);
+            }
+            else
+            {
+                if (edge.COLOR != Color.Black)
+                {
+                    penDirect = new Pen(edge.COLOR, 5);
+                }
+            }
+
             penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor;
             penDirect.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
             Double equis_X;
@@ -2032,6 +2073,11 @@ namespace editorDeGrafos
             }
         }
 
+        void offWhenClickingMouseOrKey()
+        {
+            dijkstraShow = false;
+            primShow = false;
+        }
 
         #region Isomorphism
         #endregion
@@ -2611,6 +2657,66 @@ namespace editorDeGrafos
         #endregion
 
         #region Dijkstra
+
+        Boolean dijkstraShow = false;
+        int[] edgesToColor;
+
+        void dijkstraAlgorithm()
+        {
+            if (this.graph.isConected())
+            {
+                int n = this.graph.GRAPH.Count();
+                int minVal = int.MaxValue;
+
+
+                int[] weights = new int[n];
+                edgesToColor = new int[n];
+                Boolean[] visited = new Boolean[n];
+                int workingNode;
+
+                for (int i = 0; i < n; i++)
+                {
+                    edgesToColor[i] = weights[i] = int.MaxValue;
+                }
+                
+                weights[initialNodePath.Index] = 0;
+                edgesToColor[initialNodePath.Index] = workingNode  =initialNodePath.Index;                
+
+                while(visited.Contains(false))
+                {
+                    minVal = int.MaxValue;
+                    for (int i = 0; i < n; i++)
+                    {
+                        if(weights[i] < minVal && visited[i] == false)
+                        {
+                            minVal = weights[i];
+                            workingNode = i;
+                        }
+                    }
+
+                   foreach(Node neightboor in graph.neighborListIndex(workingNode))
+                    {
+                        if (visited[neightboor.Index] == false && graph.GRAPH[workingNode][neightboor.Index].W > -1 && weights[neightboor.Index] > weights[workingNode] + graph.GRAPH[workingNode][neightboor.Index].W)
+                        {
+                            weights[neightboor.Index] = weights[workingNode] + graph.GRAPH[workingNode][neightboor.Index].W;
+                            edgesToColor[neightboor.Index] = workingNode;
+                        }
+                    }
+                    visited[workingNode] = true;
+                }
+                dijkstraShow = true;
+                Invalidate();
+            }
+            else
+            {
+                dijkstraShow = false;
+                //mostrar un mensaje de error dijkstra
+                //deploy a OK form to finish.
+                MessageBox.Show("no existe camino de Dijkstra porque no es un grafo conexo");
+                graph.allBlack();
+                Invalidate();
+            }            
+        }
         #endregion
 
         #region Floyd
@@ -2620,6 +2726,72 @@ namespace editorDeGrafos
         #endregion
 
         #region Prim
+        Boolean primShow = false;
+        Boolean[,] visitatedEdgesPrim;
+        void PrimAlgoritm()
+        {
+            if (this.graph.isConected())
+            {
+                int n = graph.GRAPH.Count();
+                int minVal = int.MaxValue;
+                Boolean[] visitatedNodes = new Boolean[n];
+                visitatedEdgesPrim = new Boolean[n,n];                
+                Boolean primIteration = true;
+                edgesToColor = new int[n];
+
+                
+
+                while(visitatedNodes.Contains(false))
+                {
+                    minVal = int.MaxValue;
+                    Edge edgeMin = null;
+
+                    for(int j = 0; j < n; j++)
+                    {
+                        if(!primIteration && !visitatedNodes[j])
+                        {
+                            continue;
+                        }
+                        for(int i = 0; i < n; i++)
+                        {
+                                if (visitatedEdgesPrim[j, i] == false && (!visitatedNodes[j] || !visitatedNodes[i]))
+                                {
+                                    if (minVal > graph.GRAPH[j][i].W)
+                                    {
+                                        if (graph.GRAPH[j][i].W > -1 && j != i)
+                                        {
+                                            minVal = graph.GRAPH[j][i].W;
+                                            edgeMin = graph.thisEdge_Undirected(j, i);
+                                        }
+                                    }
+                                }                            
+                        }
+                    }
+                    if (edgeMin != null)
+                    {
+                        edgeMin.visitada = true;
+                        visitatedEdgesPrim[edgeMin.client.Index, edgeMin.server.Index] = true;
+                        visitatedEdgesPrim[edgeMin.server.Index, edgeMin.client.Index] = true;
+                        visitatedNodes[edgeMin.client.Index] = true;
+                        visitatedNodes[edgeMin.server.Index] = true;
+                        edgesToColor[edgeMin.client.Index] = edgeMin.server.Index;
+                    }
+
+                    primIteration = false;
+
+                }
+                primShow = true;
+                Invalidate();
+            }
+            else
+            {
+                primShow = false;
+                //deploy a OK form to finish.
+                MessageBox.Show("no existe el arbol recubridor de Prim, porque no es un grafo conexo");
+                graph.allBlack();
+                Invalidate();
+            }
+        }
         #endregion
 
         #region Kruskal
@@ -2627,11 +2799,6 @@ namespace editorDeGrafos
 
 
         #endregion
-
-        private void pruebasToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.graph.Dijkstra();
-        }
         
     }//Form(END).
 }//namespace(END).

@@ -17,7 +17,7 @@ namespace editorDeGrafos
          * 
          * 
          * *************************************************************/
-        
+
         private List<List<NodeRef>> graph;//list of lists of NodeRef is a graph
 
         private List<Node> nodeList_G = new List<Node>();//all Nodes in the graph.
@@ -134,7 +134,7 @@ namespace editorDeGrafos
         public void create(Coordenate cor, int generalRadius)
         {
             Coordenate newNodePosition = new Coordenate(cor.X, cor.Y);
-            Node newNode;            
+            Node newNode;
             newNode = new Node(newNodePosition, generalRadius, this.nodeList_G.Count(), this.createID());
             this.addNode(newNode);
         }
@@ -142,7 +142,7 @@ namespace editorDeGrafos
         public void create(Coordenate cor, int generalRadius, Color color)
         {
             Coordenate newNodePosition = new Coordenate(cor.X, cor.Y);
-            Node newNode;            
+            Node newNode;
             newNode = new Node(newNodePosition, generalRadius, this.nodeList_G.Count(), this.createID(), color);
             this.addNode(newNode);
         }
@@ -237,7 +237,7 @@ namespace editorDeGrafos
 
         public void addUndirectedEdge(Node client, Node server, int weight)
         {
-            edgeList_G.Add(new Edge(client, server,weight));
+            edgeList_G.Add(new Edge(client, server, weight));
             if (graph.Count > client.Index && graph.Count > server.Index)
             {
                 if (graph[client.Index].Count > server.Index && graph[server.Index].Count > client.Index)
@@ -245,7 +245,7 @@ namespace editorDeGrafos
                     graph[client.Index][server.Index].W = weight;
                     graph[server.Index][client.Index].W = weight;
                 }
-            }            
+            }
         }
 
         public void addUndirectedEdge(Edge edge)
@@ -268,17 +268,17 @@ namespace editorDeGrafos
 
 
         public void addDirectedEdge(Node client, Node server, int weight)
-        {            
+        {
             graph[client.Index][server.Index].W = weight;
-            this.diEdgeList_G.Add(new Edge(client,server,weight));
+            this.diEdgeList_G.Add(new Edge(client, server, weight));
         }
 
 
 
-        public void addCicledEdge(Node node, int  weight)
+        public void addCicledEdge(Node node, int weight)
         {
             graph[node.Index][node.Index].W = weight;
-            this.cicleEdgeList_G.Add(new Edge(node,weight));
+            this.cicleEdgeList_G.Add(new Edge(node, weight));
         }
 
         public String ToString(bool paramBool)
@@ -349,20 +349,20 @@ namespace editorDeGrafos
 
         public void reset()
         {
-             graph = new List<List<NodeRef>>();//list of lists of NodeRef is a graph
+            graph = new List<List<NodeRef>>();//list of lists of NodeRef is a graph
 
-             this.nodeList_G = new List<Node>();//all Nodes in the graph.
+            this.nodeList_G = new List<Node>();//all Nodes in the graph.
 
-             this.edgeList_G = new List<Edge>();//all undirected Edges.
+            this.edgeList_G = new List<Edge>();//all undirected Edges.
 
-             this.diEdgeList_G = new List<Edge>();//all directed Edges.
+            this.diEdgeList_G = new List<Edge>();//all directed Edges.
 
-             this.cicleEdgeList_G = new List<Edge>();// all cicled Edges.
+            this.cicleEdgeList_G = new List<Edge>();// all cicled Edges.
 
-             List<int> IDList_G = new List<int>();//list of created IDs.
+            List<int> IDList_G = new List<int>();//list of created IDs.
         }
 
-/********************** Basics Operations (End) **************************/
+        /********************** Basics Operations (End) **************************/
 
 
         /*************************  Information (Begin)  ***************************/
@@ -476,7 +476,7 @@ namespace editorDeGrafos
                 }
             }
             */
-            if(diEdgeList_G.Count() > 0)
+            if (diEdgeList_G.Count() > 0)
             {
                 return true;
             }
@@ -500,20 +500,7 @@ namespace editorDeGrafos
             return true;
         }
 
-        public Edge thisEdge(Node client, Node server)
-        {
-            Edge thisEdge = new Edge(client, server);
-
-            foreach (Edge edge in this.edgeList_G)
-            {
-                if (edge.EqualsU(thisEdge))
-                {
-                    return edge;
-                }
-            }
-            return null;
-        }
-
+      
         public Boolean allVisitedExept(Node workingNode)
         {
             foreach (Edge edge in edgeList_G)
@@ -823,9 +810,9 @@ namespace editorDeGrafos
             int mostGrade = 0;
             Node res = null;
 
-            foreach(Node node in nodeList)
+            foreach (Node node in nodeList)
             {
-                if(this.GradeOfNode(node) > mostGrade)
+                if (this.GradeOfNode(node) > mostGrade)
                 {
                     res = node;
                     mostGrade = this.GradeOfNode(node);
@@ -848,7 +835,7 @@ namespace editorDeGrafos
 
                     mostGrade = this.GradeOfNode(node);
                 }
-                else if(this.GradeOfNode(node) == mostGrade)
+                else if (this.GradeOfNode(node) == mostGrade)
                 {
                     res.Add(node);
                 }
@@ -1273,6 +1260,19 @@ namespace editorDeGrafos
             return res;
         }
 
+        public List<Node> neighborListIndex(int workingNode)
+        {
+            List<Node> res = new List<Node>();
+            for (int i = 0; i < graph[workingNode].Count(); i++)
+            {
+                if (graph[workingNode][i].W > -1)
+                {
+                    res.Add(graph[workingNode][i].NODO);
+                }
+            }
+            return res;
+        }
+
         public List<Node> neighborListNodeNoVisited(Node workingNode)
         {
             List<Node> res = new List<Node>();
@@ -1290,21 +1290,21 @@ namespace editorDeGrafos
         public List<Node> notVisitedList()
         {
             List<Node> res = new List<Node>();
-            foreach(Node node in nodeList_G)
+            foreach (Node node in nodeList_G)
             {
-                if(node.Visitado == false)
+                if (node.Visitado == false)
                 {
                     res.Add(node);
                 }
             }
             return res;
-          }
+        }
 
         public void restoreNotVisited(List<Node> notVisitedYet)
         {
-            foreach(Node node in nodeList_G)
+            foreach (Node node in nodeList_G)
             {
-                if(notVisitedYet.Contains(node))
+                if (notVisitedYet.Contains(node))
                 {
                     node.Visitado = false;
                 }
@@ -1316,22 +1316,22 @@ namespace editorDeGrafos
         }
 
         public List<Node> listOfconectedNodes()//nodes that have at least one conection.
-            {
+        {
             List<Node> resList = new List<Node>();
-            for(int i = 0; i < graph.Count(); i++)
+            for (int i = 0; i < graph.Count(); i++)
             {
-                if(graph[i][i].W > -1)
+                if (graph[i][i].W > -1)
                 {
                     resList.Add(graph[i][i].NODO);
                 }
             }
             return resList;
 
-            }
+        }
 
         public Boolean isACutNodeBool(Node node)
         {
-            node.Visitado = true;             
+            node.Visitado = true;
             isConected();
             if (allVisitedExept(node))
             {
@@ -1342,13 +1342,13 @@ namespace editorDeGrafos
 
         public Boolean redeiPAthUtil(Node workingNode)
         {
-            foreach(Node node in this.nodeList_G)
+            foreach (Node node in this.nodeList_G)
             {
-                if(!this.neighborListNode(workingNode).Contains(node))
+                if (!this.neighborListNode(workingNode).Contains(node))
                 {
-                    if(this.neighborListNode(workingNode).Count() 
-                        + this.neighborListNode(node).Count() 
-                        < this.nodeList_G.Count()-1)
+                    if (this.neighborListNode(workingNode).Count()
+                        + this.neighborListNode(node).Count()
+                        < this.nodeList_G.Count() - 1)
                     {
                         return false;
                     }
@@ -1422,7 +1422,7 @@ namespace editorDeGrafos
         }
 
 
-       
+
 
 
 
@@ -1444,10 +1444,10 @@ namespace editorDeGrafos
 
         public void markIsolateNodesAsVisited()
         {
-            List < Node > conectedNodes = listOfconectedNodes();
-            foreach(Node node in nodeList_G)//each node 
-            { 
-              if(!conectedNodes.Contains(node))//if the node is out of the list of conectedNodes
+            List<Node> conectedNodes = listOfconectedNodes();
+            foreach (Node node in nodeList_G)//each node 
+            {
+                if (!conectedNodes.Contains(node))//if the node is out of the list of conectedNodes
                 {
                     node.Visitado = true;
                 }
@@ -1456,11 +1456,11 @@ namespace editorDeGrafos
 
         public void allBlack()
         {
-            foreach(Edge edge in edgeList_G)
+            foreach (Edge edge in edgeList_G)
             {
                 edge.COLOR = Color.Black;
             }
-            foreach(Node node in nodeList_G)
+            foreach (Node node in nodeList_G)
             {
                 node.COLOR = Color.Black;
             }
@@ -1477,9 +1477,47 @@ namespace editorDeGrafos
                     newEdges.Add(edge);
                 }
             }
-           this.edgeList_G =  newEdges;
+            this.edgeList_G = newEdges;
         }
 
+        public Edge thisEdge(Node client, Node server)
+        {
+            Edge thisEdge = new Edge(client, server);
+
+            foreach (Edge edge in this.edgeList_G)
+            {
+                if (edge.EqualsU(thisEdge))
+                {
+                    return edge;
+                }
+            }
+            return null;
+        }
+
+        public Edge thisEdge_Undirected(int client, int server)
+        {
+
+            foreach (Edge edge in this.edgeList_G)
+            {
+                if ((edge.Client.Index == client && edge.Server.Index == server) || (edge.Client.Index == server && edge.Server.Index == client))
+                {
+                    return edge;
+                }
+            }
+            return null;
+        }
+
+        public Boolean directEdgeVisitated_ByIndex(int Client, int Server)
+        {
+            foreach(Edge edge in edgeList_G)
+            {
+                if((edge.Client.Index == Client && edge.Server.Index == Server )|| (edge.Client.Index == Server && edge.Server.Index == Client))
+                {
+                        return edge.visitada;
+                }
+            }
+            return false;
+        }
 
         public void markAllLikeVisited()
         {
