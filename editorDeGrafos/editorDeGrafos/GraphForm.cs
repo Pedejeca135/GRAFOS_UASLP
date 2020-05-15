@@ -709,14 +709,7 @@ namespace editorDeGrafos
         /********************* common key-operations (Begin) ****************************/
         private void keyM_OR_MoveClick()//
             {
-               /* if (f3.Operation == 1)
-                {
-                    graph.allBlack();
-                    Invalidate();
-                    f3.Operation = 0;
-                }
-                */
-                
+            
                 deselect();               
 
                 if (Move_M_Do)
@@ -1651,6 +1644,7 @@ namespace editorDeGrafos
 
         public void deselect()
         {
+            offWhenClickingMouseOrKey();
             if (selected != null)
             {
                 selected.Status = 0;//change to the original state.
@@ -1915,12 +1909,9 @@ namespace editorDeGrafos
         #region forPathAnimation
         protected virtual void isoForm_Click(object sender, EventArgs e)
         {
-            if (f3.Operation == 1)
-            {
-                graph.allBlack();
-                Invalidate();
-                f3.Operation = 0;
-            }
+            offWhenClickingMouseOrKey();
+            Invalidate();
+            
             if (IsomorfismForm == null || IsomorfismForm.Visible == false)
             {
                 IsomorfismForm = new GraphFormIsomorphic(this);
@@ -2952,5 +2943,22 @@ namespace editorDeGrafos
 
         #endregion
 
+        private void operacionesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            offWhenClickingMouseOrKey();
+            Invalidate();
+        }
+
+        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            offWhenClickingMouseOrKey();
+            Invalidate();
+        }
+
+        private void algoritmosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            offWhenClickingMouseOrKey();
+            Invalidate();
+        }
     }//Form(END).
 }//namespace(END).
