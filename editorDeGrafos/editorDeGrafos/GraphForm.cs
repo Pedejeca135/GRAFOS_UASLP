@@ -83,7 +83,7 @@ namespace editorDeGrafos
         Node finalNodePath = null;
         Boolean nodePathsReady = false;
         Timer timerColor = new System.Windows.Forms.Timer();
-        int timerColorOption = 0;
+        //int timerColorOption = 0;
         int tmpCount = 0;
 
         /****************** for Floyd    *****************************/
@@ -138,20 +138,10 @@ namespace editorDeGrafos
         /************* tha mouse , tha f()#/&g boss*****************/
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
-            /*
-            if (f3.Operation == 1)
-            {
-                graph.allBlack();
-                Invalidate();
-                f3.Operation = 0;
-            }
-            */
-
             mousePressed = true;
-
-            if ((path_Euler_Do || path_Hamilton_Do) && graph.GRAPH.Count() > 1)//######## Do paths ##########
-            {
-
+            //this algorithms need sewlected nodes by the user.
+            if ((path_Euler_Do || path_Hamilton_Do|| dijkstra_Do ) && graph.GRAPH.Count() > 1)//######## Do paths ##########
+            {               
                 if (initialNodePath == null || finalNodePath == null)//if any node does not exist.
                 {
                     if (initialNodePath == null)
@@ -163,7 +153,7 @@ namespace editorDeGrafos
                             initialNodePath.COLOR = Color.Blue;//change the color of the initial node
                             Invalidate();
                         }
-                        if (graph.GRAPH.Count() == 1)
+                        if (graph.GRAPH.Count() == 1 || dijkstra_Do)
                         {
                             finalNodePath = initialNodePath;
                         }
@@ -176,10 +166,7 @@ namespace editorDeGrafos
                             finalNodePath.COLOR = Color.Red;//change the color of the final node
                             Invalidate();
                         }
-
-
                         nodePathsReady = true;
-
                         if (path_Euler_Do)//le toca a euler.
                         {
                             path_Euler_Do = false;
@@ -194,7 +181,7 @@ namespace editorDeGrafos
                                 pathOfEuler();
                             }
                         }
-                        else//le toca a hamilton.
+                        else if (path_Hamilton_Do)//le toca a hamilton.
                         {
                             path_Hamilton_Do = false;
                             if (initialNodePath == finalNodePath)//cycle
@@ -207,6 +194,11 @@ namespace editorDeGrafos
                                 pathOfHamilton();
                             }
 
+                        }
+                        else if(dijkstra_Do)
+                        {
+                            dijkstra_Do = false;
+                            
                         }
 
                         initialNodePath = null;
@@ -944,41 +936,61 @@ namespace editorDeGrafos
             InvalidatePlus();
         }
 
-
         //CAMINOS:
+        //EULER:
         private void eulerToolStripMenuItem_Click(object sender, EventArgs e)//make happend 
         {
             deselect();
+            reset();
             path_Euler_Do = true;
-            path_Hamilton_Do = false;
-            nodePathsReady = false;
         }
 
+        //HAMILTON
         private void hamiltonToolStripMenuItem_Click(object sender, EventArgs e)//make happend
         {
             deselect();
-            path_Hamilton_Do = false;
-            path_Euler_Do = true;
-            nodePathsReady = false;
+            reset();
+            path_Hamilton_Do = true;
         }
-
 
         //DIJKSTRA:
         private void dijkstraToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            dijkstra_Do = !dijkstra_Do;
+            deselect();
+            reset();
+            dijkstra_Do = true;
+        }
+
+        //FLOYD
+        private void floydToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            deselect();
+            reset();
+            floyd_Do = true;
+        }
+
+        //WARSHALL
+        private void warshallToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            deselect();
+            reset();
+            warshall_Do = true;
         }
 
         //PRIM:
         private void primToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            deselect();
+            reset();
+            prim_Do = true;
         }
 
         //KRUSKAL:
         private void kruskalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            deselect();
+            reset();
+            kruskal_Do = true;
         }
 
         /***************||||||||||||||  ALGORITMOS EVENTS (END) |||||||||||||||||||||||*******************/
@@ -1523,7 +1535,7 @@ namespace editorDeGrafos
 
         private void reset()
         {
-             selected = null;
+             deselect();
              selectedJustFor_Moving = null;//for moving.
              selectedJustFor_Linking = null;
              mousePressed = false;
@@ -1565,8 +1577,8 @@ namespace editorDeGrafos
          initialNodePath = null;
          finalNodePath = null;
          nodePathsReady = false;
-        int timerColorOption = 0;
-        int tmpCount = 0;
+        //int timerColorOption = 0;
+        //int tmpCount = 0;
     }
 
     public int AFWeight(String type)
@@ -1656,762 +1668,7 @@ namespace editorDeGrafos
         List<Node> workingNodes;
         pathsOK f3 = new pathsOK();
 
-        #region Euler
-
-        #region cycleEuler
-
-        public void cycleOfEuler()//next to the event.
-        {
-            if (!cycleOfEulerBool())
-            {
-                //deploy a OK form to finish.
-                MessageBox.Show("no hay circuito de Euler");
-                graph.allBlack();
-                Invalidate();
-            }
-            else//a trabajar
-            {
-                // do the animation of the path or cycle
-                    cycleOfEuler_Algorithm();
-                if (pathToAnimate == null)
-                {
-                    //deploy a OK form to finish.
-                    MessageBox.Show("no hay circuito de Euler");
-                    graph.allBlack();
-                    Invalidate();
-                }
-                else
-                {
-                    String forma3Mensaje = "";
-
-                    foreach (Node node in pathOfNodes)
-                    {
-                        forma3Mensaje = forma3Mensaje + node.Index + "->";
-                    }
-                    tmpCount = 0;
-                    f3.changeMesagge(forma3Mensaje);
-                    timerColor.Start();
-                    f3.ShowDialog();
-                    //MessageBox.Show(forma3Mensaje);
-                }
-
-            }
-        }
-        public Boolean cycleOfEulerBool()//to determine if the graph has a Eulerian cycle.
-        {
-            // An undirected graph has Eulerian cycle if following two conditions are true.
-            //….a) All vertices with non-zero degree are connected.We don’t care about 
-            //vertices with zero degree because they don’t belong to Eulerian Cycle or Path(we only consider all edges).
-            //….b) All vertices have even degree.
-            Boolean res = true;
-           // aux = new AdjacencyList();
-            workingNodes = new List<Node>();
-
-            foreach (Node node in graph.NODE_LIST)
-            {
-                int degreeByN = graph.neighborListNode(node).Count();
-
-                if (degreeByN > 0)//atleast one neightboor
-                {
-                    if (degreeByN % 2 != 0)// one node have not an even number of neirhtbors
-                    {
-                        return false;
-                    }
-                    //aux.addNode(node);
-                    workingNodes.Add(node);
-                }
-            }
-
-            //if (aux.LIST_NODES.Count() > 0)
-            if (workingNodes.Count > 0)
-            {
-                if (!allConected(workingNodes))// if not all are connected
-                {
-                    return false;
-                }
-            }
-            return res;
-        }
-
-       
-        public List<Edge> cycleOfEuler_Algorithm()//algoritmos
-        {
-            List<Edge> res = new List<Edge>();
-            List<Edge> edgeListInside = new List<Edge>();
-            edgeListInside = graph.EDGE_LIST;
-            pathOfNodes = new List<Node>();
-            pathToAnimate = new List<Edge>();
-
-            cutEdges = new List<Edge>();
-
-            graph.markAllLikeNotBridge();
-            graph.markAllLikeNotVisited(1);
-           
-
-            foreach (Edge edge in graph.EDGE_LIST)
-            {
-                if (isABridgeBool(edge))
-                {
-                    cutEdges.Add(edge);
-                }
-            }
-
-            // Mark all the vertices as not visited 
-            graph.markAllLikeNotVisited();
-
-            // Start DFS traversal from a vertex with non-zero degree 
-
-            pathOfNodes.Add(initialNodePath);
-            DFSEulerCycle(initialNodePath);
-            //pathOfNodes.Add(finalNodePath);
-            return res;
-        }
-        void DFSEulerCycle(Node workingNode/*int v, bool visited[]*/)
-        {
-            // Mark the current node as visited
-           // pathOfNodes.Add(workingNode);
-            //workingNode.Visitado = true;
-
-            List<Node> dejaAlFinal = new List<Node>();
-
-            foreach (Node node in graph.neighborListNode(workingNode))
-            {
-                //if(node.Visitado == false)
-                //{
-               Edge edge= graph.thisEdge(workingNode,node);
-                   // foreach (Edge edge in aListGraph.listOfEdges_IG)// edgeList)
-                   // {
-                    if (edge.visitada == false )
-                        {
-                            if (isABridgeVisitedsBool(edge,graph))//cutEdges.Contains(edge))//||edge.Bridge == true)
-                            {
-                                dejaAlFinal.Add(node);
-                            }
-                            else
-                            {
-                                if (node != finalNodePath)
-                                {
-                                    edge.visitada = true;
-                                    pathToAnimate.Add(edge);
-                                    pathOfNodes.Add(node);
-                                    DFSEulerCycle(node);
-                                }
-                            }
-
-                        }
-                   // }
-                //}
-            }
-
-            foreach (Node node in dejaAlFinal)
-            {
-               // if (node.Visitado == false)
-                //{
-                    foreach (Edge edge in graph.EDGE_LIST)
-                    {
-                        if (edge.isThisUndirected(workingNode, node) && edge.visitada == false)
-                        {
-                            edge.visitada = true;
-                            pathToAnimate.Add(edge);
-                            pathOfNodes.Add(node);
-                            break;
-
-                        }
-                    }
-                    DFSEulerCycle(node);
-                //}
-            }
-
-            if (graph.neighborListNode(workingNode).Contains(finalNodePath))
-            {
-                Edge edgeFinal = graph.thisEdge(workingNode,finalNodePath);
-
-                if (graph.allVisitedExept(edgeFinal) && edgeFinal.visitada == false)
-                {
-                    edgeFinal.visitada = true;
-                    pathToAnimate.Add(edgeFinal);
-                    pathOfNodes.Add(finalNodePath);
-                }
-            }
-
-        }
-
-        #endregion
-
-        #region pathEuler
-        public void pathOfEuler()//next to the event
-        {
-            if (!pathOfEulerBool())
-            {
-                //deploy a OK form to finish.
-                MessageBox.Show("no hay camino de Euler");
-                graph.allBlack();
-                Invalidate();
-            }
-            else//a trabajar
-            {
-                if (graph.neighborListNode(initialNodePath).Count() % 2 == 0 
-                 || graph.neighborListNode(finalNodePath).Count() % 2 == 0)
-                {
-                    if (estimadedIniFinNodes.Count()>1)
-                    {
-                        MessageBox.Show("Existe un camino de Euler pero no el sugerido, intenta con " + estimadedIniFinNodes[0].Index + ","+  estimadedIniFinNodes[1].Index);
-                        graph.allBlack();
-                        Invalidate();
-                    }
-                    else
-                    {
-                        MessageBox.Show("No existe el camino de Euler");
-                        graph.allBlack();
-                        Invalidate();
-                    }
-                }
-                else
-                {                
-                    pathOfEuler_Algorithm();
-                    String forma3Mensaje = "";
-
-                    foreach (Node node in pathOfNodes)
-                    {
-                        forma3Mensaje = forma3Mensaje + node.Index + "->";
-                    }
-                    tmpCount = 0;
-                    f3.changeMesagge(forma3Mensaje);
-                    timerColor.Start();
-                    f3.ShowDialog();
-                }
-            }
-        }
-        public List<Edge> pathOfEuler_Algorithm()//algorithm
-        {
-            List<Edge> res = new List<Edge>();
-            List<Edge> edgeListInside = new List<Edge>();
-            edgeListInside = graph.EDGE_LIST;
-            pathOfNodes = new List<Node>();
-            pathToAnimate = new List<Edge>();
-
-            cutEdges = new List<Edge>();
-
-            graph.markAllLikeNotBridge();
-            graph.markAllLikeNotVisited(1);
-
-
-            foreach (Edge edge in graph.EDGE_LIST)
-            {
-                if (isABridgeBool(edge))
-                {
-                    cutEdges.Add(edge);
-                }
-            }
-
-            // Mark all the vertices as not visited 
-            graph.markAllLikeNotVisited();
-
-            // Start DFS traversal from a vertex with non-zero degree 
-
-            pathOfNodes.Add(initialNodePath);
-            DFSEulerCycle(initialNodePath);
-            //pathOfNodes.Add(finalNodePath);
-            return res;
-
-        }
-
-        public Boolean pathOfEulerBool()
-        {
-            bool res = true;
-            aux = new Graph();
-            estimadedIniFinNodes = new List<Node>();
-            int oddDegreeCont = 0;
-
-            foreach (Node node in graph.NODE_LIST)
-            {
-                int degreeByN = graph.neighborListNode(node).Count();
-
-                if (degreeByN > 0)//atleast one neightboor
-                {
-                    if (degreeByN % 2 != 0)// the node have not an even number of neightbors
-                    {
-                        oddDegreeCont++;
-                        estimadedIniFinNodes.Add(node);
-                    }
-                    aux.addNode(node);
-                }
-            }
-
-            if (aux.NODE_LIST.Count() > 0)
-            {
-                if (oddDegreeCont != 2)
-                {
-                    return false;
-                }
-
-                /*if (!allConected())// if not all are connected
-                {
-                    return false;
-                }
-                */
-            }
-            return res;
-        }
-        #endregion
-        #endregion
-
-        #region Hamilton
-        //-------------------------------- Hamilton--------------------
-        public void cycleOfHamilton()
-        {
-            if (!cycleOfHamiltonBool())
-            {
-                MessageBox.Show("no hay ciclos de hamilton");
-                graph.allBlack();
-                Invalidate();
-            }
-            else//a trabajar
-            {
-                if (cycleOfHamilton_Algorithm())
-                {
-                    String forma3Mensaje = "";
-
-                    foreach (Node node in pathOfNodes)
-                    {
-                        forma3Mensaje = forma3Mensaje + node.Index + "->";
-                    }
-                    tmpCount = 0;
-                    f3.changeMesagge(forma3Mensaje);
-                    timerColor.Start();
-                    f3.ShowDialog();
-                }
-                else
-                {
-                    MessageBox.Show("no existe el ciclo de hamilton especificado");
-                    graph.allBlack();
-                    Invalidate();
-                }
-                   
-            }
-        }
-
-        public Boolean cycleOfHamiltonBool()
-        {
-
-            Boolean res = true;
-
-            //can not have a disconnected node
-            if (!allConected(graph))
-            {
-                return false;
-            }
-            //not cut vertices
-            foreach (Edge edge in graph.EDGE_LIST)
-            {
-                if (isABridgeBool(edge))//if any edge is a bridge it return false to hamilton cycle.
-                {
-                    return false;
-                }
-            }
-
-            foreach (Node node in graph.NODE_LIST)
-            {
-                if (graph.isACutNodeBool(node))//if any node is a cut node return false to hamilton cycle.
-                {
-                    return false;
-                }
-                if (graph.neighborListNode(node).Count() < 2)
-                {
-                    return false;
-                }
-            }
-
-            return res;
-        }
-
-        public Boolean cycleOfHamilton_Algorithm()
-        {  
-           
-            pathOfNodes = new List<Node>();
-            pathToAnimate = new List<Edge>();
-            cutEdges = new List<Edge>();
-
-            graph.markAllLikeNotBridge();
-            graph.markAllLikeNotVisited(1);
-
-
-            foreach (Edge edge in graph.EDGE_LIST)
-            {
-                if (isABridgeBool(edge))
-                {
-                    cutEdges.Add(edge);
-                }
-            }
-
-            // Mark all the vertices as not visited 
-
-            // Start DFS traversal from a vertex with non-zero degree 
-            //return DFSHamiltonCycle(initialNodePath);
- 
-            graph.markAllNodeAndEdgesNotVisited();//marcar todos los nodos y aristas como no visitados.
-           
-            return DFS_Any_HamiltonCycle(initialNodePath);
-        }
-
-        List<Node> nodesPath = new List<Node>();
-Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
-        {
-            workingNode.Visitado= true;//marcar el nodo actual como visitado.
-            List<Node> notVisitedYet = graph.notVisitedList();//nodos sin visitar para restauraciones.
-            List<Node> neightboors = graph.neighborListNode(workingNode);//vecinos del nodo actual.
-
-            /*********************
-             *       Caso Base. 
-             * *********************/
-            if (notVisitedYet.Count() < 1 && neightboors.Contains(initialNodePath))//todos los nodos visitados && el nodo actual tiene de vecino al nodo inicial
-            {
-                Edge edge = graph.thisEdge(workingNode, initialNodePath);
-                pathToAnimate.Add(edge);//agrega la arista( actual->inicial) al camino para animar
-                pathOfNodes.Add(initialNodePath);//se agrega por primera vez el nodoInicial(mismo que nodoFinal) al camino de nodos;
-                pathOfNodes.Add(workingNode);//agrega el nodo actual al camino de nodos 
-                return true;
-            }
-
-            //acomodar los vecinos de menor a mayor en cuestion de grado.
-            neightboors.Sort(delegate (Node x, Node y)
-            {
-                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
-            });
-
-
-            /*********************
-             *       Caso General. 
-             * *********************/
-            foreach (Node node in neightboors)
-            {
-                if (node.Visitado == false)
-                {
-                    if (DFS_Any_HamiltonCycle(node))//si el nodo vecino retorna un ciclo
-                    {
-
-                        // nodesPath.Add(workingNode);
-                        Edge edge = graph.thisEdge(workingNode, node);
-                        pathOfNodes.Add(workingNode);
-                        pathToAnimate.Add(edge);
-                        return true;
-                    }
-                    else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
-                        graph.restoreNotVisited(notVisitedYet);//restaturacion.
-                }
-
-            }
-
-            //no se encontro nigun ciclo.
-            return false;
-        }//DFS_Any_HamiltonCycle(END).
-
-
- Boolean DFSHamiltonCycle(Node workingNode/*int v, bool visited[]*/)
-        {
-            // Mark the current node as visited
-            // pathOfNodes.Add(workingNode);
-            workingNode.Visitado = true;
-
-            List<Node> dejaAlFinal = new List<Node>();
-            List<Node> dejarAlMedio = new List<Node>();
-
-            List<Node> neightboors = graph.neighborListNode(workingNode);
-            neightboors.Sort(delegate(Node x, Node y)
-            {
-               return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
-            });
-
-            Boolean inmovilizado = true ;//when all eas visited already
-            
-
-            foreach (Node node in neightboors)
-            {
-                if (node.Visitado == false)
-                {
-                    inmovilizado = false;
-                    Edge edge = graph.thisEdge(workingNode, node);
-                    if (edge.visitada == false)
-                    {
-                        if (isABridgeVisitedsBool(edge, graph))//cutEdges.Contains(edge))//||edge.Bridge == true)
-                        {
-                            
-                            dejaAlFinal.Add(node);
-                        }
-                        else
-                        {
-
-                            if (node != finalNodePath)
-                            {
-                                edge.visitada = true;
-                                pathToAnimate.Add(edge);
-                                pathOfNodes.Add(node);
-                                return DFSHamiltonCycle(node);
-                            }
-
-                        }
-                    }
-                
-                }
-            }
-
-            foreach (Node node in dejaAlFinal)
-            {
-                 if (node.Visitado == false)
-                {
-                        Edge edge = graph.thisEdge(workingNode, node);
-                    if (edge.visitada == false)                    
-                    {
-                            edge.visitada = true;
-                            pathToAnimate.Add(edge);
-                            pathOfNodes.Add(node);
-                            return DFSHamiltonCycle(node);                                             
-                    }
-                
-                }
-            }
-
-            if (neightboors.Contains(finalNodePath))
-            {
-                Edge edgeFinal = graph.thisEdge(workingNode, finalNodePath);
-
-                if (graph.allNodesVisitedBool() )//&& edgeFinal.visitada == false)
-                {
-                    edgeFinal.visitada = true;                    
-                    pathToAnimate.Add(edgeFinal);
-                    pathOfNodes.Add(finalNodePath);
-                    return true;
-                }
-            }
-            return false;
-
-        }
-
-        public void pathOfHamilton()
-        {
-            if (!pathOfHamiltonBool())
-            {
-                //deploy a OK form to finish.
-                MessageBox.Show("no hay path of hamilton");
-                graph.allBlack();
-                Invalidate();
-            }
-            else//a trabajar
-            {
-                if (pathOfHamilton_Algorithm())
-                {
-                    String forma3Mensaje = "";
-
-                    foreach (Node node in pathOfNodes)
-                    {
-                        forma3Mensaje = forma3Mensaje + node.Index + "->";
-                    }
-                    tmpCount = 0;
-                    f3.changeMesagge(forma3Mensaje);
-                    timerColor.Start();
-                    f3.ShowDialog();
-                }
-                else
-                {
-                    MessageBox.Show("no existe el camino de hamilton especificado");
-                }
-            }
-        }
-
-
-
-        int DFS_Any_HamiltonCycleOrPath(Node workingNode)//recursive function.
-        {
-            workingNode.Visitado = true;
-            List<Node> notVisitedYet = graph.notVisitedList();
-            List<Node> neightboors = graph.neighborListNode(workingNode);
-            if (notVisitedYet.Count() < 1)// si todos los nodos han sido visitados
-            {
-                if (neightboors.Contains(initialNodePath) && initialNodePath == finalNodePath)// si cumple el ciclo y se busca el ciclo.
-                {
-                    Edge edge = graph.thisEdge(workingNode, initialNodePath);
-                    pathToAnimate.Add(edge);
-                    pathOfNodes.Add(initialNodePath);
-                    pathOfNodes.Add(workingNode);
-                    return 2;
-                }
-                else
-                {
-                    pathOfNodes.Add(workingNode);
-                    return 1;
-                }
-
-            }
-            else if (notVisitedYet.Count() == 1 && neightboors.Contains(finalNodePath) && notVisitedYet.Contains(finalNodePath))
-            {
-                int res = DFS_Any_HamiltonCycleOrPath(finalNodePath);
-                if (res > 0)
-                {
-                    Edge edge = graph.thisEdge(workingNode, finalNodePath);
-                    pathOfNodes.Add(workingNode);
-                    pathToAnimate.Add(edge);
-                    return res;
-                }
-            }
-
-
-            neightboors.Sort(delegate (Node x, Node y)
-            {
-                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
-            });
-
-            foreach (Node node in neightboors)
-            {
-                if (node.Visitado == false && node != finalNodePath)
-                {
-                    int res = DFS_Any_HamiltonCycleOrPath(finalNodePath);
-                    if (res > 0)
-                    {
-
-                        // nodesPath.Add(workingNode);
-                        Edge edge = graph.thisEdge(workingNode, node);
-                        pathOfNodes.Add(workingNode);
-                        pathToAnimate.Add(edge);
-                        return res;
-                    }
-                    else
-                        graph.restoreNotVisited(notVisitedYet);
-                }
-
-            }
-
-            return 0;
-        }//DFS_Any_HamiltonCycle(END).
-
-
-
-
-        public Boolean pathOfHamiltonBool()
-        {
-        // Boolean res = false;
-            //can not have a disconnected node
-            if (!allConected(graph))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-
-        public Boolean pathOfHamilton_Algorithm()
-        {
-            pathOfNodes = new List<Node>();
-            pathToAnimate = new List<Edge>();
-            cutEdges = new List<Edge>();
-
-            graph.markAllLikeNotBridge();
-            graph.markAllLikeNotVisited(1);
-
-
-            foreach (Edge edge in graph.EDGE_LIST)
-            {
-                if (isABridgeBool(edge))
-                {
-                    cutEdges.Add(edge);
-                }
-            }
-
-            // Mark all the vertices as not visited 
-
-            // Start DFS traversal from a vertex with non-zero degree 
-
-            pathOfNodes.Add(initialNodePath);
-            graph.markAllNodeAndEdgesNotVisited();
-            //return DFSHamiltonPath(initialNodePath);
-            if(DFS_Any_HamiltonCycleOrPath(initialNodePath)>0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
-
-        Boolean DFSHamiltonPath(Node workingNode)
-        {
-            // Mark the current node as visited
-            // pathOfNodes.Add(workingNode);
-            workingNode.Visitado = true;
-
-            List<Node> dejaAlFinal = new List<Node>();
-            List<Node> dejarAlMedio = new List<Node>();
-
-            List<Node> neightboors = graph.neighborListNode(workingNode);
-            neightboors.Sort(delegate(Node x, Node y)
-            {
-               return graph.neighborListNode(x).Count().CompareTo(graph.neighborListNode(y).Count());
-            });
-
-            Boolean inmovilizado = true;//when all eas visited already
-
-
-            if (workingNode == finalNodePath && graph.allNodesVisitedBool())//&& edgeFinal.visitada == false)
-            {               
-                //pathOfNodes.Add(finalNodePath);
-                return true;
-            }
-            else
-            {
-
-                foreach (Node node in neightboors)
-                {
-                    if (node.Visitado == false)
-                    {
-                        inmovilizado = false;
-                        Edge edge = graph.thisEdge(workingNode, node);
-                        if (edge.visitada == false)
-                        {
-                            if (isABridgeVisitedsBool(edge, graph))//cutEdges.Contains(edge))//||edge.Bridge == true)
-                            {
-
-                                dejaAlFinal.Add(node);
-                            }
-                            else
-                            {
-
-                                if (node != finalNodePath)
-                                {
-                                    edge.visitada = true;
-                                    pathToAnimate.Add(edge);
-                                    pathOfNodes.Add(node);
-                                    return DFSHamiltonPath(node);
-                                }
-
-                            }
-                        }
-
-                    }
-                }
-
-                foreach (Node node in dejaAlFinal)
-                {
-                    if (node.Visitado == false)
-                    {
-                        Edge edge = graph.thisEdge(workingNode, node);
-                        if (edge.visitada == false)
-                        {
-                            edge.visitada = true;
-                            pathToAnimate.Add(edge);
-                            pathOfNodes.Add(node);
-                            return DFSHamiltonPath(node);
-                        }
-
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        #endregion
+        #region utilAlgorithms
 
         /**************************************
          * 
@@ -2602,6 +1859,18 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             }
         }
 
+        public Boolean allVisited(List<Edge> listEdges)
+        {
+            foreach (Edge edge in listEdges)
+            {
+                if (edge.visitada == false)
+                    return false;
+            }
+            return true;
+        }
+        #endregion
+
+        #region forPathAnimation
         protected virtual void isoForm_Click(object sender, EventArgs e)
         {
             if (f3.Operation == 1)
@@ -2684,7 +1953,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             Invalidate();
         }
 
-        Boolean switcher2 = false;
+        //Boolean switcher2 = false;
         List<Edge> workingEdgesList;
        // List<NeightborsTreatet>
 
@@ -2732,16 +2001,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             Invalidate();
         }
 
-        public Boolean allVisited(List<Edge> listEdges)
-        {
-            foreach(Edge edge in listEdges)
-            {
-                if (edge.visitada == false)
-                    return false;
-            }
-            return true;
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
             //pruebas pb = new pruebas();
@@ -2752,10 +2011,7 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
             tmpCount = 0;
         }
 
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
+        #endregion
 
         private void caminosToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2777,31 +2033,584 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         }
 
 
-
-
-
-
-
-
-        #region Algorithms
-
-
         #region Isomorphism
         #endregion
 
         #region Paths and Cycles
 
         #region Euler
+
+        #region cycleEuler
+
+
+        /*
+       cycleOfEuler();
+       pathOfEuler();
+                      */
+
+
+        public void cycleOfEuler()//next to the event.
+        {
+            if (!cycleOfEulerBool())
+            {
+                //deploy a OK form to finish.
+                MessageBox.Show("no hay circuito de Euler");
+                graph.allBlack();
+                Invalidate();
+            }
+            else//a trabajar
+            {
+                // do the animation of the path or cycle
+                cycleOfEuler_Algorithm();
+                if (pathToAnimate == null)
+                {
+                    //deploy a OK form to finish.
+                    MessageBox.Show("no hay circuito de Euler");
+                    graph.allBlack();
+                    Invalidate();
+                }
+                else
+                {
+                    String forma3Mensaje = "";
+
+                    foreach (Node node in pathOfNodes)
+                    {
+                        forma3Mensaje = forma3Mensaje + node.Index + "->";
+                    }
+                    tmpCount = 0;
+                    f3.changeMesagge(forma3Mensaje);
+                    timerColor.Start();
+                    f3.ShowDialog();
+                    //MessageBox.Show(forma3Mensaje);
+                }
+
+            }
+        }
+        public Boolean cycleOfEulerBool()//to determine if the graph has a Eulerian cycle.
+        {
+            // An undirected graph has Eulerian cycle if following two conditions are true.
+            //….a) All vertices with non-zero degree are connected.We don’t care about 
+            //vertices with zero degree because they don’t belong to Eulerian Cycle or Path(we only consider all edges).
+            //….b) All vertices have even degree.
+            Boolean res = true;
+            // aux = new AdjacencyList();
+            workingNodes = new List<Node>();
+
+            foreach (Node node in graph.NODE_LIST)
+            {
+                int degreeByN = graph.neighborListNode(node).Count();
+
+                if (degreeByN > 0)//atleast one neightboor
+                {
+                    if (degreeByN % 2 != 0)// one node have not an even number of neirhtbors
+                    {
+                        return false;
+                    }
+                    //aux.addNode(node);
+                    workingNodes.Add(node);
+                }
+            }
+
+            //if (aux.LIST_NODES.Count() > 0)
+            if (workingNodes.Count > 0)
+            {
+                if (!allConected(workingNodes))// if not all are connected
+                {
+                    return false;
+                }
+            }
+            return res;
+        }
+
+
+        public List<Edge> cycleOfEuler_Algorithm()//algoritmos
+        {
+            List<Edge> res = new List<Edge>();
+            List<Edge> edgeListInside = new List<Edge>();
+            edgeListInside = graph.EDGE_LIST;
+            pathOfNodes = new List<Node>();
+            pathToAnimate = new List<Edge>();
+
+            cutEdges = new List<Edge>();
+
+            graph.markAllLikeNotBridge();
+            graph.markAllLikeNotVisited(1);
+
+
+            foreach (Edge edge in graph.EDGE_LIST)
+            {
+                if (isABridgeBool(edge))
+                {
+                    cutEdges.Add(edge);
+                }
+            }
+
+            // Mark all the vertices as not visited 
+            graph.markAllLikeNotVisited();
+
+            // Start DFS traversal from a vertex with non-zero degree 
+            pathOfNodes.Add(initialNodePath);
+            DFSEulerCycle(initialNodePath);
+            return res;
+        }
+        void DFSEulerCycle(Node workingNode/*int v, bool visited[]*/)
+        {
+            List<Node> dejaAlFinal = new List<Node>();
+
+            foreach (Node node in graph.neighborListNode(workingNode))
+            {
+                Edge edge = graph.thisEdge(workingNode, node);
+
+                if (edge.visitada == false)
+                {
+                    if (isABridgeVisitedsBool(edge, graph))//cutEdges.Contains(edge))//||edge.Bridge == true)
+                    {
+                        dejaAlFinal.Add(node);
+                    }
+                    else
+                    {
+                        if (node != finalNodePath)
+                        {
+                            edge.visitada = true;
+                            pathToAnimate.Add(edge);
+                            pathOfNodes.Add(node);
+                            DFSEulerCycle(node);
+                        }
+                    }
+
+                }
+            }
+
+            foreach (Node node in dejaAlFinal)
+            {
+                foreach (Edge edge in graph.EDGE_LIST)
+                {
+                    if (edge.isThisUndirected(workingNode, node) && edge.visitada == false)
+                    {
+                        edge.visitada = true;
+                        pathToAnimate.Add(edge);
+                        pathOfNodes.Add(node);
+                        break;
+
+                    }
+                }
+                DFSEulerCycle(node);
+            }
+
+            if (graph.neighborListNode(workingNode).Contains(finalNodePath))
+            {
+                Edge edgeFinal = graph.thisEdge(workingNode, finalNodePath);
+
+                if (graph.allVisitedExept(edgeFinal) && edgeFinal.visitada == false)
+                {
+                    edgeFinal.visitada = true;
+                    pathToAnimate.Add(edgeFinal);
+                    pathOfNodes.Add(finalNodePath);
+                }
+            }
+
+        }
+
+        #endregion
+
+        #region pathEuler
+        public void pathOfEuler()//next to the event
+        {
+            if (!pathOfEulerBool())
+            {
+                //deploy a OK form to finish.
+                MessageBox.Show("no hay camino de Euler por Bool");
+                graph.allBlack();
+                Invalidate();
+            }
+            else//a trabajar
+            {
+                if (graph.neighborListNode(initialNodePath).Count() % 2 == 0
+                 || graph.neighborListNode(finalNodePath).Count() % 2 == 0)
+                {
+                    if (estimadedIniFinNodes.Count() > 1)
+                    {
+                        MessageBox.Show("Existe un camino de Euler pero no el sugerido, intenta con " + estimadedIniFinNodes[0].Index + "," + estimadedIniFinNodes[1].Index);
+                        graph.allBlack();
+                        Invalidate();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No existe el camino de Euler");
+                        graph.allBlack();
+                        Invalidate();
+                    }
+                }
+                else
+                {
+                    pathOfEuler_Algorithm();
+                    String forma3Mensaje = "";
+
+                    foreach (Node node in pathOfNodes)
+                    {
+                        forma3Mensaje = forma3Mensaje + node.Index + "->";
+                    }
+                    tmpCount = 0;
+                    f3.changeMesagge(forma3Mensaje);
+                    timerColor.Start();
+                    f3.ShowDialog();
+                }
+            }
+        }
+        public List<Edge> pathOfEuler_Algorithm()//algorithm
+        {
+            List<Edge> res = new List<Edge>();
+            List<Edge> edgeListInside = new List<Edge>();
+            edgeListInside = graph.EDGE_LIST;
+            pathOfNodes = new List<Node>();
+            pathToAnimate = new List<Edge>();
+
+            cutEdges = new List<Edge>();
+
+            graph.markAllLikeNotBridge();
+            graph.markAllLikeNotVisited(1);
+
+
+            foreach (Edge edge in graph.EDGE_LIST)
+            {
+                if (isABridgeBool(edge))
+                {
+                    cutEdges.Add(edge);
+                }
+            }
+
+            // Mark all the vertices as not visited 
+            graph.markAllLikeNotVisited();
+
+            // Start DFS traversal from a vertex with non-zero degree 
+
+            pathOfNodes.Add(initialNodePath);
+            DFSEulerCycle(initialNodePath);
+            //pathOfNodes.Add(finalNodePath);
+            return res;
+
+        }
+
+        public Boolean pathOfEulerBool()
+        {
+            bool res = true;
+            aux = new Graph();
+            estimadedIniFinNodes = new List<Node>();
+            int oddDegreeCont = 0;
+
+            foreach (Node node in graph.NODE_LIST)
+            {
+                int degreeByN = graph.neighborListNode(node).Count();
+
+                if (degreeByN > 0)//atleast one neightboor
+                {
+                    if (degreeByN % 2 != 0)// the node have not an even number of neightbors
+                    {
+                        oddDegreeCont++;
+                        estimadedIniFinNodes.Add(node);
+                    }
+                    aux.addNode(node);
+                }
+            }
+
+            if (aux.NODE_LIST.Count() > 0)
+            {
+                if (oddDegreeCont != 2)
+                {
+                    return false;
+                }
+
+                /*if (!allConected())// if not all are connected
+                {
+                    return false;
+                }
+                */
+            }
+            return res;
+        }
+        #endregion
+
         #endregion
 
         #region Hamilton
+
+        #region HamiltonCycle
+        //-------------------------------- Hamilton--------------------
+        public void cycleOfHamilton()//first call
+        {
+            if (!cycleOfHamiltonBool())
+            {
+                MessageBox.Show("no hay ciclos de hamilton");
+                graph.allBlack();
+                Invalidate();
+            }
+            else//a trabajar
+            {
+                if (cycleOfHamilton_Algorithm())
+                {
+                    String forma3Mensaje = "";
+
+                    foreach (Node node in pathOfNodes)
+                    {
+                        forma3Mensaje = forma3Mensaje + node.Index + "->";
+                    }
+                    tmpCount = 0;
+                    f3.changeMesagge(forma3Mensaje);
+                    timerColor.Start();
+                    f3.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("no existe el ciclo de hamilton especificado");
+                    graph.allBlack();
+                    Invalidate();
+                }
+
+            }
+        }
+
+        public Boolean cycleOfHamiltonBool()
+        {
+
+            Boolean res = true;
+
+            //can not have a disconnected node
+            if (!allConected(graph))
+            {
+                return false;
+            }
+            //not cut vertices
+            foreach (Edge edge in graph.EDGE_LIST)
+            {
+                if (isABridgeBool(edge))//if any edge is a bridge it return false to hamilton cycle.
+                {
+                    return false;
+                }
+            }
+
+            foreach (Node node in graph.NODE_LIST)
+            {
+                if (graph.isACutNodeBool(node))//if any node is a cut node return false to hamilton cycle.
+                {
+                    return false;
+                }
+                if (graph.neighborListNode(node).Count() < 2)
+                {
+                    return false;
+                }
+            }
+
+            return res;
+        }
+
+        public Boolean cycleOfHamilton_Algorithm()
+        {
+
+            pathOfNodes = new List<Node>();
+            pathToAnimate = new List<Edge>();
+            cutEdges = new List<Edge>();
+
+            graph.markAllLikeNotBridge();
+            graph.markAllLikeNotVisited(1);
+
+
+            foreach (Edge edge in graph.EDGE_LIST)
+            {
+                if (isABridgeBool(edge))
+                {
+                    cutEdges.Add(edge);
+                }
+            }
+
+            // Mark all the vertices as not visited 
+            // Start DFS traversal from a vertex with non-zero degree 
+            //return DFSHamiltonCycle(initialNodePath);
+
+            graph.markAllNodeAndEdgesNotVisited();//marcar todos los nodos y aristas como no visitados.
+
+            return DFS_Any_HamiltonCycle(initialNodePath);
+        }
+
+        List<Node> nodesPath = new List<Node>();
+        Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
+        {
+            workingNode.Visitado = true;//marcar el nodo actual como visitado.
+            List<Node> notVisitedYet = graph.notVisitedList();//nodos sin visitar para restauraciones.
+            List<Node> neightboors = graph.neighborListNode(workingNode);//vecinos del nodo actual.
+
+            /*********************
+             *       Caso Base. 
+             * *********************/
+            if (notVisitedYet.Count() < 1 && neightboors.Contains(initialNodePath))//todos los nodos visitados && el nodo actual tiene de vecino al nodo inicial
+            {
+                Edge edge = graph.thisEdge(workingNode, initialNodePath);
+                pathToAnimate.Add(edge);//agrega la arista( actual->inicial) al camino para animar
+                pathOfNodes.Add(initialNodePath);//se agrega por primera vez el nodoInicial(mismo que nodoFinal) al camino de nodos;
+                pathOfNodes.Add(workingNode);//agrega el nodo actual al camino de nodos 
+                return true;
+            }
+
+            //acomodar los vecinos de menor a mayor en cuestion de grado.
+            neightboors.Sort(delegate (Node x, Node y)
+            {
+                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
+            });
+
+            /*********************
+             *       Caso General. 
+             * *********************/
+            foreach (Node node in neightboors)
+            {
+                if (node.Visitado == false)
+                {
+                    if (DFS_Any_HamiltonCycle(node))//si el nodo vecino retorna un ciclo
+                    {
+
+                        // nodesPath.Add(workingNode);
+                        Edge edge = graph.thisEdge(workingNode, node);
+                        pathOfNodes.Add(workingNode);
+                        pathToAnimate.Add(edge);
+                        return true;
+                    }
+                    else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
+                        graph.restoreNotVisited(notVisitedYet);//restaturacion.
+                }
+
+            }
+            //no se encontro nigun ciclo.
+            return false;
+        }//DFS_Any_HamiltonCycle(END).
+        #endregion
+
+        #region HamiltonPath
+        public void pathOfHamilton()//first call
+        {
+            if (!pathOfHamiltonBool())
+            {
+                //deploy a OK form to finish.
+                MessageBox.Show("no hay path of hamilton por Bool");
+                graph.allBlack();
+                Invalidate();
+            }
+            else//a trabajar
+            {
+                if (pathOfHamilton_Algorithm())
+                {
+                    String forma3Mensaje = "";
+
+                    foreach (Node node in pathOfNodes)
+                    {
+                        forma3Mensaje = forma3Mensaje + node.Index + "->";
+                    }
+                    tmpCount = 0;
+                    f3.changeMesagge(forma3Mensaje);
+                    timerColor.Start();
+                    f3.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("no existe el camino de hamilton especificado");
+                }
+            }
+        }
+
+        public Boolean pathOfHamiltonBool()
+        {
+            //can not have a disconnected node
+            if (allConected(graph))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public Boolean pathOfHamilton_Algorithm()
+        {
+            pathOfNodes = new List<Node>();
+            pathToAnimate = new List<Edge>();
+            cutEdges = new List<Edge>();
+
+            graph.markAllLikeNotBridge();
+            graph.markAllNodeAndEdgesNotVisited();
+
+            foreach (Edge edge in graph.EDGE_LIST)
+            {
+                if (isABridgeBool(edge))
+                {
+                    cutEdges.Add(edge);
+                }
+            }
+
+            // Mark all the vertices as not visited 
+            // Start DFS traversal from a vertex with non-zero degree 
+
+            graph.markAllNodeAndEdgesNotVisited();
+            return DFS_Any_HamiltonPath(initialNodePath);
+        }
+
+        Boolean DFS_Any_HamiltonPath(Node workingNode)//recursive function.
+        {
+            workingNode.Visitado = true;//marcar el nodo actual como visitado.
+            List<Node> notVisitedYet = graph.notVisitedList();//nodos sin visitar para restauraciones.
+            List<Node> neightboors = graph.neighborListNode(workingNode);//vecinos del nodo actual.
+
+            /*********************
+             *       Caso Base. 
+             * *********************/
+            if (notVisitedYet.Count() < 1 && workingNode == finalNodePath)//todos los nodos visitados && el nodo actual tiene de vecino al nodo inicial
+            {
+                //Edge edge = graph.thisEdge(workingNode, initialNodePath);
+                //pathToAnimate.Add(edge);//agrega la arista( actual->inicial) al camino para animar
+                //pathOfNodes.Add(initialNodePath);//se agrega por primera vez el nodoInicial(mismo que nodoFinal) al camino de nodos;
+                pathOfNodes.Add(workingNode);//agrega el nodo actual al camino de nodos 
+                return true;
+            }
+
+            //acomodar los vecinos de menor a mayor en cuestion de grado.
+            neightboors.Sort(delegate (Node x, Node y)
+            {
+                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
+            });
+
+            /*********************
+             *       Caso General. 
+             * *********************/
+            foreach (Node node in neightboors)
+            {
+                if (node.Visitado == false && node != finalNodePath)
+                {
+                    if (DFS_Any_HamiltonPath(node))//si el nodo vecino retorna un ciclo
+                    {
+                        Edge edge = graph.thisEdge(workingNode, node);
+                        pathOfNodes.Add(workingNode);
+                        pathToAnimate.Add(edge);
+                        return true;
+                    }
+                    else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
+                        graph.restoreNotVisited(notVisitedYet);//restaturacion.
+                }
+                else if (notVisitedYet.Count() == 1 && node == finalNodePath)
+                {
+                    if (DFS_Any_HamiltonPath(node))//si el nodo vecino retorna un ciclo
+                    {
+                        Edge edge = graph.thisEdge(workingNode, node);
+                        pathOfNodes.Add(workingNode);
+                        pathToAnimate.Add(edge);
+                        return true;
+                    }
+                }
+            }
+
+            //no se encontro nigun ciclo.
+            return false;
+        }//DFS_Any_HamiltonPath(END).
+        #endregion
+
         #endregion
 
         #endregion
 
         #region Dijkstra
-
-
         #endregion
 
         #region Floyd
@@ -2816,7 +2625,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         #region Kruskal
         #endregion
 
-        #endregion
 
         #endregion
 
@@ -2824,5 +2632,6 @@ Boolean DFS_Any_HamiltonCycle(Node workingNode)//recursive function.
         {
             this.graph.Dijkstra();
         }
-    }//Form.
-}//namespace.
+        
+    }//Form(END).
+}//namespace(END).

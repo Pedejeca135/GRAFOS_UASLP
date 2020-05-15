@@ -52,6 +52,7 @@
             this.matrizDeIncidenciaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pesosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bridgesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pruebasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.algoritmosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.isomorfismoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fuerzaBrutaToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,7 +73,6 @@
             this.IsomtextBox = new System.Windows.Forms.TextBox();
             this.gradoTruncadoButton = new System.Windows.Forms.Button();
             this.trunquedGradeTextBox = new System.Windows.Forms.TextBox();
-            this.pruebasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -189,7 +189,6 @@
             this.menuStrip1.Size = new System.Drawing.Size(380, 24);
             this.menuStrip1.TabIndex = 4;
             this.menuStrip1.Text = "menuStrip1";
-            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
             // 
             // operacionesToolStripMenuItem
             // 
@@ -287,6 +286,12 @@
             this.bridgesToolStripMenuItem.Text = "Bridges ";
             this.bridgesToolStripMenuItem.Click += new System.EventHandler(this.brToolStripMenuItem_Click);
             // 
+            // pruebasToolStripMenuItem
+            // 
+            this.pruebasToolStripMenuItem.Name = "pruebasToolStripMenuItem";
+            this.pruebasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pruebasToolStripMenuItem.Text = "pruebas";
+             // 
             // algoritmosToolStripMenuItem
             // 
             this.algoritmosToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -367,12 +372,14 @@
             this.floydToolStripMenuItem.Name = "floydToolStripMenuItem";
             this.floydToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.floydToolStripMenuItem.Text = "Floyd";
+            this.floydToolStripMenuItem.Click += new System.EventHandler(this.floydToolStripMenuItem_Click);
             // 
             // warshallToolStripMenuItem
             // 
             this.warshallToolStripMenuItem.Name = "warshallToolStripMenuItem";
             this.warshallToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.warshallToolStripMenuItem.Text = "Warshall";
+            this.warshallToolStripMenuItem.Click += new System.EventHandler(this.warshallToolStripMenuItem_Click);
             // 
             // primToolStripMenuItem
             // 
@@ -449,13 +456,6 @@
             this.trunquedGradeTextBox.Name = "trunquedGradeTextBox";
             this.trunquedGradeTextBox.Size = new System.Drawing.Size(62, 20);
             this.trunquedGradeTextBox.TabIndex = 8;
-            // 
-            // pruebasToolStripMenuItem
-            // 
-            this.pruebasToolStripMenuItem.Name = "pruebasToolStripMenuItem";
-            this.pruebasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.pruebasToolStripMenuItem.Text = "pruebas";
-            this.pruebasToolStripMenuItem.Click += new System.EventHandler(this.pruebasToolStripMenuItem_Click);
             // 
             // GraphForm
             // 

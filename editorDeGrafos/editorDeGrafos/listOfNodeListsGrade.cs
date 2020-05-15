@@ -139,7 +139,7 @@ namespace editorDeGrafos
 
         public int Index_Of_cor(Coordenate cor)
         {
-            int res;
+            //int res;
             if(cor.X < this.listOfList.Count())
             {
                 if(listOfList[cor.X].GRADE_NODE_LIST.Count() > cor.Y)
