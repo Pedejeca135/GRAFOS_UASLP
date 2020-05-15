@@ -997,7 +997,7 @@ namespace editorDeGrafos
         {
             deselect();
             reset();
-            kruskal_Do = true;
+            kruskalAlgorithm();
         }
 
         /***************||||||||||||||  ALGORITMOS EVENTS (END) |||||||||||||||||||||||*******************/
@@ -1032,7 +1032,6 @@ namespace editorDeGrafos
             {
                 gradoTruncadoButton.BackColor = Color.White;
             }
-
         }
 
         private void pesosToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1379,7 +1378,14 @@ namespace editorDeGrafos
                 NodeRef nod = graph.GRAPH[i][i];
                 rectangle = new Rectangle(nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
                 graphics.FillEllipse(brush, rectangle);
-                pen = new Pen(nod.NODO.COLOR, 5);
+                if (dijkstraShow || primShow || kruskalShow)
+                {
+                    pen = new Pen(Color.CadetBlue, 5);
+                }
+                else
+                {
+                    pen = new Pen(nod.NODO.COLOR, 5);
+                }
                 graphics.DrawEllipse(pen, nod.NODO.Position.X - nod.NODO.Radius, nod.NODO.Position.Y - nod.NODO.Radius, nod.NODO.Radius * 2, nod.NODO.Radius * 2);
 
                 //draw inside the node a index.
@@ -1402,7 +1408,6 @@ namespace editorDeGrafos
                 D_linkingAnimation = false;
                 U_LinkingAnimation = false;
             }
-
         }
 
                
@@ -1410,11 +1415,15 @@ namespace editorDeGrafos
         private void drawEdge(Graphics graphics, Edge edge)
         {
             Pen pen2 = new Pen(edge.COLOR, 5);
-            if ((dijkstraShow || primShow) && (edgesToColor[edge.Client.Index] == edge.Server.Index || edgesToColor[edge.Server.Index] == edge.Client.Index))
+            if ((dijkstraShow ) && (edgesToColor[edge.Client.Index] == edge.Server.Index || edgesToColor[edge.Server.Index] == edge.Client.Index))
             {
-                if (primShow)
+                pen2 = new Pen(Color.Red, 5);
+            }
+            else 
+            {
+                if (primShow || kruskalShow)
                 {
-                    if(visitatedEdgesPrim[edge.Client.Index,edge.Server.Index] || visitatedEdgesPrim[edge.Server.Index, edge.Client.Index])
+                    if (prim_And_Kruskal_Edges.Contains(edge))
                     {
                         pen2 = new Pen(Color.Red, 5);
                     }
@@ -1423,14 +1432,6 @@ namespace editorDeGrafos
                         pen2 = new Pen(edge.COLOR, 5);
                     }
                 }
-                else
-                {
-                    pen2 = new Pen(Color.Red, 5);
-                }
-            }
-            else 
-            {
-                pen2 = new Pen(edge.COLOR, 5);
             }
             graphics.DrawLine(pen2, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
 
@@ -2077,6 +2078,7 @@ namespace editorDeGrafos
         {
             dijkstraShow = false;
             primShow = false;
+            kruskalShow = false;
         }
 
         #region Isomorphism
@@ -2727,19 +2729,19 @@ namespace editorDeGrafos
 
         #region Prim
         Boolean primShow = false;
-        Boolean[,] visitatedEdgesPrim;
+      // List<Edge> prim_And_Kruskal_Edges;
+
+        List<Edge> prim_And_Kruskal_Edges;
         void PrimAlgoritm()
         {
-            if (this.graph.isConected())
+            if (this.graph.isConected() && this.graph.GRAPH.Count() > 1 )
             {
                 int n = graph.GRAPH.Count();
                 int minVal = int.MaxValue;
                 Boolean[] visitatedNodes = new Boolean[n];
-                visitatedEdgesPrim = new Boolean[n,n];                
+                Boolean[,] visitatedEdgesPrim = new Boolean[n,n];                
                 Boolean primIteration = true;
-                edgesToColor = new int[n];
-
-                
+                prim_And_Kruskal_Edges = new List<Edge>();                
 
                 while(visitatedNodes.Contains(false))
                 {
@@ -2774,11 +2776,9 @@ namespace editorDeGrafos
                         visitatedEdgesPrim[edgeMin.server.Index, edgeMin.client.Index] = true;
                         visitatedNodes[edgeMin.client.Index] = true;
                         visitatedNodes[edgeMin.server.Index] = true;
-                        edgesToColor[edgeMin.client.Index] = edgeMin.server.Index;
-                    }
-
+                        prim_And_Kruskal_Edges.Add(edgeMin);
+                    }                    
                     primIteration = false;
-
                 }
                 primShow = true;
                 Invalidate();
@@ -2795,10 +2795,162 @@ namespace editorDeGrafos
         #endregion
 
         #region Kruskal
-        #endregion
-
-
-        #endregion
+        Boolean kruskalShow = false;
         
+        //List<Edge> kruskalEdges;
+        void kruskalAlgorithm()
+        {
+            if (this.graph.isConected() && this.graph.GRAPH.Count() > 1)
+            {
+                int n = graph.GRAPH.Count();
+                int minVal = int.MaxValue;
+                int maxVal = int.MinValue;
+
+                Boolean[] visitatedNodes = new Boolean[n];
+                Boolean[,] visitatedEdgesKruskal = new Boolean[n, n];
+                prim_And_Kruskal_Edges = new List<Edge>();
+
+                for(int j = 0; j < n; j++)
+                {
+                    for(int i = 0; i < n ; i++)
+                    {
+                        int peso = this.graph.GRAPH[j][i].W;
+                        if (peso > -1)
+                        {
+                            if (minVal > peso)
+                            {
+                                minVal = peso;
+                            }
+                            if (maxVal < peso)
+                            {
+                                maxVal = peso;
+                            }
+                        }
+                    }
+                }
+                List<Edge> auxResagados = new List<Edge>();
+                if(maxVal == minVal)
+                {
+                    foreach (Edge edge in this.graph.thisEdgesWeight_Undirected(minVal))
+                    {
+                        if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && (!visitatedNodes[edge.Client.Index] || !visitatedNodes[edge.Server.Index]))
+                        {
+                            visitatedEdgesKruskal[edge.client.Index, edge.server.Index] = true;
+                            visitatedEdgesKruskal[edge.server.Index, edge.client.Index] = true;
+                            visitatedNodes[edge.client.Index] = true;
+                            visitatedNodes[edge.server.Index] = true;
+                            prim_And_Kruskal_Edges.Add(edge);
+                        }
+                        else if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index])
+                        {
+                            auxResagados.Add(edge);
+                        }
+                    }
+                }
+                else
+                for(int i = minVal ; i < maxVal; i++)
+                {
+                    foreach(Edge edge in this.graph.thisEdgesWeight_Undirected(i))
+                    {
+                        if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && (!visitatedNodes[edge.Client.Index] || !visitatedNodes[edge.Server.Index]))
+                        {
+                            visitatedEdgesKruskal[edge.client.Index, edge.server.Index] = true;
+                            visitatedEdgesKruskal[edge.server.Index, edge.client.Index] = true;
+                            visitatedNodes[edge.client.Index] = true;
+                            visitatedNodes[edge.server.Index] = true;
+                            prim_And_Kruskal_Edges.Add(edge);
+                        }
+                        else if(!visitatedEdgesKruskal[edge.client.Index, edge.server.Index])
+                        {
+                            auxResagados.Add(edge);
+                        }
+                    }
+                }
+                int contEdges = prim_And_Kruskal_Edges.Count();
+                while (contEdges < graph.GRAPH.Count() - 1)
+                {
+                    foreach(Edge edge in auxResagados)
+                    {
+                        if(!graph.DFS_GenerateACycle(prim_And_Kruskal_Edges,edge))
+                        {
+                            prim_And_Kruskal_Edges.Add(edge);
+                            contEdges++;
+                        }
+                    }
+                }                
+                kruskalShow = true;
+                Invalidate();
+            }
+            else
+            {
+                primShow = false;
+                //deploy a OK form to finish.
+                MessageBox.Show("no existe el arbol recubridor de Kruskal, porque no es un grafo conexo");
+                graph.allBlack();
+                Invalidate();
+            }
+        }
+
+        void kruskalAlgorithmRemasterizado()
+        {
+            if (this.graph.isConected() && this.graph.GRAPH.Count() > 1)
+            {
+                int n = graph.GRAPH.Count();
+                int minVal = int.MaxValue;
+                int maxVal = int.MinValue;
+
+                Boolean[] visitatedNodes = new Boolean[n];
+                Boolean[,] visitatedEdgesKruskal = new Boolean[n, n];
+                prim_And_Kruskal_Edges = new List<Edge>();
+
+                for (int j = 0; j < n; j++)
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        int peso = this.graph.GRAPH[j][i].W;
+                        if (peso > -1)
+                        {
+                            if (minVal > peso)
+                            {
+                                minVal = peso;
+                            }
+                            if (maxVal < peso)
+                            {
+                                maxVal = peso;
+                            }
+                        }
+                    }
+                }
+
+                for (int i = minVal; i < maxVal; i++)
+                {
+                    foreach (Edge edge in this.graph.thisEdgesWeight_Undirected(i))
+                    {
+                        if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && !graph.DFS_GenerateACycle(prim_And_Kruskal_Edges, edge))
+                        {
+                            visitatedEdgesKruskal[edge.client.Index, edge.server.Index] = true;
+                            visitatedEdgesKruskal[edge.server.Index, edge.client.Index] = true;
+                            visitatedNodes[edge.client.Index] = true;
+                            visitatedNodes[edge.server.Index] = true;
+                            prim_And_Kruskal_Edges.Add(edge);
+                        }
+                    }
+                }
+                kruskalShow = true;
+                Invalidate();
+            }
+            else
+            {
+                primShow = false;
+                //deploy a OK form to finish.
+                MessageBox.Show("no existe el arbol recubridor de Kruskal, porque no es un grafo conexo");
+                graph.allBlack();
+                Invalidate();
+            }
+        }
+        #endregion
+
+        #endregion
+
     }//Form(END).
 }//namespace(END).

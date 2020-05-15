@@ -1507,6 +1507,26 @@ namespace editorDeGrafos
             return null;
         }
 
+        public List<Edge> thisEdgesWeight_Undirected(int weight)
+        {
+            List<Edge> res = new List<Edge>();
+            for(int j = 0; j < graph.Count(); j++)
+            {
+                for(int i = 0; i < graph.Count(); i++)
+                {
+                    if (graph[j][i].W > -1 && j!=i)
+                    {
+                        if (graph[j][i].W == weight)
+                        {
+                            res.Add(this.thisEdge_Undirected(j,i));
+                        }
+                    }
+                }
+            }
+
+            return res;
+        }
+
         public Boolean directEdgeVisitated_ByIndex(int Client, int Server)
         {
             foreach(Edge edge in edgeList_G)
@@ -1517,6 +1537,56 @@ namespace editorDeGrafos
                 }
             }
             return false;
+        }
+
+        public int[] nodeListIndexOfedgeList(List<Edge> edgeList)
+        {
+            List<int> res = new List<int>();
+            foreach(Edge edge in edgeList)
+            {
+                if(!res.Contains(edge.Client.Index))
+                {
+                    res.Add(edge.Client.Index);
+                }
+                if(!res.Contains(edge.Server.Index))
+                {
+                    res.Add(edge.Server.Index);
+                }
+            }
+            return res.ToArray();
+        }
+
+        public Boolean DFS_GenerateACycle(List<Edge> edgeList, Edge edge)
+        {
+            if (edgeList.Count() > 0)
+            {
+                int[] nodeIndices = nodeListIndexOfedgeList(edgeList);
+                Boolean[] visitated = new Boolean[graph.Count()];
+                int workingNode = nodeIndices[0];
+
+                while (true)
+                {
+                    int i;
+                    for (i = 0; i < this.graph.Count(); i++)
+                    {
+                        if (graph[workingNode][i].W > -1 && nodeIndices.Contains(i) && visitated[i] == false)
+                        {
+                            visitated[workingNode] = true;
+                            workingNode = i;
+                            break;
+                        }
+                    }
+                    if (i >= this.graph.Count)
+                    {
+                        break;
+                    }
+                }
+                return !visitated.Contains(false);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void markAllLikeVisited()
@@ -1653,124 +1723,6 @@ namespace editorDeGrafos
        * 
        ********************************************************************************************************************/
 
-        #region Dijkstra
-        /******************************************************************************************************************
-        * 
-        * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
-        * 
-        *                         ----- START OF DIJKSTRA ALGORITHM -----
-        *                                    
-        * STARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTARTSTART
-        * 
-        ********************************************************************************************************************/
-            
-        public List<Edge> Dijkstra()
-        {
-            if(this.isConected())
-            {
-                List<Edge> res = new List<Edge>();
-                Dijkstra_Algorithm(0);
-                return res;
-            }
-            else
-            {
-                Console.WriteLine("adios wacho");
-                return null;
-            }
-        }
-
-        int minDistance(int[] dist,
-                   bool[] sptSet)
-        {
-            // Initialize min value 
-            int min = int.MaxValue, min_index = -1;
-
-            for (int v = 0; v < this.GRAPH.Count(); v++)
-                if (sptSet[v] == false && dist[v] <= min)
-                {
-                    min = dist[v];
-                    min_index = v;
-                }
-
-            return min_index;
-        }
-
-        // Funtion that implements Dijkstra's 
-        // single source shortest path algorithm 
-        // for a graph represented using adjacency 
-        // matrix representation 
-        private void Dijkstra_Algorithm(int src)
-        {
-            int[] dist = new int[this.GRAPH.Count()]; // The output array. dist[i] 
-                                     // will hold the shortest 
-                                     // distance from src to i 
-
-            // sptSet[i] will true if vertex 
-            // i is included in shortest path 
-            // tree or shortest distance from 
-            // src to i is finalized 
-            bool[] sptSet = new bool[this.GRAPH.Count()];
-
-            // Initialize all distances as 
-            // INFINITE and stpSet[] as false 
-            for (int i = 0; i < this.GRAPH.Count(); i++)
-            {
-                dist[i] = int.MaxValue;
-                sptSet[i] = false;
-            }
-
-            // Distance of source vertex 
-            // from itself is always 0 
-            dist[src] = 0;
-
-            // Find shortest path for all vertices 
-            for (int count = 0; count < this.GRAPH.Count() - 1; count++)
-            {
-                // Pick the minimum distance vertex 
-                // from the set of vertices not yet 
-                // processed. u is always equal to 
-                // src in first iteration. 
-                int u = minDistance(dist, sptSet);
-
-                // Mark the picked vertex as processed 
-                sptSet[u] = true;
-
-                // Update dist value of the adjacent 
-                // vertices of the picked vertex. 
-                for (int v = 0; v < this.GRAPH.Count(); v++)
-
-                    // Update dist[v] only if is not in 
-                    // sptSet, there is an edge from u 
-                    // to v, and total weight of path 
-                    // from src to v through u is smaller 
-                    // than current value of dist[v] 
-                    if (!sptSet[v] && this.GRAPH[u][v].W != 0 && dist[u] != int.MaxValue && dist[u] + this.GRAPH[u][v].W < dist[v])
-                        dist[v] = dist[u] + this.GRAPH[u][v].W;
-            }
-
-            // print the constructed distance array 
-             printSolution(dist);
-            
-        }
-
-        void printSolution(int[] dist)
-        {
-            Console.Write("Vertex \t\t Distance "
-                          + "from Source\n");
-            for (int i = 0; i < graph.Count(); i++)
-                Console.Write(i + " \t\t " + dist[i] + "\n");
-        }
-
-        /******************************************************************************************************************
-       * 
-       * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
-       * 
-       *                              ----- END OF DIJKSTRA ALGORITHM -----
-       *                                    
-       * ENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDENDEND
-       * 
-       ********************************************************************************************************************/
-        #endregion
 
 
     }//AdjacencyList(END).    
