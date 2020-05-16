@@ -990,7 +990,8 @@ namespace editorDeGrafos
         {
             deselect();
             reset();
-            kruskalAlgorithm();
+            //kruskalAlgorithm();
+            kruskalAlgorithmRemasterizado();
         }
 
         /***************||||||||||||||  ALGORITMOS EVENTS (END) |||||||||||||||||||||||*******************/
@@ -2789,7 +2790,7 @@ namespace editorDeGrafos
         Boolean kruskalShow = false;
         
         //List<Edge> kruskalEdges;
-        void kruskalAlgorithm()
+ /*       void kruskalAlgorithm()
         {
             if (this.graph.isConected() && this.graph.GRAPH.Count() > 1)
             {
@@ -2841,7 +2842,8 @@ namespace editorDeGrafos
                 else
                 for(int i = minVal ; i < maxVal; i++)
                 {
-                    foreach(Edge edge in this.graph.thisEdgesWeight_Undirected(i))
+                        List<Edge> edgeList = this.graph.thisEdgesWeight_Undirected(i);
+                    foreach (Edge edge in edgeList)
                     {
                         if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && (!visitatedNodes[edge.Client.Index] || !visitatedNodes[edge.Server.Index]))
                         {
@@ -2862,7 +2864,7 @@ namespace editorDeGrafos
                 {
                     foreach(Edge edge in auxResagados)
                     {
-                        if(!graph.DFS_GenerateACycle(prim_And_Kruskal_Edges,edge))
+                        if(!graph.generateCycle(prim_And_Kruskal_Edges,edge))
                         {
                             prim_And_Kruskal_Edges.Add(edge);
                             contEdges++;
@@ -2881,7 +2883,8 @@ namespace editorDeGrafos
                 Invalidate();
             }
         }
-
+        */
+        /*el kruskal con esteroides */
         void kruskalAlgorithmRemasterizado()
         {
             if (this.graph.isConected() && this.graph.GRAPH.Count() > 1)
@@ -2917,7 +2920,7 @@ namespace editorDeGrafos
                 {
                     foreach (Edge edge in this.graph.thisEdgesWeight_Undirected(i))
                     {
-                        if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && !graph.DFS_GenerateACycle(prim_And_Kruskal_Edges, edge))
+                        if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && !graph.generateCycle(prim_And_Kruskal_Edges, edge))
                         {
                             visitatedEdgesKruskal[edge.client.Index, edge.server.Index] = true;
                             visitatedEdgesKruskal[edge.server.Index, edge.client.Index] = true;

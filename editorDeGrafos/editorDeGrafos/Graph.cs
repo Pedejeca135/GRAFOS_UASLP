@@ -1556,38 +1556,56 @@ namespace editorDeGrafos
             return res.ToArray();
         }
 
-        public Boolean DFS_GenerateACycle(List<Edge> edgeList, Edge edge)
-        {
-            if (edgeList.Count() > 0)
-            {
-                int[] nodeIndices = nodeListIndexOfedgeList(edgeList);
-                Boolean[] visitated = new Boolean[graph.Count()];
-                int workingNode = nodeIndices[0];
 
-                while (true)
+        List<Edge> edgeListforGeneratedCycle;
+        Edge edgeForGeneratedCycle;
+        public Boolean generateCycle(List<Edge> edgeList, Edge prove)
+        {
+            edgeListforGeneratedCycle = edgeList;
+            edgeForGeneratedCycle = prove;
+
+            HashSet<int> visited = new HashSet<int>();
+            for (int vertex = 0; vertex < graph.Count(); vertex++)
+            {
+                if (visited.Contains(vertex))
                 {
-                    int i;
-                    for (i = 0; i < this.graph.Count(); i++)
+                    continue;
+                }
+                Boolean flag = dfsGenerateCycle(vertex, visited, -1);
+                if (flag)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public Boolean dfsGenerateCycle(int vertex, HashSet<int> visited, int parent)
+        {
+            visited.Add(vertex);
+            foreach (NodeRef nodeR in graph[vertex])
+            {
+                Edge auxEdge = this.thisEdge_Undirected(vertex, nodeR.NODO.Index);
+                if (nodeR.W > -1 && ( edgeListforGeneratedCycle.Contains(auxEdge) || auxEdge == edgeForGeneratedCycle) )
+                {
+                    if (nodeR.NODO.Index.Equals(parent))
                     {
-                        if (graph[workingNode][i].W > -1 && nodeIndices.Contains(i) && visitated[i] == false)
-                        {
-                            visitated[workingNode] = true;
-                            workingNode = i;
-                            break;
-                        }
+                        continue;
                     }
-                    if (i >= this.graph.Count)
+                    if (visited.Contains(nodeR.NODO.Index))
                     {
-                        break;
+                        return true;
+                    }
+                    Boolean hasCycle = dfsGenerateCycle(nodeR.NODO.Index, visited, vertex);
+                    if (hasCycle)
+                    {
+                        return true;
                     }
                 }
-                return !visitated.Contains(false);
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
+
 
         public void markAllLikeVisited()
         {
