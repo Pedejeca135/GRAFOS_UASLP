@@ -138,271 +138,283 @@ namespace editorDeGrafos
         /************* tha mouse , tha f()#/&g boss*****************/
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
-            offWhenClickingMouseOrKey();
-            mousePressed = true;
-            //this algorithms need sewlected nodes by the user.
-            if ((path_Euler_Do || path_Hamilton_Do || dijkstra_Do) && graph.GRAPH.Count() > 1)//######## Do paths ##########
+            if (floydShow || warshallShow)
             {
-            
-
-                if (initialNodePath == null || finalNodePath == null)//if any node does not exist.
+                if(initialNodePath != null)                    
                 {
-                    if (initialNodePath == null)
-                    {
-                        //one node clicked.//check all the node list.
-                        initialNodePath = findNodeClicked(new Coordenate(e.X, e.Y));
-                        if (initialNodePath != null)
-                        {
-                            initialNodePath.COLOR = Color.Blue;//change the color of the initial node
-                            Invalidate();
-                            if (dijkstra_Do)
-                            {
-                                Form1_MouseDown(sender, e);
-                            }
-                        }
-                        if (graph.GRAPH.Count() == 1 || dijkstra_Do)
-                        {
-                            finalNodePath = initialNodePath;                            
-                        }
-
-                    }
-                    else
-                    {
-                        finalNodePath = findNodeClicked(new Coordenate(e.X, e.Y));
-                        if (finalNodePath != null)
-                        {
-                            finalNodePath.COLOR = Color.Red;//change the color of the final node
-                            Invalidate();
-                        }
-                        if (path_Euler_Do)//le toca a euler.
-                        {
-                            path_Euler_Do = false;
-                            if (initialNodePath == finalNodePath)//cycle
-                            {
-                                finalNodePath.COLOR = Color.Beige;//
-                                Invalidate();
-                                cycleOfEuler();
-                            }
-                            else//path
-                            {
-                                pathOfEuler();
-                            }
-                        }
-                        else if (path_Hamilton_Do)//le toca a hamilton.
-                        {
-                            path_Hamilton_Do = false;
-                            if (initialNodePath == finalNodePath)//cycle
-                            {
-                                finalNodePath.COLOR = Color.Beige;//
-                                cycleOfHamilton();
-                            }
-                            else//path
-                            {
-                                pathOfHamilton();
-                            }
-
-                        }
-                        else if(dijkstra_Do)
-                        {
-                            dijkstra_Do = false;
-                            dijkstraAlgorithm();
-                        }
-                        initialNodePath = null;
-                        finalNodePath = null;
-                    }
-
+                    initialNodePath.COLOR = Color.Black;
                 }
+                initialNodePath = findNodeClicked(new Coordenate(e.X, e.Y));
+                Invalidate();
             }
-            else if ( Move_M_Do ||  MoveAll_A_Do || Remove_R_Do || MoRe_F_Do || Link_Do || Link_D_Do || Link_U_Do)//######## Do operations ##########
+            else
             {
-                selectedJustFor_Moving = findNodeClicked(new Coordenate(e.X, e.Y));
-                selected = selectedJustFor_Moving;
+                offWhenClickingMouseOrKey();
 
-                if (Remove_R_Do)
+
+                mousePressed = true;
+                //this algorithms need sewlected nodes by the user.
+                if ((path_Euler_Do || path_Hamilton_Do || dijkstra_Do) && graph.GRAPH.Count() > 1)//######## Do paths ##########
                 {
-                    eliminate();
-                }
-                else if (MoRe_F_Do)
-                {
-                    selected = selectedJustFor_Moving;
-                    if (e.Button == System.Windows.Forms.MouseButtons.Right)
+                    if (initialNodePath == null || finalNodePath == null)//if any node does not exist.
                     {
-                        eliminate();
-                    }
-                    else
-                    {
-                        if (selected == null)
+                        if (initialNodePath == null)
                         {
-                            graph.create(new Coordenate(e.X, e.Y),generalRadius);
-                            justSaved = false;
-                        }
-                    }
-                }
-                else if (Link_Do || Link_D_Do || Link_U_Do) // if doing a link and mousedown
-                {
-                    if(selectedJustFor_Linking == null)
-                    {
-                        if (selected == null)
-                        {
-                            Color colorToCreateNode = Color.Black;
-                            if(Link_Do)
+                            //one node clicked.//check all the node list.
+                            initialNodePath = findNodeClicked(new Coordenate(e.X, e.Y));
+                            if (initialNodePath != null)
                             {
-                                colorToCreateNode = Color.Purple;
+                                initialNodePath.COLOR = Color.Blue;//change the color of the initial node
+                                Invalidate();
+                                if (dijkstra_Do)
+                                {
+                                    Form1_MouseDown(sender, e);
+                                }
                             }
-                            else if(Link_D_Do)
+                            if (graph.GRAPH.Count() == 1 || dijkstra_Do)
                             {
-                                colorToCreateNode = Color.Orange;
+                                finalNodePath = initialNodePath;
                             }
-                            else if(Link_U_Do)
-                            {
-                                colorToCreateNode = Color.RoyalBlue;
-                            }
-                                    
-                            graph.create(new Coordenate(e.X, e.Y),generalRadius, colorToCreateNode);
-                            justSaved = false;
+
                         }
                         else
                         {
-                            selectedJustFor_Linking = selected;
+                            finalNodePath = findNodeClicked(new Coordenate(e.X, e.Y));
+                            if (finalNodePath != null)
+                            {
+                                finalNodePath.COLOR = Color.Red;//change the color of the final node
+                                Invalidate();
+                            }
+                            if (path_Euler_Do)//le toca a euler.
+                            {
+                                path_Euler_Do = false;
+                                if (initialNodePath == finalNodePath)//cycle
+                                {
+                                    finalNodePath.COLOR = Color.Beige;//
+                                    Invalidate();
+                                    cycleOfEuler();
+                                }
+                                else//path
+                                {
+                                    pathOfEuler();
+                                }
+                            }
+                            else if (path_Hamilton_Do)//le toca a hamilton.
+                            {
+                                path_Hamilton_Do = false;
+                                if (initialNodePath == finalNodePath)//cycle
+                                {
+                                    finalNodePath.COLOR = Color.Beige;//
+                                    cycleOfHamilton();
+                                }
+                                else//path
+                                {
+                                    pathOfHamilton();
+                                }
+
+                            }
+                            else if (dijkstra_Do)
+                            {
+                                dijkstra_Do = false;
+                                dijkstraAlgorithm();
+                            }
+                            initialNodePath = null;
+                            finalNodePath = null;
+                        }
+
+                    }
+                }
+                else if (Move_M_Do || MoveAll_A_Do || Remove_R_Do || MoRe_F_Do || Link_Do || Link_D_Do || Link_U_Do)//######## Do operations ##########
+                {
+                    selectedJustFor_Moving = findNodeClicked(new Coordenate(e.X, e.Y));
+                    selected = selectedJustFor_Moving;
+
+                    if (Remove_R_Do)
+                    {
+                        eliminate();
+                    }
+                    else if (MoRe_F_Do)
+                    {
+                        selected = selectedJustFor_Moving;
+                        if (e.Button == System.Windows.Forms.MouseButtons.Right)
+                        {
+                            eliminate();
+                        }
+                        else
+                        {
+                            if (selected == null)
+                            {
+                                graph.create(new Coordenate(e.X, e.Y), generalRadius);
+                                justSaved = false;
+                            }
                         }
                     }
-                }                
-                InvalidatePlus();
-            }
-            else//######### Do other operations ##############
-            {
-                if (e.Button == System.Windows.Forms.MouseButtons.Left)//if mouse button pressed is left.
-                {
-                    Node oneNode = null;
-                    //one node clicked.//check all the node list.
-                    oneNode = findNodeClicked(new Coordenate(e.X, e.Y));
-
-                    if (oneNode != null)//one Node was clicked
+                    else if (Link_Do || Link_D_Do || Link_U_Do) // if doing a link and mousedown
                     {
-                        if (oneNode.SelectedBool == true)//if the node selected was selected already in any state.
-                                                         //if(oneNode == selected)
+                        if (selectedJustFor_Linking == null)
                         {
-                            if (oneNode.Status == 3)// in the third state
+                            if (selected == null)
                             {
-                                deselect();
+                                Color colorToCreateNode = Color.Black;
+                                if (Link_Do)
+                                {
+                                    colorToCreateNode = Color.Purple;
+                                }
+                                else if (Link_D_Do)
+                                {
+                                    colorToCreateNode = Color.Orange;
+                                }
+                                else if (Link_U_Do)
+                                {
+                                    colorToCreateNode = Color.RoyalBlue;
+                                }
+
+                                graph.create(new Coordenate(e.X, e.Y), generalRadius, colorToCreateNode);
+                                justSaved = false;
                             }
                             else
                             {
-                                if (oneNode.Status == 2)//selected more than one time(second State).
+                                selectedJustFor_Linking = selected;
+                            }
+                        }
+                    }
+                    InvalidatePlus();
+                }
+                else//######### Do other operations ##############
+                {
+                    if (e.Button == System.Windows.Forms.MouseButtons.Left)//if mouse button pressed is left.
+                    {
+                        Node oneNode = null;
+                        //one node clicked.//check all the node list.
+                        oneNode = findNodeClicked(new Coordenate(e.X, e.Y));
+
+                        if (oneNode != null)//one Node was clicked
+                        {
+                            if (oneNode.SelectedBool == true)//if the node selected was selected already in any state.
+                                                             //if(oneNode == selected)
+                            {
+                                if (oneNode.Status == 3)// in the third state
                                 {
-                                    oneNode.Status = 3;//change to thid state for directed links.
-                                    oneNode.COLOR = Color.Red;//change to red color(third state).
+                                    deselect();
                                 }
                                 else
                                 {
-                                    if (oneNode.Status == 1)//selected one time.
+                                    if (oneNode.Status == 2)//selected more than one time(second State).
                                     {
-                                        oneNode.Status = 2;//change to the second selected State.
-                                        oneNode.COLOR = Color.Blue;//change to blue color to indicate the status(can do undirected Edges).
-                                    }
-
-                                }
-                            }
-                        }
-                        else // is tryng to do a link between nodes or select for first time
-                        {
-                            if (selected != null)//want to do a link between nodes.
-                            {
-                                if (selected.Status == 2)//undirected link
-                                {
-                                    int weight;
-                                    //here i have to ask the weight of the link.
-                                    if (trunquedGrade)
-                                    {
-                                        int.TryParse(trunquedGradeTextBox.Text, out weight);
-                                    }
-                                    else 
-                                    {
-                                        weight = AFWeight("Bidireccional");
-                                    }
-
-                                    //int weight = 0;
-                                    if (weight >= 0)
-                                    {
-                                        Edge edge = new Edge(selected, oneNode,weight);
-                                        graph.addUndirectedEdge(edge, weight);
-                                    }
-                                }
-                                if (selected.Status == 3)//directed link
-                                {
-                                    int weight;
-                                    //here i have to ask the weight of the link.
-                                    if (trunquedGrade)
-                                    {
-                                        int.TryParse(trunquedGradeTextBox.Text, out weight);
+                                        oneNode.Status = 3;//change to thid state for directed links.
+                                        oneNode.COLOR = Color.Red;//change to red color(third state).
                                     }
                                     else
                                     {
-                                        weight = AFWeight("Dirijido");
-                                    }
+                                        if (oneNode.Status == 1)//selected one time.
+                                        {
+                                            oneNode.Status = 2;//change to the second selected State.
+                                            oneNode.COLOR = Color.Blue;//change to blue color to indicate the status(can do undirected Edges).
+                                        }
 
-                                    if (weight >= 0)
-                                    {
-                                        graph.addDirectedEdge(selected, oneNode, weight);
                                     }
                                 }
-                                InvalidatePlus(1);
                             }
-                            else // select for the first time.                            
+                            else // is tryng to do a link between nodes or select for first time
                             {
-                                // is not selected, (Status == 0).
-                                oneNode.Status = 1;//change to the first selected state.
-                                oneNode.COLOR = Color.ForestGreen;//change to green color to indicate the status(can move).
-                                oneNode.SelectedBool = true;
-                                selected = oneNode;
-                            }
-                        }
-                    }
-                    else // want to make and add a new node 
-                    {
-                        graph.create(new Coordenate(e.X, e.Y),generalRadius);
-                        justSaved = false;
-                    }
-
-                }//left mouse button presed.           
-                else//right mouse button pressed.
-                {
-                    if (selected != null)
-                    {
-                        if (selected == findNodeClicked(new Coordenate(e.X, e.Y)))
-                        {
-                            if (selected.Status > 1)
-                            {
-                                if (selected.Status == 2)//make a own link
+                                if (selected != null)//want to do a link between nodes.
                                 {
-                                    int weight;
-                                    //here i have to ask the weight of the link.
-                                    if (trunquedGrade)
+                                    if (selected.Status == 2)//undirected link
                                     {
-                                        int.TryParse(trunquedGradeTextBox.Text, out weight);
-                                    }
-                                    else
-                                    {
-                                        weight = AFWeight("Ciclo");
-                                    }
+                                        int weight;
+                                        //here i have to ask the weight of the link.
+                                        if (trunquedGrade)
+                                        {
+                                            int.TryParse(trunquedGradeTextBox.Text, out weight);
+                                        }
+                                        else
+                                        {
+                                            weight = AFWeight("Bidireccional");
+                                        }
 
-                                    if (weight >= 0)
+                                        //int weight = 0;
+                                        if (weight >= 0)
+                                        {
+                                            Edge edge = new Edge(selected, oneNode, weight);
+                                            graph.addUndirectedEdge(edge, weight);
+                                        }
+                                    }
+                                    if (selected.Status == 3)//directed link
                                     {
-                                        graph.addCicledEdge(selected, weight);
-                                        justSaved = false;
+                                        int weight;
+                                        //here i have to ask the weight of the link.
+                                        if (trunquedGrade)
+                                        {
+                                            int.TryParse(trunquedGradeTextBox.Text, out weight);
+                                        }
+                                        else
+                                        {
+                                            weight = AFWeight("Dirijido");
+                                        }
+
+                                        if (weight >= 0)
+                                        {
+                                            graph.addDirectedEdge(selected, oneNode, weight);
+                                        }
                                     }
                                     InvalidatePlus(1);
                                 }
-                                else//eliminate the node
+                                else // select for the first time.                            
                                 {
-                                    eliminate();
+                                    // is not selected, (Status == 0).
+                                    oneNode.Status = 1;//change to the first selected state.
+                                    oneNode.COLOR = Color.ForestGreen;//change to green color to indicate the status(can move).
+                                    oneNode.SelectedBool = true;
+                                    selected = oneNode;
+                                }
+                            }
+                        }
+                        else // want to make and add a new node 
+                        {
+                            graph.create(new Coordenate(e.X, e.Y), generalRadius);
+                            justSaved = false;
+                        }
+
+                    }//left mouse button presed.           
+                    else//right mouse button pressed.
+                    {
+                        if (selected != null)
+                        {
+                            if (selected == findNodeClicked(new Coordenate(e.X, e.Y)))
+                            {
+                                if (selected.Status > 1)
+                                {
+                                    if (selected.Status == 2)//make a own link
+                                    {
+                                        int weight;
+                                        //here i have to ask the weight of the link.
+                                        if (trunquedGrade)
+                                        {
+                                            int.TryParse(trunquedGradeTextBox.Text, out weight);
+                                        }
+                                        else
+                                        {
+                                            weight = AFWeight("Ciclo");
+                                        }
+
+                                        if (weight >= 0)
+                                        {
+                                            graph.addCicledEdge(selected, weight);
+                                            justSaved = false;
+                                        }
+                                        InvalidatePlus(1);
+                                    }
+                                    else//eliminate the node
+                                    {
+                                        eliminate();
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                InvalidatePlus();
             }
-            InvalidatePlus();
         }//Form_MouseDown(). BYE FOR THE MDF KING!!!! 
 
         private void Form1_MouseUp(object sender, MouseEventArgs e)
@@ -422,7 +434,7 @@ namespace editorDeGrafos
                     {
                         if (left_Linkind)//undirected
                         {
-                            
+
                             //here i have to ask the weight of the link.
                             if (trunquedGrade)
                             {
@@ -494,7 +506,7 @@ namespace editorDeGrafos
                     }
                 }
                 selectedJustFor_Linking = null;
-                InvalidatePlus(1);                
+                InvalidatePlus(1);
             }
         }
 
@@ -522,15 +534,15 @@ namespace editorDeGrafos
                     //Calculate delta of the mouse moving
                     int deltaX = selectedJustFor_Moving.Position.X - e.X;
                     int deltaY = selectedJustFor_Moving.Position.Y - e.Y;
-                    Coordenate deltaOfCoordenate = new Coordenate(deltaX, deltaY);                
+                    Coordenate deltaOfCoordenate = new Coordenate(deltaX, deltaY);
 
                     foreach (Node node in graph.NODE_LIST)
                     {
-                            node.Position.X -= deltaOfCoordenate.X;
-                            node.Position.Y -= deltaOfCoordenate.Y;
-                    }                    
+                        node.Position.X -= deltaOfCoordenate.X;
+                        node.Position.Y -= deltaOfCoordenate.Y;
+                    }
                 }
-                    mouseLastPosition = new Coordenate(e.X, e.Y);
+                mouseLastPosition = new Coordenate(e.X, e.Y);
                 InvalidatePlus(1);
             }
             if (mousePressed == true && e.Button == MouseButtons.Left && MoRe_F_Do == true && selectedJustFor_Moving != null)//MoRe
@@ -539,9 +551,9 @@ namespace editorDeGrafos
                 selectedJustFor_Moving.Position.Y = e.Y;
                 InvalidatePlus(1);
             }
-            if (mousePressed == true && (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right ) && Link_Do == true && selectedJustFor_Linking != null)//Linking
+            if (mousePressed == true && (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && Link_Do == true && selectedJustFor_Linking != null)//Linking
             {
-                Node auxMouseUperNode = findNodeClicked(new Coordenate(e.X,e.Y));
+                Node auxMouseUperNode = findNodeClicked(new Coordenate(e.X, e.Y));
                 Coordenate corToDraw;
 
                 if (auxMouseUperNode != null)
@@ -555,19 +567,19 @@ namespace editorDeGrafos
 
                 linkingEdge = new Edge(selectedJustFor_Linking, corToDraw);
 
-                if (e.Button == MouseButtons.Left )//for undirected Edges.
+                if (e.Button == MouseButtons.Left)//for undirected Edges.
                 {
                     U_LinkingAnimation = true;
                     left_Linkind = true;
                     right_Linking = false;
                 }
-                else if(e.Button == MouseButtons.Right)//directed edges
+                else if (e.Button == MouseButtons.Right)//directed edges
                 {
                     D_linkingAnimation = true;
                     left_Linkind = false;
                     right_Linking = true;
                 }
-                
+
                 Invalidate();
 
             }
@@ -583,10 +595,10 @@ namespace editorDeGrafos
                 else
                 {
                     corToDraw = new Coordenate(e.X, e.Y);
-                }               
-                    D_linkingAnimation = true;
-                    linkingEdge = new Edge(selectedJustFor_Linking, corToDraw);
-                    Invalidate();
+                }
+                D_linkingAnimation = true;
+                linkingEdge = new Edge(selectedJustFor_Linking, corToDraw);
+                Invalidate();
             }
             if (mousePressed == true && (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right) && Link_U_Do == true && selectedJustFor_Linking != null)//Linking D
             {
@@ -617,7 +629,7 @@ namespace editorDeGrafos
         * |||||||||||||||||||||||||||||||||||||||||||||||||||||  General EVENTS   |||||||||||||||||||||||||||||||||||||||||||||||||||
         * 
         * ***********************************************************************************************************************/
-        
+
 
         #region operation
         /********************** OPERATIONS *****************/
@@ -666,12 +678,12 @@ namespace editorDeGrafos
             if ((e.KeyCode == Keys.Escape || e.KeyCode == Keys.S) && selected != null)
             {
                 deselect();
-                
+
             }
             if (e.KeyCode == Keys.M)//Move (M).
             {
                 keyM_OR_MoveClick();
-            } 
+            }
             if (e.KeyCode == Keys.A)//Move All (A).
             {
                 keyA_OR_MoveAllClick();
@@ -708,190 +720,190 @@ namespace editorDeGrafos
         #region commonKeyOperations
         /********************* common key-operations (Begin) ****************************/
         private void keyM_OR_MoveClick()//
-            {
-            
-                deselect();               
+        {
 
-                if (Move_M_Do)
+            deselect();
+
+            if (Move_M_Do)
+            {
+                foreach (Node node in graph.NODE_LIST)
                 {
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.Black;
-                    }
-                    Move_M_Do = (!Move_M_Do);
+                    node.COLOR = Color.Black;
                 }
-                else
+                Move_M_Do = (!Move_M_Do);
+            }
+            else
+            {
+                allOperationOff();
+                foreach (Node node in graph.NODE_LIST)
                 {
-                      allOperationOff();                
-                      foreach (Node node in graph.NODE_LIST)
-                      {
-                        node.COLOR = Color.Green; 
-                      }
-                        Move_M_Do = (!Move_M_Do);                    
+                    node.COLOR = Color.Green;
                 }
-                InvalidatePlus(1);
+                Move_M_Do = (!Move_M_Do);
+            }
+            InvalidatePlus(1);
+        }
+
+        private void keyA_OR_MoveAllClick()
+        {
+            deselect();
+
+            if (MoveAll_A_Do)
+            {
+                foreach (Node node in graph.NODE_LIST)
+                {
+                    node.COLOR = Color.Black;
+                }
+                MoveAll_A_Do = (!MoveAll_A_Do);
+            }
+            else
+            {
+                allOperationOff();
+                foreach (Node node in graph.NODE_LIST)
+                {
+                    node.COLOR = Color.LimeGreen;
+                }
+                MoveAll_A_Do = (!MoveAll_A_Do);
+            }
+            InvalidatePlus(1);
+        }
+
+        private void keyR_OR_RemoveClick()
+        {
+
+            deselect();
+
+            if (Remove_R_Do)
+            {
+                foreach (Node node in graph.NODE_LIST)
+                {
+                    node.COLOR = Color.Black;
+                }
+                Remove_R_Do = (!Remove_R_Do);
+            }
+            else
+            {
+                allOperationOff();
+                foreach (Node node in graph.NODE_LIST)
+                {
+                    node.COLOR = Color.Red;
+                }
+                Remove_R_Do = (!Remove_R_Do);
             }
 
-            private void keyA_OR_MoveAllClick()
-            {
-                    deselect();                
+            InvalidatePlus(1);
+        }
+        private void keyF_OR_MoReClick()
+        {
+            deselect();
 
-                if (MoveAll_A_Do)
+            if (MoRe_F_Do)
+            {
+                foreach (Node node in graph.NODE_LIST)
                 {
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.Black;
-                    }
-                    MoveAll_A_Do = (!MoveAll_A_Do);
+                    node.COLOR = Color.Black;
                 }
-                else
+                MoRe_F_Do = (!MoRe_F_Do);
+            }
+            else
+            {
+                allOperationOff();
+                foreach (Node node in graph.NODE_LIST)
                 {
-                        allOperationOff();
-                        foreach (Node node in graph.NODE_LIST)
-                        {
-                            node.COLOR = Color.LimeGreen;
-                        }
-                        MoveAll_A_Do = (!MoveAll_A_Do);                    
+                    node.COLOR = Color.Indigo;
                 }
-                InvalidatePlus(1);
+                MoRe_F_Do = (!MoRe_F_Do);
             }
 
-            private void keyR_OR_RemoveClick()
+            InvalidatePlus(1);
+        }
+        private void keyL_OR_LinkingClick()
+        {
+            deselect();
+
+            if (Link_Do)
             {
-
-               deselect();              
-
-                if (Remove_R_Do)
+                foreach (Node node in graph.NODE_LIST)
                 {
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.Black;
-                    }
-                    Remove_R_Do = (!Remove_R_Do);
+                    node.COLOR = Color.Black;
                 }
-                else
-                {
-                        allOperationOff();
-                        foreach (Node node in graph.NODE_LIST)
-                        {
-                            node.COLOR = Color.Red;
-                        }
-                        Remove_R_Do = (!Remove_R_Do);                    
-                }
-
-                InvalidatePlus(1);
+                Link_Do = (!Link_Do);
             }
-            private void keyF_OR_MoReClick()
+            else
             {
-                deselect();                
-
-                if (MoRe_F_Do)
+                allOperationOff();
+                foreach (Node node in graph.NODE_LIST)
                 {
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.Black;
-                    }
-                    MoRe_F_Do = (!MoRe_F_Do);
+                    node.COLOR = Color.Purple;
                 }
-                else
-                {
-                        allOperationOff();
-                        foreach (Node node in graph.NODE_LIST)
-                        {
-                            node.COLOR = Color.Indigo;
-                        }
-                        MoRe_F_Do = (!MoRe_F_Do);                    
-                }
-
-                InvalidatePlus(1);
+                Link_Do = (!Link_Do);
             }
-            private void keyL_OR_LinkingClick()
-            {
-                deselect();
+            InvalidatePlus(1);
+        }
 
-                if (Link_Do)
+        private void keyD_OR_D_LinkingClick()
+        {
+            deselect();
+
+            if (Link_D_Do)
+            {
+                foreach (Node node in graph.NODE_LIST)
                 {
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.Black;
-                    }
-                    Link_Do = (!Link_Do);
+                    node.COLOR = Color.Black;
                 }
-                else
+                Link_D_Do = (!Link_D_Do);
+            }
+            else
+            {
+                allOperationOff();
+                foreach (Node node in graph.NODE_LIST)
                 {
-                    allOperationOff();
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.Purple;
-                    }
-                    Link_Do = (!Link_Do);
+                    node.COLOR = Color.Orange;
                 }
-                InvalidatePlus(1);
+                Link_D_Do = (!Link_D_Do);
             }
 
-            private void keyD_OR_D_LinkingClick()
+            InvalidatePlus(1);
+        }
+
+        private void keyU_OR_U_LinkingClick()
+        {
+            deselect();
+
+            if (Link_U_Do)
             {
-                deselect();
-
-                if (Link_D_Do)
+                foreach (Node node in graph.NODE_LIST)
                 {
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.Black;
-                    }
-                    Link_D_Do = (!Link_D_Do);
+                    node.COLOR = Color.Black;
                 }
-                else
+                Link_U_Do = (!Link_U_Do);
+            }
+            else
+            {
+                allOperationOff();
+                foreach (Node node in graph.NODE_LIST)
                 {
-                    allOperationOff();
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.Orange;
-                    }
-                    Link_D_Do = (!Link_D_Do);
+                    node.COLOR = Color.RoyalBlue;
                 }
-
-                InvalidatePlus(1);
+                Link_U_Do = (!Link_U_Do);
             }
 
-            private void keyU_OR_U_LinkingClick()
-            {
-                deselect();
-
-                if (Link_U_Do)
-                {
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.Black;
-                    }
-                    Link_U_Do = (!Link_U_Do);
-                }
-                else
-                {
-                    allOperationOff();
-                    foreach (Node node in graph.NODE_LIST)
-                    {
-                        node.COLOR = Color.RoyalBlue;
-                    }
-                    Link_U_Do = (!Link_U_Do);
-                }
-
-                InvalidatePlus(1);
-            }
+            InvalidatePlus(1);
+        }
 
 
-            /**************** deselect Operations ***************/
-            private void allOperationOff()
-            {
-                Move_M_Do = false;
-                MoveAll_A_Do = false;
-                Remove_R_Do = false;
-                MoRe_F_Do = false;
-                Link_Do = false;
-                Link_D_Do = false;
-                Link_U_Do = false;
-                mousePressed = false;
-            }
+        /**************** deselect Operations ***************/
+        private void allOperationOff()
+        {
+            Move_M_Do = false;
+            MoveAll_A_Do = false;
+            Remove_R_Do = false;
+            MoRe_F_Do = false;
+            Link_Do = false;
+            Link_D_Do = false;
+            Link_U_Do = false;
+            mousePressed = false;
+        }
 
         /********************* common key-operations (END) ****************************/
         #endregion
@@ -966,7 +978,7 @@ namespace editorDeGrafos
         {
             deselect();
             reset();
-            floyd_Do = true;
+            floydAlgorithm();
         }
 
         //WARSHALL
@@ -974,7 +986,8 @@ namespace editorDeGrafos
         {
             deselect();
             reset();
-            warshall_Do = true;
+            //warshall_Do
+            warshallAlgorithm();
         }
 
         //PRIM:
@@ -982,7 +995,17 @@ namespace editorDeGrafos
         {
             deselect();
             reset();
-            PrimAlgoritm();
+            if (this.graph.Directed())
+            {
+                primShow = false;
+                MessageBox.Show("El Algoritmo de Prim es para grafos no dirigidos");
+                graph.allBlack();
+                Invalidate();
+            }
+            else
+            {
+                PrimAlgoritm();
+            }
         }
 
         //KRUSKAL:
@@ -990,8 +1013,18 @@ namespace editorDeGrafos
         {
             deselect();
             reset();
-            //kruskalAlgorithm();
-            kruskalAlgorithmRemasterizado();
+            if (this.graph.Directed())
+            {
+                kruskalShow = false;
+                MessageBox.Show("El Algoritmo de Kruskal es para grafos no dirigidos");
+                graph.allBlack();
+                Invalidate();
+            }
+            else
+            {
+                kruskalAlgorithm();
+            }
+            
         }
 
         /***************||||||||||||||  ALGORITMOS EVENTS (END) |||||||||||||||||||||||*******************/
@@ -1043,12 +1076,13 @@ namespace editorDeGrafos
 
         private void Save_Click(object sender, EventArgs e)
         {
+            offWhenClickingMouseOrKey(false);
             saveFile();
         }
 
         private void Load_Click(object sender, EventArgs e)
         {
-
+            offWhenClickingMouseOrKey(false);
             if (justSaved == false)
             {
                 gdc = new SaveChangesWindow();
@@ -1070,6 +1104,7 @@ namespace editorDeGrafos
 
         private void New_Click(object sender, EventArgs e)
         {
+            offWhenClickingMouseOrKey();
             if (justSaved == false)//si el trabajo no ha sido guardado
             {
                 SaveChangesWindow gdc = new SaveChangesWindow();
@@ -1349,22 +1384,98 @@ namespace editorDeGrafos
             Pen pen = new Pen(Color.Black, 5);
 
             Brush brush = new SolidBrush(BackColor);
-            Rectangle rectangle;
-
-
-            foreach (Edge edge in graph.EDGE_LIST)//undirected edges.
-            {
-                drawEdge(graphics, edge);
-            }
+            Rectangle rectangle;           
 
             foreach (Edge edge in graph.CIEDGE_LIST)//cicled edge.
             {
                 drawCicledEdge(graphics, edge, e);
             }
 
-            foreach (Edge edge in graph.DIEDGE_LIST)//directed edges.
+                foreach (Edge edge in graph.EDGE_LIST)//undirected edges.
+                {
+                    drawEdge(graphics, edge);
+                }
+                foreach (Edge edge in graph.DIEDGE_LIST)//directed edges.
+                {
+                    drawDirectedEdge(graphics, edge);
+                }            
+
+            if (floydShow || warshallShow)
             {
-                drawDirectedEdge(graphics, edge);
+                if (floydShow)
+                {
+                    if(initialNodePath != null)
+                    //for (int j = 0; j < matrixFloydPaths.GetLength(0); j++)
+                    {
+                        for (int i = 0; i < matrixFloydPaths.GetLength(1); i++)
+                        {
+                            if (matrixFloydPaths[initialNodePath.Index, i] != i)
+                            {
+                                this.graph.GRAPH[matrixFloydPaths[initialNodePath.Index, i]][matrixFloydPaths[initialNodePath.Index, i]].NODO.COLOR = Color.Aquamarine;
+                                this.graph.GRAPH[i][i].NODO.COLOR = Color.Aquamarine;
+
+                                Edge auxEdge = this.graph.thisEdge_Undirected(matrixFloydPaths[initialNodePath.Index, i], i);
+                                if (auxEdge != null)
+                                {
+                                    drawEdge(graphics, auxEdge, Color.Red);
+                                }
+                                else
+                                {
+                                    auxEdge = this.graph.thisEdge_Directed(matrixFloydPaths[initialNodePath.Index, i], i);
+                                    if (auxEdge != null)
+                                    {
+                                        drawDirectedEdge(graphics, auxEdge, Color.Red);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                this.graph.GRAPH[matrixFloydPaths[initialNodePath.Index, i]][matrixFloydPaths[initialNodePath.Index, i]].NODO.COLOR = Color.Black;
+                                this.graph.GRAPH[i][i].NODO.COLOR = Color.Black;
+                                
+                            }
+                        }
+                        initialNodePath.COLOR = Color.Red;
+                    }
+                    
+                }
+                else if (warshallShow)
+                {
+                    if (initialNodePath != null)
+                    //for (int j = 0; j < matrixFloydPaths.GetLength(0); j++)
+                    {
+                        for (int i = 0; i < matrixWarshallPaths.GetLength(1); i++)
+                        {
+                            if (matrixWarshallPaths[initialNodePath.Index, i] != i)
+                            {
+                                this.graph.GRAPH[matrixWarshallPaths[initialNodePath.Index, i]][matrixWarshallPaths[initialNodePath.Index, i]].NODO.COLOR = Color.Aquamarine;
+                                this.graph.GRAPH[i][i].NODO.COLOR = Color.Aquamarine;
+
+                                Edge auxEdge = this.graph.thisEdge_Undirected(matrixWarshallPaths[initialNodePath.Index, i], i);
+                                if (auxEdge != null)
+                                {
+                                    drawEdge(graphics, auxEdge, Color.Red);
+                                }
+                                else
+                                {
+                                    auxEdge = this.graph.thisEdge_Directed(matrixWarshallPaths[initialNodePath.Index, i], i);
+                                    if (auxEdge != null)
+                                    {
+                                        drawDirectedEdge(graphics, auxEdge, Color.Red);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                this.graph.GRAPH[matrixWarshallPaths[initialNodePath.Index, i]][matrixWarshallPaths[initialNodePath.Index, i]].NODO.COLOR = Color.Black;
+                                this.graph.GRAPH[i][i].NODO.COLOR = Color.Black;
+
+                            }
+                        }
+                        initialNodePath.COLOR = Color.Red;
+                    }
+                }
+                
             }
 
             for (int i = 0; i < graph.GRAPH.Count; i++)//Nodes.
@@ -1438,6 +1549,21 @@ namespace editorDeGrafos
             }
         }
 
+        private void drawEdge(Graphics graphics, Edge edge,Color color)
+        {
+            Pen pen2 = new Pen(color, 5);
+
+            graphics.DrawLine(pen2, edge.A.X, edge.A.Y, edge.B.X, edge.B.Y);
+
+            if (pesosActivated)
+            {
+                Brush brush = new SolidBrush(Color.Gray);
+                String fuente = "Arial";
+                Font f = new Font(fuente, 15);
+                graphics.DrawString("e" + edge.Weight + "", f, brush, (edge.A.X + edge.B.X) / 2 + 2, (edge.A.Y + edge.B.Y) / 2 + 2, new StringFormat());
+            }
+        }
+
         private void drawCicledEdge(Graphics graphics, Edge edge, PaintEventArgs e)
         {
             Pen pen = new Pen(Color.Black, 5);
@@ -1472,6 +1598,27 @@ namespace editorDeGrafos
                 }
             }
 
+            penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor;
+            penDirect.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
+            Double equis_X;
+            Double ye_Y;
+            Double rate = edge.Distancia / generalRadius;
+            equis_X = (edge.A.X + rate * edge.B.X) / (1 + rate);
+            ye_Y = (edge.A.Y + rate * edge.B.Y) / (1 + rate);
+            graphics.DrawLine(penDirect, edge.A.X, edge.A.Y, (float)equis_X, (float)ye_Y);
+
+            if (pesosActivated)
+            {
+                Brush brush = new SolidBrush(Color.Gray);
+                String fuente = "Arial";
+                Font f = new Font(fuente, 15);
+                graphics.DrawString("e" + edge.Weight + "", f, brush, (edge.A.X + edge.B.X) / 2 + 2, (edge.A.Y + edge.B.Y) / 2 + 2, new StringFormat());
+            }
+        }
+
+        private void drawDirectedEdge(Graphics graphics, Edge edge,Color color)
+        {
+            Pen penDirect = new Pen(color, 5);             
             penDirect.StartCap = System.Drawing.Drawing2D.LineCap.RoundAnchor;
             penDirect.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
             Double equis_X;
@@ -1571,7 +1718,8 @@ namespace editorDeGrafos
 
         private void reset()
         {
-             deselect();
+                deselect();
+            
              selectedJustFor_Moving = null;//for moving.
              selectedJustFor_Linking = null;
              mousePressed = false;
@@ -1613,11 +1761,92 @@ namespace editorDeGrafos
          initialNodePath = null;
          finalNodePath = null;
          nodePathsReady = false;
-        //int timerColorOption = 0;
-        //int tmpCount = 0;
     }
 
-    public int AFWeight(String type)
+        private void reset(Boolean deselectBool)
+        {
+            if (deselectBool)
+            {
+                deselect();
+            }
+
+            selectedJustFor_Moving = null;//for moving.
+            selectedJustFor_Linking = null;
+            mousePressed = false;
+            justSaved = true;// -> storage saveStateAuxiliar.        
+                             //Boolean matIn = false;
+            Move_M_Do = false;
+            MoveAll_A_Do = false;
+            Remove_R_Do = false;
+            MoRe_F_Do = false;
+            Link_Do = false;
+            Link_D_Do = false;
+            Link_U_Do = false;
+
+            /********** for linking operations ************************/
+            D_linkingAnimation = false;
+            U_LinkingAnimation = false;
+            linkingEdge = null;
+            left_Linkind = false;
+            right_Linking = false;
+
+
+            /******************************** for ALGORITMOS EVENTS  **********************************************/
+            //Dos...............................
+            Isomorphism_FB_Do = false;
+            Isomorphism_TS_Do = false;
+            Isomorphism_IN_Do = false;
+            path_Euler_Do = false;
+            path_Hamilton_Do = false;
+            dijkstra_Do = false;
+            floyd_Do = false;
+            warshall_Do = false;
+            prim_Do = false;
+            kruskal_Do = false;
+            //Dos--------------------------------
+            /****************** for Isomorphism *************************/
+            isoForm = false;
+            /****************** for paths and cicles ********************/
+
+            initialNodePath = null;
+            finalNodePath = null;
+            nodePathsReady = false;
+        }
+
+        void offWhenClickingMouseOrKey()
+        {
+            dijkstraShow = false;
+            floydShow = false;
+            warshallShow = false;
+            primShow = false;
+            kruskalShow = false;
+            if (hamiltonOrEulerJustDone)
+            {
+                this.graph.allBlack();
+                hamiltonOrEulerJustDone = false;
+            }
+            reset(false);
+            Invalidate();
+        }
+
+        void offWhenClickingMouseOrKey(Boolean resetB)
+        {
+            dijkstraShow = false;
+            floydShow = false;
+            warshallShow = false;
+            primShow = false;
+            kruskalShow = false;
+            if (hamiltonOrEulerJustDone)
+            {
+                this.graph.allBlack();
+                hamiltonOrEulerJustDone = false;
+            }
+            reset(resetB);
+            Invalidate();
+        }
+
+
+        public int AFWeight(String type)
         {
             int res = 0;
             AskForWeight afaw = new AskForWeight(type);
@@ -2066,17 +2295,13 @@ namespace editorDeGrafos
             }
         }
 
-        void offWhenClickingMouseOrKey()
-        {
-            dijkstraShow = false;
-            primShow = false;
-            kruskalShow = false;
-        }
-
+        
         #region Isomorphism
         #endregion
 
         #region Paths and Cycles
+
+        Boolean hamiltonOrEulerJustDone = false;
 
         #region Euler
 
@@ -2121,6 +2346,7 @@ namespace editorDeGrafos
                     f3.changeMesagge(forma3Mensaje);
                     timerColor.Start();
                     f3.ShowDialog();
+                    hamiltonOrEulerJustDone = true;
                     //MessageBox.Show(forma3Mensaje);
                 }
 
@@ -2294,6 +2520,7 @@ namespace editorDeGrafos
                     f3.changeMesagge(forma3Mensaje);
                     timerColor.Start();
                     f3.ShowDialog();
+                    hamiltonOrEulerJustDone = true;
                 }
             }
         }
@@ -2375,6 +2602,7 @@ namespace editorDeGrafos
         #region Hamilton
 
         #region HamiltonCycle
+        
         //-------------------------------- Hamilton--------------------
         public void cycleOfHamilton()//first call
         {
@@ -2398,6 +2626,7 @@ namespace editorDeGrafos
                     f3.changeMesagge(forma3Mensaje);
                     timerColor.Start();
                     f3.ShowDialog();
+                    hamiltonOrEulerJustDone = true;
                 }
                 else
                 {
@@ -2546,6 +2775,7 @@ namespace editorDeGrafos
                     f3.changeMesagge(forma3Mensaje);
                     timerColor.Start();
                     f3.ShowDialog();
+                    hamiltonOrEulerJustDone = true;
                 }
                 else
                 {
@@ -2714,9 +2944,113 @@ namespace editorDeGrafos
         #endregion
 
         #region Floyd
+        int[,] matrixFloydWeight;
+        int[,] matrixFloydPaths;
+        Boolean floydShow = false;
+        public void floydAlgorithm()
+        {
+            int n = graph.GRAPH.Count();
+            matrixFloydWeight = new int[n,n];
+            matrixFloydPaths = new int[n,n];
+
+            for (int j = 0; j < n; j++)
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    if (graph.GRAPH[j][i].W > -1 && i!=j) 
+                    {
+                        matrixFloydWeight[j, i] = graph.GRAPH[j][i].W;
+                        matrixFloydPaths[j, i] = j;
+                    }
+                    else
+                    {
+                        matrixFloydWeight[j, i] = int.MaxValue;
+                        matrixFloydPaths[j, i] = i;
+                    }                    
+                }
+            }
+
+            for (int k = 0; k < n; k++)
+            {
+                for(int j =  0; j < n; j++)
+                {
+                    for (int i = 0; i < n; i ++)
+                    {
+                        int sumComp;
+                        if (matrixFloydWeight[j, k] == int.MaxValue || matrixFloydWeight[k, i] == int.MaxValue)
+                        {
+                            sumComp = int.MaxValue;
+                        }
+                        else
+                        {
+                            sumComp = matrixFloydWeight[j, k] + matrixFloydWeight[k, i];
+                        }
+
+                        if(sumComp < matrixFloydWeight[j, i] && i!=j)
+                        {
+                            matrixFloydWeight[j, i] = matrixFloydWeight[j, k] + matrixFloydWeight[k, i];
+                            matrixFloydPaths[j, i] = k;
+                        }
+                    }
+                }
+            }
+                 floydShow = true;
+        }
         #endregion
 
         #region Warshall
+        int[,] matrixWarshallWeight;
+        int[,] matrixWarshallPaths;
+        Boolean warshallShow = false;
+
+        public void warshallAlgorithm()
+        {
+            int n = graph.GRAPH.Count();
+            matrixWarshallWeight = new int[n, n];
+            matrixWarshallPaths = new int[n, n];
+
+            for (int j = 0; j < n; j++)
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    if(graph.GRAPH[j][i].W > -1)
+                    {
+                        matrixWarshallWeight[j, i] = 1;
+                        matrixWarshallPaths[j, i] = j;
+                    }
+                    else
+                    {
+                        matrixWarshallWeight[j, i] = 0;
+                        matrixWarshallPaths[j, i] = i;
+                    }
+                }
+            }
+
+            for (int k = 0; k < n; k++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if(j == k)
+                    {
+                        continue;
+                    }
+                    for (int i = 0; i < n; i++)
+                    {
+                        if(i == k)
+                        {
+                            continue;
+                        }
+                        if (matrixWarshallWeight[j, k] == 1 && matrixWarshallWeight[k, i] == 1 && i!= j && j!= k && k!=j)
+                        {
+                            matrixWarshallWeight[j, i] = 1;
+                            matrixWarshallPaths[j, i] = k;
+                        }
+                    }
+                }
+            }
+            warshallShow = true;
+        }
+
         #endregion
 
         #region Prim
@@ -2790,102 +3124,8 @@ namespace editorDeGrafos
         Boolean kruskalShow = false;
         
         //List<Edge> kruskalEdges;
- /*       void kruskalAlgorithm()
-        {
-            if (this.graph.isConected() && this.graph.GRAPH.Count() > 1)
-            {
-                int n = graph.GRAPH.Count();
-                int minVal = int.MaxValue;
-                int maxVal = int.MinValue;
-
-                Boolean[] visitatedNodes = new Boolean[n];
-                Boolean[,] visitatedEdgesKruskal = new Boolean[n, n];
-                prim_And_Kruskal_Edges = new List<Edge>();
-
-                for(int j = 0; j < n; j++)
-                {
-                    for(int i = 0; i < n ; i++)
-                    {
-                        int peso = this.graph.GRAPH[j][i].W;
-                        if (peso > -1)
-                        {
-                            if (minVal > peso)
-                            {
-                                minVal = peso;
-                            }
-                            if (maxVal < peso)
-                            {
-                                maxVal = peso;
-                            }
-                        }
-                    }
-                }
-                List<Edge> auxResagados = new List<Edge>();
-                if(maxVal == minVal)
-                {
-                    foreach (Edge edge in this.graph.thisEdgesWeight_Undirected(minVal))
-                    {
-                        if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && (!visitatedNodes[edge.Client.Index] || !visitatedNodes[edge.Server.Index]))
-                        {
-                            visitatedEdgesKruskal[edge.client.Index, edge.server.Index] = true;
-                            visitatedEdgesKruskal[edge.server.Index, edge.client.Index] = true;
-                            visitatedNodes[edge.client.Index] = true;
-                            visitatedNodes[edge.server.Index] = true;
-                            prim_And_Kruskal_Edges.Add(edge);
-                        }
-                        else if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index])
-                        {
-                            auxResagados.Add(edge);
-                        }
-                    }
-                }
-                else
-                for(int i = minVal ; i < maxVal; i++)
-                {
-                        List<Edge> edgeList = this.graph.thisEdgesWeight_Undirected(i);
-                    foreach (Edge edge in edgeList)
-                    {
-                        if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && (!visitatedNodes[edge.Client.Index] || !visitatedNodes[edge.Server.Index]))
-                        {
-                            visitatedEdgesKruskal[edge.client.Index, edge.server.Index] = true;
-                            visitatedEdgesKruskal[edge.server.Index, edge.client.Index] = true;
-                            visitatedNodes[edge.client.Index] = true;
-                            visitatedNodes[edge.server.Index] = true;
-                            prim_And_Kruskal_Edges.Add(edge);
-                        }
-                        else if(!visitatedEdgesKruskal[edge.client.Index, edge.server.Index])
-                        {
-                            auxResagados.Add(edge);
-                        }
-                    }
-                }
-                int contEdges = prim_And_Kruskal_Edges.Count();
-                while (contEdges < graph.GRAPH.Count() - 1)
-                {
-                    foreach(Edge edge in auxResagados)
-                    {
-                        if(!graph.generateCycle(prim_And_Kruskal_Edges,edge))
-                        {
-                            prim_And_Kruskal_Edges.Add(edge);
-                            contEdges++;
-                        }
-                    }
-                }                
-                kruskalShow = true;
-                Invalidate();
-            }
-            else
-            {
-                primShow = false;
-                //deploy a OK form to finish.
-                MessageBox.Show("no existe el arbol recubridor de Kruskal, porque no es un grafo conexo");
-                graph.allBlack();
-                Invalidate();
-            }
-        }
-        */
         /*el kruskal con esteroides */
-        void kruskalAlgorithmRemasterizado()
+        void kruskalAlgorithm()
         {
             if (this.graph.isConected() && this.graph.GRAPH.Count() > 1)
             {
@@ -2915,10 +3155,9 @@ namespace editorDeGrafos
                         }
                     }
                 }
-
-                for (int i = minVal; i < maxVal; i++)
+                if (minVal == maxVal)
                 {
-                    foreach (Edge edge in this.graph.thisEdgesWeight_Undirected(i))
+                    foreach (Edge edge in this.graph.thisEdgesWeight_Undirected(maxVal))
                     {
                         if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && !graph.generateCycle(prim_And_Kruskal_Edges, edge))
                         {
@@ -2927,6 +3166,23 @@ namespace editorDeGrafos
                             visitatedNodes[edge.client.Index] = true;
                             visitatedNodes[edge.server.Index] = true;
                             prim_And_Kruskal_Edges.Add(edge);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = minVal; i < maxVal; i++)
+                    {
+                        foreach (Edge edge in this.graph.thisEdgesWeight_Undirected(i))
+                        {
+                            if (!visitatedEdgesKruskal[edge.client.Index, edge.server.Index] && !graph.generateCycle(prim_And_Kruskal_Edges, edge))
+                            {
+                                visitatedEdgesKruskal[edge.client.Index, edge.server.Index] = true;
+                                visitatedEdgesKruskal[edge.server.Index, edge.client.Index] = true;
+                                visitatedNodes[edge.client.Index] = true;
+                                visitatedNodes[edge.server.Index] = true;
+                                prim_And_Kruskal_Edges.Add(edge);
+                            }
                         }
                     }
                 }

@@ -1456,7 +1456,15 @@ namespace editorDeGrafos
 
         public void allBlack()
         {
+            foreach (Edge edge in diEdgeList_G)
+            {
+                edge.COLOR = Color.Gray;
+            }
             foreach (Edge edge in edgeList_G)
+            {
+                edge.COLOR = Color.Black;
+            }
+            foreach (Edge edge in cicleEdgeList_G)
             {
                 edge.COLOR = Color.Black;
             }
@@ -1487,6 +1495,18 @@ namespace editorDeGrafos
             foreach (Edge edge in this.edgeList_G)
             {
                 if (edge.EqualsU(thisEdge))
+                {
+                    return edge;
+                }
+            }
+            return null;
+        }
+
+        public Edge thisEdge_Directed(int client, int server)
+        {
+            foreach (Edge edge in this.diEdgeList_G)
+            {
+                if ((edge.Client.Index == client && edge.Server.Index == server) ^ (edge.Client.Index == server && edge.Server.Index == client))
                 {
                     return edge;
                 }
