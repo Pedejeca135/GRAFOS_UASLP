@@ -1300,6 +1300,20 @@ namespace editorDeGrafos
             return res;
         }
 
+        public List<Edge> notVisitedListEdge()
+        {
+            List<Edge> res = new List<Edge>();
+            foreach (Edge edge in edgeList_G)
+            {
+                if (edge.visitada == false)
+                {
+                    res.Add(edge);
+                }
+            }
+            return res;
+        }
+
+
         public void restoreNotVisited(List<Node> notVisitedYet)
         {
             foreach (Node node in nodeList_G)
@@ -1311,6 +1325,21 @@ namespace editorDeGrafos
                 else
                 {
                     node.Visitado = true;
+                }
+            }
+        }
+
+        public void restoreNotVisitedEdge(List<Edge> notVisitedYetEdge)
+        {
+            foreach (Edge edge in edgeList_G)
+            {
+                if (notVisitedYetEdge.Contains(edge))
+                {
+                    edge.visitada = false;
+                }
+                else
+                {
+                    edge.visitada = true;
                 }
             }
         }
@@ -1498,6 +1527,20 @@ namespace editorDeGrafos
                 {
                     return edge;
                 }
+            }
+            return null;
+        }
+
+        public Edge thisEdgeDirOrIndir(int client, int server)
+        {
+
+            if (thisEdge_Directed(client,server) != null)
+            {
+                return thisEdge_Directed(client, server);
+            }
+            else if (thisEdge_Undirected(client,server) != null)
+            {
+                return thisEdge_Directed(client, server);
             }
             return null;
         }
@@ -1721,6 +1764,11 @@ namespace editorDeGrafos
         public void markAsVisited_T_F(int index, Boolean mark)
         {
             graph[index][index].NODO.Visitado = mark;
+        }
+
+        public Node thisnode(int index)
+        {
+            return this.graph[index][index].NODO;
         }
 
         public Matrix toMatrix()

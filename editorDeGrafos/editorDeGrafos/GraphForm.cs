@@ -978,7 +978,20 @@ namespace editorDeGrafos
         {
             deselect();
             reset();
-            floydAlgorithm();
+            if (this.graph.Directed())
+            {
+                floydAlgorithm();
+                
+            }
+            else
+            {
+                floydShow = false;
+                MessageBox.Show("El Algoritmo de Floyd es para grafos dirigidos");
+                graph.allBlack();
+                Invalidate();
+            }
+
+            
         }
 
         //WARSHALL
@@ -1403,36 +1416,36 @@ namespace editorDeGrafos
             if (floydShow || warshallShow)
             {
                 if (floydShow)
-                {
-                    if(initialNodePath != null)
-                    //for (int j = 0; j < matrixFloydPaths.GetLength(0); j++)
+                {   
+                    if (initialNodePath != null)
                     {
-                        for (int i = 0; i < matrixFloydPaths.GetLength(1); i++)
-                        {
-                            if (matrixFloydPaths[initialNodePath.Index, i] != i)
-                            {
-                                this.graph.GRAPH[matrixFloydPaths[initialNodePath.Index, i]][matrixFloydPaths[initialNodePath.Index, i]].NODO.COLOR = Color.Aquamarine;
-                                this.graph.GRAPH[i][i].NODO.COLOR = Color.Aquamarine;
+                        floydShowFunction();
+                        
 
-                                Edge auxEdge = this.graph.thisEdge_Undirected(matrixFloydPaths[initialNodePath.Index, i], i);
-                                if (auxEdge != null)
-                                {
-                                    drawEdge(graphics, auxEdge, Color.Red);
-                                }
-                                else
-                                {
-                                    auxEdge = this.graph.thisEdge_Directed(matrixFloydPaths[initialNodePath.Index, i], i);
-                                    if (auxEdge != null)
-                                    {
-                                        drawDirectedEdge(graphics, auxEdge, Color.Red);
-                                    }
-                                }
+                        foreach(Edge diEdge in graph.DIEDGE_LIST)
+                        {
+                            if(edgesFloyd.Contains(diEdge))
+                            {
+                                diEdge.Server.COLOR = Color.Aquamarine;
+                                drawDirectedEdge(graphics, diEdge, Color.Red);
                             }
                             else
                             {
-                                this.graph.GRAPH[matrixFloydPaths[initialNodePath.Index, i]][matrixFloydPaths[initialNodePath.Index, i]].NODO.COLOR = Color.Black;
-                                this.graph.GRAPH[i][i].NODO.COLOR = Color.Black;
-                                
+                                drawDirectedEdge(graphics, diEdge, Color.Gray);
+                            }
+                        }
+
+                        foreach (Edge edge in graph.EDGE_LIST)
+                        {
+                            if (edgesFloyd.Contains(edge))
+                            {
+                                edge.client.COLOR = Color.Aquamarine;
+                                edge.Server.COLOR = Color.Aquamarine;
+                                drawEdge(graphics, edge, Color.Red);
+                            }
+                            else
+                            {
+                                drawEdge(graphics, edge, Color.Black);
                             }
                         }
                         initialNodePath.COLOR = Color.Red;
@@ -1442,34 +1455,34 @@ namespace editorDeGrafos
                 else if (warshallShow)
                 {
                     if (initialNodePath != null)
-                    //for (int j = 0; j < matrixFloydPaths.GetLength(0); j++)
                     {
-                        for (int i = 0; i < matrixWarshallPaths.GetLength(1); i++)
-                        {
-                            if (matrixWarshallPaths[initialNodePath.Index, i] != i)
-                            {
-                                this.graph.GRAPH[matrixWarshallPaths[initialNodePath.Index, i]][matrixWarshallPaths[initialNodePath.Index, i]].NODO.COLOR = Color.Aquamarine;
-                                this.graph.GRAPH[i][i].NODO.COLOR = Color.Aquamarine;
+                        warshallShowFunction();
 
-                                Edge auxEdge = this.graph.thisEdge_Undirected(matrixWarshallPaths[initialNodePath.Index, i], i);
-                                if (auxEdge != null)
-                                {
-                                    drawEdge(graphics, auxEdge, Color.Red);
-                                }
-                                else
-                                {
-                                    auxEdge = this.graph.thisEdge_Directed(matrixWarshallPaths[initialNodePath.Index, i], i);
-                                    if (auxEdge != null)
-                                    {
-                                        drawDirectedEdge(graphics, auxEdge, Color.Red);
-                                    }
-                                }
+
+                        foreach (Edge diEdge in graph.DIEDGE_LIST)
+                        {
+                            if (edgesWarshall.Contains(diEdge))
+                            {
+                                diEdge.Server.COLOR = Color.Aquamarine;
+                                drawDirectedEdge(graphics, diEdge, Color.Red);
                             }
                             else
                             {
-                                this.graph.GRAPH[matrixWarshallPaths[initialNodePath.Index, i]][matrixWarshallPaths[initialNodePath.Index, i]].NODO.COLOR = Color.Black;
-                                this.graph.GRAPH[i][i].NODO.COLOR = Color.Black;
+                                drawDirectedEdge(graphics, diEdge, Color.Gray);
+                            }
+                        }
 
+                        foreach (Edge edge in graph.EDGE_LIST)
+                        {
+                            if (edgesWarshall.Contains(edge))
+                            {
+                                edge.client.COLOR = Color.Aquamarine;
+                                edge.Server.COLOR = Color.Aquamarine;
+                                drawEdge(graphics, edge, Color.Red);
+                            }
+                            else
+                            {
+                                drawEdge(graphics, edge, Color.Black);
                             }
                         }
                         initialNodePath.COLOR = Color.Red;
@@ -1825,7 +1838,7 @@ namespace editorDeGrafos
                 this.graph.allBlack();
                 hamiltonOrEulerJustDone = false;
             }
-            reset(false);
+            //reset(false);
             Invalidate();
         }
 
@@ -2139,7 +2152,7 @@ namespace editorDeGrafos
         #region forPathAnimation
         protected virtual void isoForm_Click(object sender, EventArgs e)
         {
-            offWhenClickingMouseOrKey();
+            //offWhenClickingMouseOrKey();
             Invalidate();
             
             if (IsomorfismForm == null || IsomorfismForm.Visible == false)
@@ -2182,20 +2195,21 @@ namespace editorDeGrafos
                     }
                     else
                     {
+                        
                         int serverIndex = tmpCount + 1;
                         if (serverIndex == pathOfNodes.Count())
                         {
                             serverIndex = 0;
                         }
 
-                        foreach (Edge edge in pathToAnimate)// edgeList)
+                        Edge otroX = this.graph.thisEdge(pathOfNodes[tmpCount], pathOfNodes[serverIndex]);
+
+                        Edge auxEdge = this.graph.thisEdge(pathOfNodes[tmpCount], pathOfNodes[serverIndex]);
+                        if (auxEdge != null)
                         {
-                            if (edge.EqualsU(new Edge(pathOfNodes[tmpCount], pathOfNodes[serverIndex])))
-                            {
-                                edge.COLOR = Color.Red;
-                                Invalidate();
-                            }
+                            auxEdge.COLOR = Color.Red;
                         }
+                        Invalidate();
                         switcher = false;
                         tmpCount++;
                     }
@@ -2223,8 +2237,6 @@ namespace editorDeGrafos
         public void GraphTimerColor2(object sender, EventArgs e)
         {
             graph.markAllLikeNotVisited();
-            
-
             
             Edge[] workingEdgesArray = new Edge[graph.EDGE_LIST.Count()];
             graph.EDGE_LIST.CopyTo(workingEdgesArray);
@@ -2269,7 +2281,7 @@ namespace editorDeGrafos
             //pruebas pb = new pruebas();
             //pb.ShowDialog();
             timerColor = new System.Windows.Forms.Timer();
-            timerColor.Interval = 500;
+            timerColor.Interval = 800;
             timerColor.Tick += new EventHandler(GraphTimerColor/*GraphTimerColor*/);
             tmpCount = 0;
         }
@@ -2326,8 +2338,9 @@ namespace editorDeGrafos
             else//a trabajar
             {
                 // do the animation of the path or cycle
-                cycleOfEuler_Algorithm();
-                if (pathToAnimate == null)
+                //cycleOfEuler_Algorithm();
+                //if (pathToAnimate == null)
+                if(!cycleOfEuler_Algorithm())
                 {
                     //deploy a OK form to finish.
                     MessageBox.Show("no hay circuito de Euler");
@@ -2389,18 +2402,15 @@ namespace editorDeGrafos
         }
 
 
-        public List<Edge> cycleOfEuler_Algorithm()//algoritmos
+        public Boolean cycleOfEuler_Algorithm()
         {
-            List<Edge> res = new List<Edge>();
-            List<Edge> edgeListInside = new List<Edge>();
-            edgeListInside = graph.EDGE_LIST;
+
             pathOfNodes = new List<Node>();
             pathToAnimate = new List<Edge>();
-
             cutEdges = new List<Edge>();
 
             graph.markAllLikeNotBridge();
-            graph.markAllLikeNotVisited(1);
+            graph.markAllNodeAndEdgesNotVisited();
 
 
             foreach (Edge edge in graph.EDGE_LIST)
@@ -2412,70 +2422,82 @@ namespace editorDeGrafos
             }
 
             // Mark all the vertices as not visited 
-            graph.markAllLikeNotVisited();
-
             // Start DFS traversal from a vertex with non-zero degree 
-            pathOfNodes.Add(initialNodePath);
-            DFSEulerCycle(initialNodePath);
-            return res;
+            //return DFSHamiltonCycle(initialNodePath);
+
+            graph.markAllNodeAndEdgesNotVisited();//marcar todos los nodos y aristas como no visitados.
+
+            return DFS_Any_EulerCycle(initialNodePath);
         }
-        void DFSEulerCycle(Node workingNode/*int v, bool visited[]*/)
-        {
-            List<Node> dejaAlFinal = new List<Node>();
 
-            foreach (Node node in graph.neighborListNode(workingNode))
+
+
+        //List<Node> nodesPath = new List<Node>();
+        Boolean DFS_Any_EulerCycle(Node workingNode)//recursive function.
+        {            
+            List<Edge> notVisitedYet = graph.notVisitedListEdge();//nodos sin visitar para restauraciones.
+            List<Node> neightboors = graph.neighborListNode(workingNode);//vecinos del nodo actual.
+
+            /*********************
+             *       Caso Base. 
+             * *********************/
+            if (notVisitedYet.Count() == 1 && neightboors.Contains(initialNodePath) && graph.thisEdge(workingNode, initialNodePath).visitada == false)//todos los nodos visitados && el nodo actual tiene de vecino al nodo inicial
             {
-                Edge edge = graph.thisEdge(workingNode, node);
-
-                if (edge.visitada == false)
-                {
-                    if (isABridgeVisitedsBool(edge, graph))//cutEdges.Contains(edge))//||edge.Bridge == true)
-                    {
-                        dejaAlFinal.Add(node);
-                    }
-                    else
-                    {
-                        if (node != finalNodePath)
-                        {
-                            edge.visitada = true;
-                            pathToAnimate.Add(edge);
-                            pathOfNodes.Add(node);
-                            DFSEulerCycle(node);
-                        }
-                    }
-
-                }
+                graph.thisEdge(workingNode, initialNodePath).visitada = true;
+                Edge edge = graph.thisEdge(workingNode, initialNodePath);
+                pathToAnimate.Add(edge);//agrega la arista( actual->inicial) al camino para animar
+                pathOfNodes.Add(initialNodePath);//se agrega por primera vez el nodoInicial(mismo que nodoFinal) al camino de nodos;
+                pathOfNodes.Add(workingNode);//agrega el nodo actual al camino de nodos 
+                return true;
             }
 
-            foreach (Node node in dejaAlFinal)
+            //acomodar los vecinos de menor a mayor en cuestion de grado.
+            neightboors.Sort(delegate (Node x, Node y)
             {
-                foreach (Edge edge in graph.EDGE_LIST)
+                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
+            });
+
+            /*********************
+             *       Caso General. 
+             * *********************/
+            foreach (Node node in neightboors)
+            {
+                if (this.graph.thisEdge(workingNode,node).visitada == false && node != initialNodePath)
                 {
-                    if (edge.isThisUndirected(workingNode, node) && edge.visitada == false)
+                    this.graph.thisEdge(workingNode, node).visitada = true;
+
+                    if (DFS_Any_EulerCycle(node))//si el nodo vecino retorna un ciclo
                     {
-                        edge.visitada = true;
+                        // nodesPath.Add(workingNode);
+                        Edge edge = graph.thisEdge(workingNode, node);
+                        pathOfNodes.Add(workingNode);
                         pathToAnimate.Add(edge);
-                        pathOfNodes.Add(node);
-                        break;
-
+                        return true;
                     }
+                    else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
+                        graph.restoreNotVisitedEdge(notVisitedYet);//restaturacion.
                 }
-                DFSEulerCycle(node);
-            }
 
-            if (graph.neighborListNode(workingNode).Contains(finalNodePath))
+            }
+            if(neightboors.Contains(initialNodePath) && graph.thisEdge(workingNode,initialNodePath).visitada == false)
             {
-                Edge edgeFinal = graph.thisEdge(workingNode, finalNodePath);
+                this.graph.thisEdge(workingNode, initialNodePath).visitada = true;
 
-                if (graph.allVisitedExept(edgeFinal) && edgeFinal.visitada == false)
+                if (DFS_Any_EulerCycle(initialNodePath))//si el nodo vecino retorna un ciclo
                 {
-                    edgeFinal.visitada = true;
-                    pathToAnimate.Add(edgeFinal);
-                    pathOfNodes.Add(finalNodePath);
+                    // nodesPath.Add(workingNode);
+                    Edge edge = graph.thisEdge(workingNode, initialNodePath);
+                    pathOfNodes.Add(workingNode);
+                    pathToAnimate.Add(edge);
+                    return true;
                 }
+                else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
+                    graph.restoreNotVisitedEdge(notVisitedYet);//restaturacion.
             }
+            //no se encontro nigun ciclo.
+            return false;
+        }//DFS_Any_HamiltonCycle(END).
 
-        }
 
         #endregion
 
@@ -2524,39 +2546,6 @@ namespace editorDeGrafos
                 }
             }
         }
-        public List<Edge> pathOfEuler_Algorithm()//algorithm
-        {
-            List<Edge> res = new List<Edge>();
-            List<Edge> edgeListInside = new List<Edge>();
-            edgeListInside = graph.EDGE_LIST;
-            pathOfNodes = new List<Node>();
-            pathToAnimate = new List<Edge>();
-
-            cutEdges = new List<Edge>();
-
-            graph.markAllLikeNotBridge();
-            graph.markAllLikeNotVisited(1);
-
-
-            foreach (Edge edge in graph.EDGE_LIST)
-            {
-                if (isABridgeBool(edge))
-                {
-                    cutEdges.Add(edge);
-                }
-            }
-
-            // Mark all the vertices as not visited 
-            graph.markAllLikeNotVisited();
-
-            // Start DFS traversal from a vertex with non-zero degree 
-
-            pathOfNodes.Add(initialNodePath);
-            DFSEulerCycle(initialNodePath);
-            //pathOfNodes.Add(finalNodePath);
-            return res;
-
-        }
 
         public Boolean pathOfEulerBool()
         {
@@ -2595,14 +2584,115 @@ namespace editorDeGrafos
             }
             return res;
         }
+
+        public Boolean pathOfEuler_Algorithm()
+        {
+
+            pathOfNodes = new List<Node>();
+            pathToAnimate = new List<Edge>();
+            cutEdges = new List<Edge>();
+
+            graph.markAllLikeNotBridge();
+            graph.markAllNodeAndEdgesNotVisited();
+
+
+            foreach (Edge edge in graph.EDGE_LIST)
+            {
+                if (isABridgeBool(edge))
+                {
+                    cutEdges.Add(edge);
+                }
+            }
+
+            // Mark all the vertices as not visited 
+            // Start DFS traversal from a vertex with non-zero degree 
+            //return DFSHamiltonCycle(initialNodePath);
+
+            graph.markAllNodeAndEdgesNotVisited();//marcar todos los nodos y aristas como no visitados.
+
+            return DFS_Any_EulerPath(initialNodePath);
+        }
+
+
+
+        //List<Node> nodesPath = new List<Node>();
+        Boolean DFS_Any_EulerPath(Node workingNode)//recursive function.
+        {
+            List<Edge> notVisitedYet = graph.notVisitedListEdge();//nodos sin visitar para restauraciones.
+            List<Node> neightboors = graph.neighborListNode(workingNode);//vecinos del nodo actual.
+
+            /*********************
+             *       Caso Base. 
+             * *********************/
+            if (notVisitedYet.Count() == 0)//todos los nodos visitados && el nodo actual tiene de vecino al nodo inicial
+            {
+                pathOfNodes.Add(workingNode);//agrega el nodo actual al camino de nodos 
+                return true;
+            }
+
+            //acomodar los vecinos de menor a mayor en cuestion de grado.
+            neightboors.Sort(delegate (Node x, Node y)
+            {
+                return graph.neighborListNodeNoVisited(x).Count().CompareTo(graph.neighborListNodeNoVisited(y).Count());
+            });
+
+            /*********************
+             *       Caso General. 
+             * *********************/
+            foreach (Node node in neightboors)
+            {
+                if (this.graph.thisEdge(workingNode, node).visitada == false && node != finalNodePath)
+                {
+                    this.graph.thisEdge(workingNode, node).visitada = true;
+
+                    if (DFS_Any_EulerPath(node))//si el nodo vecino retorna un ciclo
+                    {
+                        // nodesPath.Add(workingNode);
+                        Edge edge = graph.thisEdge(workingNode, node);
+                        pathOfNodes.Add(workingNode);
+                        pathToAnimate.Add(edge);
+                        return true;
+                    }
+                    else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
+                        graph.restoreNotVisitedEdge(notVisitedYet);//restaturacion.
+                }
+
+            }
+            if(neightboors.Contains(finalNodePath) && this.graph.thisEdge(workingNode, finalNodePath).visitada == false)
+            {
+                this.graph.thisEdge(workingNode, finalNodePath).visitada = true;
+
+                if (DFS_Any_EulerPath(finalNodePath))//si el nodo vecino retorna un ciclo
+                {
+                    // nodesPath.Add(workingNode);
+                    Edge edge = graph.thisEdge(workingNode, finalNodePath);
+                    pathOfNodes.Add(workingNode);
+                    pathToAnimate.Add(edge);
+                    return true;
+                }
+                else// si se retorna false se restauran los nodos de la lista de restaturacion(notVisitedYet)
+                    graph.restoreNotVisitedEdge(notVisitedYet);//restaturacion.
+            }
+            //no se encontro nigun ciclo.
+            return false;
+        }//DFS_Any_HamiltonCycle(END).
+
+
+
         #endregion
+
+
+
+
+
+
 
         #endregion
 
         #region Hamilton
 
         #region HamiltonCycle
-        
+
         //-------------------------------- Hamilton--------------------
         public void cycleOfHamilton()//first call
         {
@@ -2996,6 +3086,37 @@ namespace editorDeGrafos
             }
                  floydShow = true;
         }
+
+        List<Edge> edgesFloyd;
+        public void floydShowFunction()
+        {
+            edgesFloyd = new List<Edge>();
+            graph.markAllNodeAndEdgesNotVisited();
+            floydShow_BFS(initialNodePath.Index);
+        }
+
+        public void floydShow_BFS(int workingNode)
+        {
+            List<int> directIncidenceNodes = new List<int>();
+            for (int i = 0; i < matrixFloydPaths.GetLength(0); i++)
+            {
+                if (matrixFloydPaths[workingNode,i] == workingNode && graph.thisnode(i).Visitado == false)
+                {
+                    Edge edgeToAdd = this.graph.thisEdgeDirOrIndir(workingNode, i);
+                    if (edgeToAdd != null)
+                    {
+                        edgesFloyd.Add(edgeToAdd);
+                    }
+                    graph.markAsVisited_T_F(i, true);
+                    directIncidenceNodes.Add(i);
+                }
+            }
+
+            foreach(int integer in directIncidenceNodes)
+            {
+                floydShow_BFS(integer);
+            }
+        }
         #endregion
 
         #region Warshall
@@ -3030,17 +3151,11 @@ namespace editorDeGrafos
             {
                 for (int j = 0; j < n; j++)
                 {
-                    if(j == k)
-                    {
-                        continue;
-                    }
                     for (int i = 0; i < n; i++)
                     {
-                        if(i == k)
-                        {
-                            continue;
-                        }
-                        if (matrixWarshallWeight[j, k] == 1 && matrixWarshallWeight[k, i] == 1 && i!= j && j!= k && k!=j)
+                        int j_i = matrixWarshallWeight[j, k];
+                        int k_i = matrixWarshallWeight[k, i];
+                        if (j_i  == 1 && k_i == 1 && i!= j && j!= k && k!=j && matrixWarshallWeight[j, i] == 0)
                         {
                             matrixWarshallWeight[j, i] = 1;
                             matrixWarshallPaths[j, i] = k;
@@ -3049,6 +3164,38 @@ namespace editorDeGrafos
                 }
             }
             warshallShow = true;
+        }
+
+        List<Edge> edgesWarshall;
+
+        public void warshallShowFunction()
+        {
+            edgesWarshall = new List<Edge>();
+            graph.markAllNodeAndEdgesNotVisited();
+            warshallShow_BFS(initialNodePath.Index);
+        }
+
+        public void warshallShow_BFS(int workingNode)
+        {
+            List<int> directIncidenceNodes = new List<int>();
+            for (int i = 0; i < matrixWarshallPaths.GetLength(0); i++)
+            {
+                if (matrixWarshallPaths[workingNode, i] == workingNode && graph.thisnode(i).Visitado == false)
+                {
+                    Edge edgeToAdd = this.graph.thisEdgeDirOrIndir(workingNode, i);
+                    if (edgeToAdd != null)
+                    {
+                        edgesWarshall.Add(edgeToAdd);
+                    }
+                    graph.markAsVisited_T_F(i, true);
+                    directIncidenceNodes.Add(i);
+                }
+            }
+
+            foreach (int integer in directIncidenceNodes)
+            {
+                warshallShow_BFS(integer);
+            }
         }
 
         #endregion
